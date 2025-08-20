@@ -51,8 +51,8 @@ export default function AstrologyLogin() {
         // Store token and user data
         if (data.data && data.data.token) {
           // You can store the token in localStorage or context
-          // localStorage.setItem('authToken', data.data.token);
-          // localStorage.setItem('user', JSON.stringify(data.data.user));
+          localStorage.setItem('authToken', data.data.token);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
 
           // For demo purposes, we'll just log it
           console.log("Token:", data.data.token);
