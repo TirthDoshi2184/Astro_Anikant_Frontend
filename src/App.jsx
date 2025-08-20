@@ -17,6 +17,7 @@ import View_Profile from './pages/View_Profile';
 import Aboutus from './pages/Aboutus';
 import Cart from './pages/Cart';
 import Footer from './Components/Footer';
+import AdminSidePanel from './Components/Admin/AdminSidePanel';
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
         <Route path="/booking" element={<Book_Visit />} />
         <Route path="/profile" element={<View_Profile />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/adminpanel" element={<AdminSidePanel />} />
+
       </Routes>
       <Footer />
 
