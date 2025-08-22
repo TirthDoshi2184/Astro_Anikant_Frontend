@@ -1,0 +1,144 @@
+// AdminLayout.jsx - Reusable layout component
+import React, { useState } from 'react';
+import {
+    Search,
+    UserPlus,
+    Users,
+    Settings,
+    LogOut,
+    BarChart3,
+    Eye,
+    Home,
+    Star,
+    Moon,
+    Sun
+} from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+
+export const AdminLayout = ({ children }) => {
+    const location = useLocation();
+    
+    // Determine active menu item based on current path
+    const getActiveMenuItem = () => {
+        const path = location.pathname;
+        if (path.includes('/admin/users')) return 'users';
+        if (path.includes('/admin/products')) return 'astrology';
+        if (path.includes('/admin/inquiry')) return 'predictions';
+        if (path.includes('/admin/visits')) return 'reports';
+        if (path.includes('/admin/settings')) return 'settings';
+        if (path.includes('/admindashboard')) return 'dashboard';
+        return 'dashboard';
+    };
+
+    const [activeMenuItem, setActiveMenuItem] = useState(getActiveMenuItem());
+
+    const sidebarItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
+        { id: 'users', label: 'Users', icon: Users, link: '/admin/users' },
+        { id: 'astrology', label: 'Products', icon: Star, link: '/admin/products' },
+        { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
+        { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/visits' },
+        { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
+        { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+    ];
+
+    return (
+        <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
+            {/* Sidebar */}
+            <div className="w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-900 shadow-2xl">
+                {/* Logo Section */}
+                <div className="p-6 border-b border-red-700/50">
+                    <div className="flex items-center space-x-3">
+                        <div className="relative">
+                            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+                                <Home className="w-5 h-5 text-red-900" />
+                            </div>
+                            <div className="absolute -inset-1 bg-gradient-to-br from-amber-300 to-yellow-400 rounded-full opacity-30 blur-sm"></div>
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-amber-50">Astro Anekant</h2>
+                            <p className="text-xs text-amber-200">Admin Panel</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Navigation Menu */}
+                <nav className="p-4 space-y-2">
+                    {sidebarItems.map((item) => {
+                        const IconComponent = item.icon;
+                        return (
+                            <Link
+                                key={item.id}
+                                to={item.link}
+                                onClick={() => setActiveMenuItem(item.id)}
+                                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
+                                    activeMenuItem === item.id
+                                        ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
+                                        : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
+                                }`}
+                            >
+                                <IconComponent className="w-5 h-5" />
+                                <span>{item.label}</span>
+                            </Link>
+                        );
+                    })}
+                </nav>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 overflow-hidden">
+                {children}
+            </div>
+        </div>
+    );
+};
+
+// AdminUsersView.jsx - Updated to work with AdminLayout
+import React, { useEffect, useState } from 'react';
+import { Search, UserPlus, Eye } from 'lucide-react';
+import axios from 'axios';
+import { AdminLayout } from './AdminLayout';
+
+
+
+// Example usage for other admin pages
+// AdminDashboard.jsx
+export const AdminDashboard = () => {
+    return (
+        <AdminLayout>
+            <div className="p-8">
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
+                {/* Your dashboard content here */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Dashboard cards */}
+                </div>
+            </div>
+        </AdminLayout>
+    );
+};
+
+// AdminProducts.jsx
+export const AdminProducts = () => {
+    return (
+        <AdminLayout>
+            <div className="p-8">
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">Products</h1>
+                {/* Your products content here */}
+            </div>
+        </AdminLayout>
+    );
+};
+
+// AdminInquiry.jsx
+export const AdminInquiry = () => {
+    return (
+        <AdminLayout>
+            <div className="p-8">
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">Inquiries</h1>
+                {/* Your inquiry content here */}
+            </div>
+        </AdminLayout>
+    );
+};
+
+export default AdminUsersView;

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Search, 
-  UserPlus, 
-  Users, 
-  Settings, 
-  LogOut, 
+import {
+  Search,
+  UserPlus,
+  Users,
+  Settings,
+  LogOut,
   BarChart3,
   Eye,
   Home,
@@ -13,62 +13,22 @@ import {
   Sun
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export const AdminSidePanel = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [activeMenuItem, setActiveMenuItem] = useState('users');
 
-  // Mock data for demonstration
-  const mockUsers = [
-    {
-      _id: '507f1f77bcf86cd799439011',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      mobileNo: '+1-234-567-8900',
-      gender: 'Male'
-    },
-    {
-      _id: '507f1f77bcf86cd799439012',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      mobileNo: '+1-234-567-8901',
-      gender: 'Female'
-    },
-    {
-      _id: '507f1f77bcf86cd799439013',
-      name: 'Mike Johnson',
-      email: 'mike.johnson@example.com',
-      mobileNo: '+1-234-567-8902',
-      gender: 'Male'
-    },
-    {
-      _id: '507f1f77bcf86cd799439014',
-      name: 'Sarah Wilson',
-      email: 'sarah.wilson@example.com',
-      mobileNo: '+1-234-567-8903',
-      gender: 'Female'
-    },
-    {
-      _id: '507f1f77bcf86cd799439015',
-      name: 'David Brown',
-      email: 'david.brown@example.com',
-      mobileNo: '+1-234-567-8904',
-      gender: 'Male'
-    }
-  ];
 
-  // Simulate API call
   const getAllUsers = async () => {
-    try {
-      // Simulating API delay
-      setTimeout(() => {
-        setUsers(mockUsers);
-      }, 500);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
+
+    const response = await axios.get("http://localhost:1921/user/getalluser")
+    setUsers(response.data.data)
+    console.log(response.data.data);
+    
+
+  }
 
   useEffect(() => {
     getAllUsers();
@@ -80,7 +40,7 @@ export const AdminSidePanel = () => {
   );
 
   const sidebarItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admin/dashboard' },
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3, Link: '/admindashboard' },
     { id: 'users', label: 'Users', icon: Users, link: '/admin/users' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/admin/products' },
     { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
@@ -117,11 +77,10 @@ export const AdminSidePanel = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveMenuItem(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
-                  activeMenuItem === item.id
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${activeMenuItem === item.id
                     ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
                     : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
-                }`}
+                  }`}
               >
                 <IconComponent className="w-5 h-5" />
                 <span>{item.label}</span>
@@ -141,7 +100,7 @@ export const AdminSidePanel = () => {
               <h1 className="text-4xl font-bold text-red-900 mb-2">Registered Users</h1>
               <p className="text-red-700">Manage your astrology community members</p>
             </div>
-            
+
             {/* Action Buttons */}
             <div className="flex items-center space-x-4">
               {/* Search Bar */}
@@ -157,7 +116,7 @@ export const AdminSidePanel = () => {
                   className="w-80 pl-10 pr-4 py-3 border-2 border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white text-red-900 placeholder-red-500"
                 />
               </div>
-              
+
               {/* Add User Button */}
               <Link to="/admin/add-user">
                 <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-xl shadow-lg hover:shadow-red-900/40 transition-all duration-300 transform hover:scale-105">
@@ -205,9 +164,8 @@ export const AdminSidePanel = () => {
                 {filteredUsers.map((user, index) => (
                   <tr
                     key={user._id}
-                    className={`hover:bg-gradient-to-r hover:from-amber-100/50 hover:to-yellow-100/50 transition-all duration-300 ${
-                      index % 2 === 0 ? 'bg-white/50' : 'bg-amber-50/30'
-                    }`}
+                    className={`hover:bg-gradient-to-r hover:from-amber-100/50 hover:to-yellow-100/50 transition-all duration-300 ${index % 2 === 0 ? 'bg-white/50' : 'bg-amber-50/30'
+                      }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 font-mono">
                       {user._id.slice(-8)}...
@@ -226,19 +184,18 @@ export const AdminSidePanel = () => {
                       {user.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-red-700">
-                      {user.mobileNo}
+                      {user.phone}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.gender === 'Male' 
-                          ? 'bg-blue-100 text-blue-800' 
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.gender === 'Male'
+                          ? 'bg-blue-100 text-blue-800'
                           : 'bg-pink-100 text-pink-800'
-                      }`}>
+                        }`}>
                         {user.gender}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link to={`/admin/users/${user._id}`}>
+                      <Link to={"#"}>
                         <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                           <Eye className="w-4 h-4" />
                           <span className="font-medium">View</span>
@@ -272,7 +229,7 @@ export const AdminSidePanel = () => {
               <Users className="w-8 h-8 text-amber-300" />
             </div>
           </div>
-          
+
           <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-6 text-red-900 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
@@ -282,7 +239,7 @@ export const AdminSidePanel = () => {
               <Star className="w-8 h-8 text-red-700" />
             </div>
           </div>
-          
+
           <div className="bg-gradient-to-br from-red-700 to-red-800 rounded-2xl p-6 text-amber-50 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
@@ -292,7 +249,7 @@ export const AdminSidePanel = () => {
               <Moon className="w-8 h-8 text-amber-300" />
             </div>
           </div>
-          
+
           <div className="bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl p-6 text-red-900 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
