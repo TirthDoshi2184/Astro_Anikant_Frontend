@@ -18,6 +18,7 @@ import AdminSideNav from "./Components/Admin/AdminSideNav";
 import AdminUsersView from "./Components/Admin/AdminUsersView";
 import AdminProductsView from "./Components/Admin/AdminProductsView";
 import { AdminSingleUser } from "./Components/Admin/AdminSingleUser";
+import { AdminUpdateUser } from "./Components/Admin/AdminUpdateUser";
 
 function App() {
   const location = useLocation();
@@ -29,7 +30,8 @@ function App() {
     "/adminsidenav",
     "/adminusers",
     "/adminproducts",
-    "/adminusers/:id"
+    "/adminusers/:id",
+    "/adminupdateuser/:id"
   ];
 
   // check if current path matches any of the patterns
@@ -42,8 +44,8 @@ function App() {
       {!hideLayout && <AstrologyNavbar />}
 
       <Routes>
-        <Route path="/astrohome" element={<AstrologyHomepage />} />
-        <Route path="/" element={<AstrologyLogin />} />
+        <Route path="/" element={<AstrologyHomepage />} />
+        <Route path="/login" element={<AstrologyLogin />} />
         <Route path="/products" element={<Product />} />
         <Route path="/about" element={<Aboutus />} />
         <Route path="/orders" element={<Orders />} />
@@ -57,6 +59,8 @@ function App() {
         <Route path='/adminusers' element={<AdminUsersView />} />
         <Route path='/adminusers/:id' element={<AdminSingleUser />} />
         <Route path='/adminproducts' element={<AdminProductsView />} />
+        <Route path='/adminupdateuser/:id' element={<AdminUpdateUser />} />
+
       </Routes>
 
       {!hideLayout && <Footer />}

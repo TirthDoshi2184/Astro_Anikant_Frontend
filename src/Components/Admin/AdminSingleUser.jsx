@@ -23,7 +23,9 @@ import {
   Sun,
   CheckCheckIcon,
   MapPinIcon,
-  MapPin
+  MapPin,
+  GalleryVerticalEnd,
+  VenusAndMars
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -253,10 +255,10 @@ export const AdminSingleUser = () => {
                     </div>
                   </div>
                   <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
-                    <Mail className="text-red-600 mt-1" size={18} />
+                    <VenusAndMars className="text-red-600 mt-1" size={18} />
                     <div>
-                      <p className="text-sm text-red-600 font-medium">Email Address</p>
-                      <p className="font-semibold text-red-900">{user?.email || 'Not provided'}</p>
+                      <p className="text-sm text-red-600 font-medium">Gender</p>
+                      <p className="font-semibold text-red-900">{user?.gender || 'Not provided'}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
@@ -341,13 +343,15 @@ export const AdminSingleUser = () => {
                   Delete User
                 </button>
 
-                <button
-                  onClick={() => alert('Update user functionality (mock)')}
+                <Link
+
+                  to={`/adminupdateuser/${id}`}
+                  // onClick={() => alert('Update user functionality (mock)')}
                   className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-800/40"
                 >
                   <Edit size={18} className="mr-2" />
                   Update User
-                </button>
+                </Link>
               </div>
             </div>
           </div>
