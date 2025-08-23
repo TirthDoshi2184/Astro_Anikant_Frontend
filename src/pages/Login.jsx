@@ -64,7 +64,7 @@ export default function AstrologyLogin() {
         setFormData({ ...formData, email: "", password: "" });
 
         // Redirect or update app state here
-        // window.location.href = "/";
+        window.location.href = "/";
       } else {
         // Handle different error cases
         if (response.status === 404) {
