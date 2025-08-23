@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingCart, User, ChevronDown, Lock, LogOut, Eye, Heart, Home } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 // Make sure AstrologyNavbar is used inside a <BrowserRouter> in your app entry point
 
 const AstrologyNavbar = () => {
@@ -35,11 +35,12 @@ const AstrologyNavbar = () => {
     setIsProfileOpen(false);
   };
 
-const handleCartClick = () => {
-    console.log('Cart button clicked - navigating to /cart');
-    navigate('/cart');
-    setActiveItem('cart');
-};
+// const handleCartClick = () => {
+//   alert("dsjdjj")
+//   console.log('Cart button clicked - navigating to /cart');
+//     navigate('/cart');
+//     // setActiveItem('cart');
+// };
 
   const handleLogoClick = () => {
     setActiveItem('home');
@@ -92,12 +93,15 @@ const handleCartClick = () => {
             
              {/* Cart Button */}
               <div className="relative group">
-                <button 
+                {/* <button 
                   onClick={handleCartClick}
                   className="p-3 rounded-full bg-gradient-to-br from-red-800 to-red-900 text-amber-50 shadow-lg hover:shadow-red-900/40 transition-all duration-300 transform hover:scale-110"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                </button>
+                </button> */}
+                <Link to="/cart">
+                  Cart
+                </Link>
                 <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-bounce shadow-md">
                   3
                 </div>
