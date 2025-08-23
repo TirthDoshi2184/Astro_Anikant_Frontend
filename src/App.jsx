@@ -1,4 +1,4 @@
-import { useLocation, Routes, Route } from "react-router-dom";
+import { useLocation, Routes, Route, matchPath } from "react-router-dom";
 
 import AstrologyHomepage from './pages/Home'
 import AstrologyLogin from './pages/Login';
@@ -17,21 +17,33 @@ import AdminDashboard from './Components/Admin/AdminDashboard';
 import AdminSideNav from "./Components/Admin/AdminSideNav";
 import AdminUsersView from "./Components/Admin/AdminUsersView";
 import AdminProductsView from "./Components/Admin/AdminProductsView";
+import { AdminSingleUser } from "./Components/Admin/AdminSingleUser";
 
 function App() {
   const location = useLocation();
 
   // paths where navbar/footer should be hidden
-  const hideLayoutPaths = ["/adminpanel", "/admindashboard","/adminsidenav","/adminusers","/adminproducts"];
-  const hideLayout = hideLayoutPaths.includes(location.pathname);
+  const hideLayoutPaths = [
+    "/adminpanel",
+    "/admindashboard",
+    "/adminsidenav",
+    "/adminusers",
+    "/adminproducts",
+    "/adminusers/:id"
+  ];
+
+  // check if current path matches any of the patterns
+  const hideLayout = hideLayoutPaths.some(path =>
+    matchPath({ path, end: true }, location.pathname)
+  );
 
   return (
     <>
       {!hideLayout && <AstrologyNavbar />}
 
       <Routes>
-        <Route path="/" element={<AstrologyHomepage />} />
-        <Route path="/login" element={<AstrologyLogin />} />
+        <Route path="/astrohome" element={<AstrologyHomepage />} />
+        <Route path="/" element={<AstrologyLogin />} />
         <Route path="/products" element={<Product />} />
         <Route path="/about" element={<Aboutus />} />
         <Route path="/orders" element={<Orders />} />
@@ -43,9 +55,8 @@ function App() {
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path='/adminsidenav' element={<AdminSideNav />} />
         <Route path='/adminusers' element={<AdminUsersView />} />
+        <Route path='/adminusers/:id' element={<AdminSingleUser />} />
         <Route path='/adminproducts' element={<AdminProductsView />} />
-
-
       </Routes>
 
       {!hideLayout && <Footer />}
