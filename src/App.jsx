@@ -53,6 +53,7 @@ function App() {
         <Route path="/booking" element={<Book_Visit />} />
         <Route path="/profile" element={<View_Profile />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/productdetail/:id" element={<ProductDetailPage />} />
         <Route path='/adminpanel' element={<AdminSidePanel />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path='/adminsidenav' element={<AdminSideNav />} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Heart, Share2, ShoppingCart, Zap, Shield, Truck, MessageCircle, BookOpen, Users, ChevronDown, ChevronUp, Plus, Minus } from 'lucide-react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -10,42 +10,17 @@ const ProductDetailPage = () => {
   const [expandedSection, setExpandedSection] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  
+  // State for API data
+  const [product, setProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
+  
+  const { id: productID } = useParams();
 
-  // Mock product data - in real app, this would come from props/API
-  const product = {
-    id: 1,
-    name: "Natural Ruby Gemstone Ring",
-    shortDescription: "Authentic Burma Ruby for Love & Prosperity",
-    description: "This exquisite Natural Ruby Gemstone Ring is crafted with genuine Burma ruby, known for its exceptional quality and powerful astrological properties. The ring features a 3.5-carat natural ruby set in pure silver, making it perfect for enhancing love, passion, and financial prosperity in your life.",
-    price: 15999,
-    originalPrice: 19999,
-    discount: 20,
-    sku: "RUB-RING-001",
-    category: "Gemstone Rings",
-    stock: 15,
-    weight: "8.5g",
-    dimensions: "Adjustable (Size 6-10)",
-    origin: "Burma (Myanmar)",
-    material: "Natural Ruby, Sterling Silver",
-    certification: "Certified by Gemological Institute",
-    astrologicalBenefits: [
-      "Enhances love and relationships",
-      "Boosts confidence and leadership",
-      "Attracts wealth and prosperity",
-      "Strengthens Sun's positive energy",
-      "Improves blood circulation"
-    ],
-    usage: "Wear on the ring finger of right hand on Sunday morning after sunrise. Chant 'Om Suryaya Namaha' 108 times before wearing.",
-    compatibleSigns: ["Leo", "Aries", "Sagittarius"],
-    planets: ["Sun"],
-    energization: "Pre-energized with Vedic mantras",
-    careInstructions: "Clean with soft cloth, avoid chemicals, store separately",
-    images: ["/api/placeholder/500/500"],
-    rating: 4.8,
-    reviewCount: 127,
-    inStock: true
-  };
-
+  // Static data that might not come from API
   const relatedProducts = [
     { id: 2, name: "Ruby Pendant", price: 8999, image: "/api/placeholder/200/200" },
     { id: 3, name: "Sun Yantra", price: 2499, image: "/api/placeholder/200/200" },
@@ -73,14 +48,38 @@ const ProductDetailPage = () => {
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSelectedImage((prev) => (prev + 1) % 1);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    if (productID) {
+      fetchProduct(productID);
+    }
+  }, [productID]);
+
+  useEffect(() => {
+    if (product?.images?.length > 0) {
+      const interval = setInterval(() => {
+        setSelectedImage((prev) => (prev + 1) % product.images.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [product?.images?.length]);
+
+  const fetchProduct = async (productID) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      console.log('Fetching product with ID:', productID);
+      const response = await axios.get(`http://localhost:1921/product/getsingleproduct/${productID}`);
+      console.log('Fetched product:', response.data.data);
+      setProduct(response.data.data);
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      setError('Failed to fetch product details');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleQuantityChange = (type) => {
-    if (type === 'increment' && quantity < product.stock) {
+    if (type === 'increment' && quantity < product?.stock) {
       setQuantity(prev => prev + 1);
     } else if (type === 'decrement' && quantity > 1) {
       setQuantity(prev => prev - 1);
@@ -91,29 +90,177 @@ const ProductDetailPage = () => {
     setExpandedSection(expandedSection === section ? '' : section);
   };
 
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-const { id: productID } = useParams();
+  // Helper functions to process API data
+  const getProductImages = () => {
+    if (!product?.images || product.images.length === 0) {
+      return ["/api/placeholder/500/500"];
+    }
+    return product.images.map(img => img.url || "/api/placeholder/500/500");
+  };
 
-useEffect(() => {
-  fetchProducts(productID);
-}, [productID]);
+  const getPrimaryImage = () => {
+    if (!product?.images || product.images.length === 0) {
+      return "/api/placeholder/500/500";
+    }
+    const primaryImage = product.images.find(img => img.isPrimary);
+    return primaryImage ? primaryImage.url : product.images[0]?.url || "/api/placeholder/500/500";
+  };
 
-const fetchProducts = async (productID) => {
-  setIsLoading(true);
+  const getDiscountPercentage = () => {
+    if (product?.discountedPrice && product?.price) {
+      return Math.round(((product.price - product.discountedPrice) / product.price) * 100);
+    }
+    return 0;
+  };
+
+  const getCurrentPrice = () => {
+    return product?.discountedPrice || product?.price || 0;
+  };
+
+  const getOriginalPrice = () => {
+    return product?.discountedPrice ? product.price : null;
+  };
+
+  // Add to Cart functionality
+  const handleAddToCart = async () => {
+  setIsAddingToCart(true);
   try {
-    console.log('Fetching product with ID:', productID);
-    const response = await axios.get('http://localhost:1921/product/getsingleproduct/' + productID);
-    console.log('Fetched products:', response.data.data);
+    const authToken = localStorage.getItem('authToken');
+    let userId = "user123"; // fallback default
+    
+    if (authToken) {
+      try {
+        const payload = JSON.parse(atob(authToken.split('.')[1]));
+        userId = payload.id || payload.userId || payload._id || userId;
+      } catch (e) {
+        console.log('Token decode error:', e);
+      }
+    }
 
-    setProducts(response.data.data);
+    const cartData = {
+      user: userId,
+      product: productID,
+      order_dt: new Date().toISOString(),
+      status: "pending"
+    };
+
+    const response = await axios.post('http://localhost:1921/cart/createcart', cartData, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+      }
+    });
+    
+    if (response.status === 200 && response.data.message === "Created Cart") {
+      alert('Product added to cart successfully!');
+    } else {
+      throw new Error('Unexpected response');
+    }
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error('Error adding to cart:', error.response?.data || error);
+    
+    // Handle duplicate product error
+    if (error.response?.status === 409) {
+      alert('Product is already added to cart!');
+    } else {
+      const errorMessage = error.response?.data?.message || 'Failed to add product to cart. Please try again.';
+      alert(errorMessage);
+    }
   } finally {
-    setIsLoading(false);
+    setIsAddingToCart(false);
   }
 };
-  
+  // Buy Now functionality
+  // const handleBuyNow = async () => {
+  //   setIsBuyingNow(true);
+  //   try {
+  //     const orderData = {
+  //       order: {
+  //         user: "user123", // Replace with actual user ID from your auth system
+  //         products: [{
+  //           product: productID,
+  //           quantity: quantity,
+  //           price: getCurrentPrice()
+  //         }],
+  //         totalAmount: getCurrentPrice() * quantity,
+  //         shippingAddress: {}, // You might want to collect this from user
+  //         paymentMethod: "pending", // This could be set during payment
+  //         status: "pending",
+  //         orderDate: new Date().toISOString()
+  //       }
+  //     };
+
+  //     const response = await axios.post('http://localhost:1921/order/createorder', orderData);
+      
+  //     if (response.data.message === "Order Placed Successfully") {
+  //       alert('Order placed successfully! Redirecting to payment...');
+  //       // Here you could redirect to payment page or show payment modal
+  //       // window.location.href = `/payment/${response.data.data._id}`;
+  //     }
+  //   } catch (error) {
+  //     console.error('Error creating order:', error);
+  //     alert('Failed to create order. Please try again.');
+  //   } finally {
+  //     setIsBuyingNow(false);
+  //   }
+  // };
+
+  const getWeightDisplay = () => {
+    if (product?.weight?.value && product?.weight?.unit) {
+      return `${product.weight.value}${product.weight.unit}`;
+    }
+    return 'N/A';
+  };
+
+  const getDimensionsDisplay = () => {
+    if (product?.dimensions?.length && product?.dimensions?.width) {
+      const { length, width, height, unit = 'mm' } = product.dimensions;
+      return height 
+        ? `${length}×${width}×${height} ${unit}`
+        : `${length}×${width} ${unit}`;
+    }
+    return 'N/A';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-red-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-800 mx-auto"></div>
+          <p className="mt-4 text-lg text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-red-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-red-600">{error}</p>
+          <button 
+            onClick={() => fetchProduct(productID)}
+            className="mt-4 bg-red-800 text-white px-6 py-2 rounded-lg hover:bg-red-900 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-red-50 flex items-center justify-center">
+        <p className="text-lg text-gray-600">Product not found</p>
+      </div>
+    );
+  }
+
+  const productImages = getProductImages();
+  const discountPercentage = getDiscountPercentage();
+  const currentPrice = getCurrentPrice();
+  const originalPrice = getOriginalPrice();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-red-50">
@@ -124,7 +271,7 @@ const fetchProducts = async (productID) => {
           <span>/</span>
           <a href="/products" className="hover:text-red-800 transition-colors">Products</a>
           <span>/</span>
-          <a href="#" className="hover:text-red-800 transition-colors">{product.category}</a>
+          <a href="#" className="hover:text-red-800 transition-colors">{product.category?.name || 'Category'}</a>
           <span>/</span>
           <span className="text-red-800 font-medium">{product.name}</span>
         </div>
@@ -138,7 +285,7 @@ const fetchProducts = async (productID) => {
               <div className="absolute inset-0 bg-gradient-to-r from-red-800/5 to-yellow-200/10"></div>
               <div className="relative">
                 <img 
-                  src={product.images[selectedImage]} 
+                  src={productImages[selectedImage]} 
                   alt={product.name}
                   className="w-full h-96 object-cover rounded-xl group-hover:scale-105 transition-transform duration-700"
                 />
@@ -153,13 +300,30 @@ const fetchProducts = async (productID) => {
                     <Share2 className="w-5 h-5" />
                   </button>
                 </div>
-                {product.discount > 0 && (
+                {discountPercentage > 0 && (
                   <div className="absolute top-4 left-4 bg-red-800 text-white px-3 py-1 rounded-full text-sm font-semibold animate-pulse">
-                    {product.discount}% OFF
+                    {discountPercentage}% OFF
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Image Thumbnails */}
+            {productImages.length > 1 && (
+              <div className="flex space-x-2 overflow-x-auto">
+                {productImages.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                      selectedImage === index ? 'border-red-800' : 'border-gray-200 hover:border-red-400'
+                    }`}
+                  >
+                    <img src={image} alt={`${product.name} view ${index + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Trust Badges */}
             <div className="grid grid-cols-3 gap-4">
@@ -191,32 +355,37 @@ const fetchProducts = async (productID) => {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star 
                           key={star} 
-                          className={`w-5 h-5 ${star <= Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                          className={`w-5 h-5 ${star <= Math.floor(product.averageRating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
                         />
                       ))}
-                      <span className="ml-2 text-sm text-gray-600">({product.reviewCount} reviews)</span>
+                      <span className="ml-2 text-sm text-gray-600">({product.reviewCount || 0} reviews)</span>
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 space-y-1">
-                    <p><strong>SKU:</strong> {product.sku}</p>
-                    <p><strong>Category:</strong> {product.category}</p>
-                    <p><strong>Weight:</strong> {product.weight}</p>
-                    <p><strong>Origin:</strong> {product.origin}</p>
+                    <p><strong>SKU:</strong> {product.sku || 'N/A'}</p>
+                    <p><strong>Stone Type:</strong> {product.stoneType}</p>
+                    <p><strong>Weight:</strong> {getWeightDisplay()}</p>
+                    <p><strong>Dimensions:</strong> {getDimensionsDisplay()}</p>
                   </div>
                 </div>
 
                 {/* Pricing */}
                 <div className="border-t pt-6">
                   <div className="flex items-center space-x-4 mb-4">
-                    <span className="text-3xl font-bold text-red-800">₹{product.price.toLocaleString()}</span>
-                    {product.originalPrice > product.price && (
-                      <span className="text-xl text-gray-500 line-through">₹{product.originalPrice.toLocaleString()}</span>
+                    <span className="text-3xl font-bold text-red-800">₹{currentPrice.toLocaleString()}</span>
+                    {originalPrice && (
+                      <span className="text-xl text-gray-500 line-through">₹{originalPrice.toLocaleString()}</span>
                     )}
                   </div>
                   <div className="flex items-center space-x-2 mb-6">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {product.inStock ? `In Stock (${product.stock} available)` : 'Out of Stock'}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {product.stock > 0 ? `In Stock (${product.stock} available)` : 'Out of Stock'}
                     </span>
+                    {product.isFeatured && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Featured
+                      </span>
+                    )}
                   </div>
 
                   {/* Quantity Selector */}
@@ -242,13 +411,41 @@ const fetchProducts = async (productID) => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <button className="bg-red-800 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg">
-                      Add to Cart
+                  <div className="">
+                    <button 
+                      onClick={handleAddToCart}
+                      className="bg-red-800 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      disabled={product.stock === 0 || isAddingToCart}
+                    >
+                      {isAddingToCart ? (
+                        <>
+                          <div className="animate-spin rounded-full border-b-2 border-white mr-2"></div>
+                          Adding...
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingCart className="w-5 h-5 mr-2" />
+                          Add to Cart
+                        </>
+                      )}
                     </button>
-                    <button className="bg-yellow-200 text-red-800 py-3 px-6 rounded-xl font-semibold hover:bg-yellow-300 transform hover:scale-105 transition-all duration-300 shadow-lg border-2 border-red-800">
-                      Buy Now
-                    </button>
+                    {/* <button 
+                      onClick={handleBuyNow}
+                      className="bg-yellow-200 text-red-800 py-3 px-6 rounded-xl font-semibold hover:bg-yellow-300 transform hover:scale-105 transition-all duration-300 shadow-lg border-2 border-red-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      disabled={product.stock === 0 || isBuyingNow}
+                    >
+                      {isBuyingNow ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-800 mr-2"></div>
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-5 h-5 mr-2" />
+                          Buy Now
+                        </>
+                      )}
+                    </button> */}
                   </div>
                 </div>
               </div>
@@ -301,46 +498,39 @@ const fetchProducts = async (productID) => {
           <div className="p-8">
             {activeTab === 'benefits' && (
               <div className="space-y-6 animate-fadeIn">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Spiritual Benefits</h3>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {product.astrologicalBenefits.map((benefit, index) => (
-                      <li key={index} className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-red-800 rounded-full"></div>
-                        <span className="text-gray-700">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {product.astrologicalBenefits && product.astrologicalBenefits.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Spiritual Benefits</h3>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {product.astrologicalBenefits.map((benefit, index) => (
+                        <li key={index} className="flex items-center space-x-3">
+                          <div className="w-2 h-2 bg-red-800 rounded-full"></div>
+                          <span className="text-gray-700">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">How to Use</h3>
-                  <p className="text-gray-700 bg-yellow-50 p-4 rounded-xl border-l-4 border-red-800">{product.usage}</p>
-                </div>
+                {product.usage && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">How to Use</h3>
+                    <p className="text-gray-700 bg-yellow-50 p-4 rounded-xl border-l-4 border-red-800">{product.usage}</p>
+                  </div>
+                )}
 
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Astrological Compatibility</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-medium text-gray-800 mb-2">Compatible Zodiac Signs:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {product.compatibleSigns.map((sign, index) => (
-                          <span key={index} className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
-                            {sign}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-800 mb-2">Ruling Planet:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {product.planets.map((planet, index) => (
-                          <span key={index} className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                            {planet}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Product Description</h3>
+                  <div className="text-gray-700 bg-gray-50 p-4 rounded-xl">
+                    <p>{showFullDescription ? product.description : `${product.description?.substring(0, 200)}...`}</p>
+                    {product.description && product.description.length > 200 && (
+                      <button 
+                        onClick={() => setShowFullDescription(!showFullDescription)}
+                        className="mt-2 text-red-800 font-medium hover:text-red-900"
+                      >
+                        {showFullDescription ? 'Show Less' : 'Read More'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -353,36 +543,46 @@ const fetchProducts = async (productID) => {
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">Product Specifications</h3>
                     <dl className="space-y-3">
                       <div className="flex justify-between py-2 border-b border-gray-200">
-                        <dt className="font-medium text-gray-600">Material:</dt>
-                        <dd className="text-gray-900">{product.material}</dd>
+                        <dt className="font-medium text-gray-600">Stone Type:</dt>
+                        <dd className="text-gray-900">{product.stoneType}</dd>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-200">
                         <dt className="font-medium text-gray-600">Weight:</dt>
-                        <dd className="text-gray-900">{product.weight}</dd>
+                        <dd className="text-gray-900">{getWeightDisplay()}</dd>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-200">
                         <dt className="font-medium text-gray-600">Dimensions:</dt>
-                        <dd className="text-gray-900">{product.dimensions}</dd>
+                        <dd className="text-gray-900">{getDimensionsDisplay()}</dd>
+                      </div>
+                      {product.certification && (
+                        <div className="flex justify-between py-2 border-b border-gray-200">
+                          <dt className="font-medium text-gray-600">Certification:</dt>
+                          <dd className="text-gray-900">{product.certification}</dd>
+                        </div>
+                      )}
+                      <div className="flex justify-between py-2 border-b border-gray-200">
+                        <dt className="font-medium text-gray-600">Views:</dt>
+                        <dd className="text-gray-900">{product.views || 0}</dd>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-200">
-                        <dt className="font-medium text-gray-600">Origin:</dt>
-                        <dd className="text-gray-900">{product.origin}</dd>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-gray-200">
-                        <dt className="font-medium text-gray-600">Certification:</dt>
-                        <dd className="text-gray-900">{product.certification}</dd>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-gray-200">
-                        <dt className="font-medium text-gray-600">Energization:</dt>
-                        <dd className="text-gray-900">{product.energization}</dd>
+                        <dt className="font-medium text-gray-600">Sales Count:</dt>
+                        <dd className="text-gray-900">{product.salesCount || 0}</dd>
                       </div>
                     </dl>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Care Instructions</h3>
-                    <div className="bg-yellow-50 p-4 rounded-xl border-l-4 border-red-800">
-                      <p className="text-gray-700">{product.careInstructions}</p>
-                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Tags</h3>
+                    {product.tags && product.tags.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {product.tags.map((tag, index) => (
+                          <span key={index} className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">No tags available</p>
+                    )}
                   </div>
                 </div>
               </div>
