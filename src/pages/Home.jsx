@@ -70,7 +70,7 @@ const HomePage = () => {
   };
 
   const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
+    navigate(`/products/${productId}`);
     // handleNavigation(`/products/${productId}`);
   };
 

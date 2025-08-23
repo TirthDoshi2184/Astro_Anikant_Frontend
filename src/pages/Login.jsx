@@ -42,6 +42,7 @@ export default function AstrologyLogin() {
       });
 
       const data = await response.json();
+      console.log("Login response:", data.data);
 
       if (response.ok) {
         // Login successful
@@ -51,19 +52,19 @@ export default function AstrologyLogin() {
         // Store token and user data
         if (data.data && data.data.token) {
           // You can store the token in localStorage or context
-          // localStorage.setItem('authToken', data.data.token);
+          localStorage.setItem('authToken', data.data.token);
           // localStorage.setItem('user', JSON.stringify(data.data.user));
 
           // For demo purposes, we'll just log it
           console.log("Token:", data.data.token);
-          console.log("User:", data.data.user);
+          console.log("User:", <data value="" className="data user"></data>);
         }
 
         // Reset form
         setFormData({ ...formData, email: "", password: "" });
 
         // Redirect or update app state here
-        window.location.href = "/";
+        // window.location.href = "/";
       } else {
         // Handle different error cases
         if (response.status === 404) {

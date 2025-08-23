@@ -17,6 +17,7 @@ import View_Profile from './pages/View_Profile';
 import Aboutus from './pages/Aboutus';
 import Cart from './pages/Cart';
 import Footer from './Components/Footer';
+import ProductDetailPage from './pages/ProductDetail';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/booking" element={<Book_Visit/>} />
         <Route path="/profile" element={<View_Profile/>} />
         <Route path="/cart" element={<Cart/>} />
+        <Route path='/productdetail/:id' element={<ProductDetailPage />} />
       </Routes>
       <Footer/>
     </Router>

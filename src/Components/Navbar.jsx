@@ -21,7 +21,7 @@ const AstrologyNavbar = () => {
   const profileMenuItems = [
     { id: 'profile', label: 'View Profile', icon: Eye, link: '/profile' },
     { id: 'password', label: 'Change Password', icon: Lock, link: '/change-password' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/logout' }
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/login' }
   ];
 
   // Modified handlers for navigation
