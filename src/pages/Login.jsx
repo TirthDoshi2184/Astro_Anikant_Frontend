@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Star, Moon, Sun, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function AstrologyLogin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +25,7 @@ export default function AstrologyLogin() {
     if (error) setError("");
   };
 
+  const navigate = useNavigate()
   const handleLogin = async () => {
     setIsLoading(true);
     setError("");
@@ -47,6 +49,7 @@ export default function AstrologyLogin() {
       if (response.ok) {
         // Login successful
         setSuccess("Login successful! Welcome back!");
+        navigate("/astrohome")
         console.log("Login successful:", data);
 
         // Store token and user data

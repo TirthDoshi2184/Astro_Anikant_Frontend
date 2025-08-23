@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { useEffect, useState } from "react";
 import { Users, Package, ShoppingCart, Star, Moon, Sun, Home, BarChart3, Settings, LogOut, Search, UserPlus, Eye } from "lucide-react";
+import axios from "axios";
 
 export const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -10,52 +11,78 @@ export const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeMenuItem, setActiveMenuItem] = useState('dashboard');
 
+  const getAllproducts = async () => {
+    try {
+      const response = await axios.get("http://localhost:1921/product/getallproducts");
+      setProducts(response.data.data);
+      console.log("Products", response.data.data);
+      console.log("Products Length", response.data.data.length);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  }
 
+  const getAllUsers = async () => {
+    try {
+      const response = await axios.get("http://localhost:1921/user/getalluser");
+      setUsers(response.data.data);
+      console.log("Users", response.data.data);
+      console.log("Users Length", response.data.data.length);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }
 
-  
-
-  // Mock data for demonstration
-  const mockData = {
-    users: Array.from({ length: 45 }, (_, i) => ({ id: i + 1, name: `User ${i + 1}` })),
-    products: Array.from({ length: 28 }, (_, i) => ({ id: i + 1, name: `Product ${i + 1}` })),
-    orders: Array.from({ length: 156 }, (_, i) => ({ id: i + 1, name: `Order ${i + 1}` })),
-    custom: Array.from({ length: 12 }, (_, i) => ({ id: i + 1, name: `Custom ${i + 1}` }))
-  };
+  const getAllOrder = async () => {
+    try {
+      const response = await axios.get("http://localhost:1921/order/getallorder");
+      setOrders(response.data.data); // Fixed: was setting products instead of orders
+      console.log("Order", response.data.data);
+      console.log("Order Length", response.data.data.length);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
+      setLoading(true);
       try {
-        // Simulating API delay
-        setTimeout(() => {
-          setUsers(mockData.users);
-          setProducts(mockData.products);
-          setOrders(mockData.orders);
-          setCustoms(mockData.custom);
-          setLoading(false);
-        }, 1000);
+        await Promise.all([
+          getAllOrder(),
+          getAllUsers(),
+          getAllproducts()
+        ]);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
         setLoading(false);
       }
     };
-
-    fetchData();
+    
+    fetchAllData();
   }, []);
 
-  const total = users.length + products.length + orders.length + custom.length || 1;
+  // Calculate totals safely
+  const usersCount = users.length || 0;
+  const productsCount = products.length || 0;
+  const ordersCount = orders.length || 0;
+  const customCount = custom.length || 0;
   
+  const total = usersCount + productsCount + ordersCount + customCount || 1;
+
   const data = [
-    { name: "Users", count: users.length },
-    { name: "Products", count: products.length },
-    { name: "Orders", count: orders.length },
-    { name: "Custom", count: custom.length },
+    { name: "Users", count: usersCount },
+    { name: "Products", count: productsCount },
+    { name: "Orders", count: ordersCount },
+    { name: "Custom", count: customCount },
   ];
 
   const pieData = [
-    { name: "Users", value: (users.length / total) * 100 },
-    { name: "Products", value: (products.length / total) * 100 },
-    { name: "Orders", value: (orders.length / total) * 100 },
-    { name: "Custom", value: (custom.length / total) * 100 },
+    { name: "Users", value: (usersCount / total) * 100 },
+    { name: "Products", value: (productsCount / total) * 100 },
+    { name: "Orders", value: (ordersCount / total) * 100 },
+    { name: "Custom", value: (customCount / total) * 100 },
   ];
 
   // Astrology theme colors - red and amber palette
@@ -81,9 +108,9 @@ export const AdminDashboard = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-900 shadow-2xl">
+    <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
+      {/* Sidebar - Fixed */}
+      <div className="w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-900 shadow-2xl fixed h-full z-10">
         {/* Logo Section */}
         <div className="p-6 border-b border-red-700/50">
           <div className="flex items-center space-x-3">
@@ -112,16 +139,15 @@ export const AdminDashboard = () => {
                 window.location.href = item.link;
               }
             };
-            
+
             return (
               <button
                 key={item.id}
                 onClick={handleNavigation}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
-                  activeMenuItem === item.id
-                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
-                    : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
-                }`}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${activeMenuItem === item.id
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
+                  : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
+                  }`}
               >
                 <IconComponent className="w-5 h-5" />
                 <span>{item.label}</span>
@@ -132,9 +158,9 @@ export const AdminDashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-hidden">
-        {/* Header Section */}
-        <div className="bg-gradient-to-r from-red-900 via-red-800 to-red-900 shadow-2xl">
+      <div className="flex-1 ml-64 flex flex-col h-screen">
+        {/* Header Section - Fixed */}
+        <div className="bg-gradient-to-r from-red-900 via-red-800 to-red-900 shadow-2xl flex-shrink-0">
           <div className="px-6 py-8">
             <div className="flex items-center space-x-4 mb-4">
               <div className="relative">
@@ -152,7 +178,8 @@ export const AdminDashboard = () => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-6 max-w-7xl mx-auto overflow-y-auto">
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6 max-w-7xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center space-x-3 mb-6">
               <BarChart3 className="w-8 h-8 text-red-800" />
@@ -178,9 +205,9 @@ export const AdminDashboard = () => {
                     className="relative group cursor-pointer transform hover:scale-105 transition-all duration-300"
                   >
                     <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-amber-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                    <div 
+                    <div
                       className="relative h-36 p-6 flex flex-col justify-between rounded-2xl shadow-xl border-2 border-red-900/20"
-                      style={{ 
+                      style={{
                         background: `linear-gradient(135deg, ${STAT_COLORS[index]} 0%, ${STAT_COLORS[index]}dd 100%)`,
                       }}
                     >
@@ -221,20 +248,20 @@ export const AdminDashboard = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" opacity={0.3} />
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="#7F1D1D" 
+                    <XAxis
+                      dataKey="name"
+                      stroke="#7F1D1D"
                       fontSize={12}
                       fontWeight="600"
                     />
-                    <YAxis 
-                      stroke="#7F1D1D" 
+                    <YAxis
+                      stroke="#7F1D1D"
                       fontSize={12}
                       fontWeight="600"
                     />
                     <Tooltip
-                      contentStyle={{ 
-                        backgroundColor: "rgba(255, 255, 255, 0.95)", 
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
                         borderColor: "#DC2626",
                         borderRadius: "12px",
                         border: "2px solid #DC2626"
@@ -242,9 +269,9 @@ export const AdminDashboard = () => {
                       itemStyle={{ color: "#7F1D1D", fontWeight: "600" }}
                       labelStyle={{ color: "#7F1D1D", fontWeight: "700" }}
                     />
-                    <Bar 
-                      dataKey="count" 
-                      barSize={60} 
+                    <Bar
+                      dataKey="count"
+                      barSize={60}
                       fill="url(#barGradient)"
                       radius={[8, 8, 0, 0]}
                     />
@@ -273,34 +300,37 @@ export const AdminDashboard = () => {
                     <Pie
                       data={pieData.map(item => ({ ...item, value: Math.round(item.value * 10) / 10 }))}
                       cx="50%"
-                      cy="45%"
-                      outerRadius={85}
+                      cy="40%"
+                      outerRadius={70}
+                      innerRadius={25}
                       fill="#8884d8"
                       dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                      label={({ value }) => `${value.toFixed(1)}%`}
                       labelLine={false}
+                      fontSize={11}
+                      fontWeight="600"
                     >
                       {pieData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value) => [`${value.toFixed(1)}%`, 'Percentage']}
-                      contentStyle={{ 
-                        backgroundColor: "rgba(255, 255, 255, 0.95)", 
+                      formatter={(value, name) => [`${value.toFixed(1)}%`, name]}
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
                         borderColor: "#DC2626",
                         borderRadius: "12px",
                         border: "2px solid #DC2626"
                       }}
                       itemStyle={{ color: "#7F1D1D", fontWeight: "600" }}
                     />
-                    <Legend 
-                      layout="horizontal" 
-                      verticalAlign="bottom" 
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
                       align="center"
                       fontSize={12}
                       iconSize={12}
-                      wrapperStyle={{ paddingTop: '20px', color: '#7F1D1D', fontWeight: '600' }}
+                      wrapperStyle={{ paddingTop: '10px', color: '#7F1D1D', fontWeight: '600' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -320,7 +350,7 @@ export const AdminDashboard = () => {
                 <Moon className="w-8 h-8 text-amber-300" />
               </div>
             </div>
-            
+
             <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-6 text-red-900 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
@@ -331,7 +361,7 @@ export const AdminDashboard = () => {
                 <Sun className="w-8 h-8 text-red-700" />
               </div>
             </div>
-            
+
             <div className="bg-gradient-to-br from-red-700 to-red-800 rounded-2xl p-6 text-amber-50 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
@@ -345,6 +375,7 @@ export const AdminDashboard = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
