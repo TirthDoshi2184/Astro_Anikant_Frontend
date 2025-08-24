@@ -342,24 +342,24 @@ export const AdminUsersView = () => {
                     <Moon className="w-8 h-8 text-amber-300" />
                   </div>
                 </div>
-
-                <div className="bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl p-6 text-red-900 shadow-xl">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-red-700 text-sm">New This Month</p>
-                      <p className="text-3xl font-bold">
-                        {users.filter(user => {
-                          if (!user.createdAt) return false;
-                          const userDate = new Date(user.createdAt);
-                          const currentDate = new Date();
-                          return userDate.getMonth() === currentDate.getMonth() && 
-                                 userDate.getFullYear() === currentDate.getFullYear();
-                        }).length}
-                      </p>
-                    </div>
-                    <Sun className="w-8 h-8 text-red-700" />
-                  </div>
-                </div>
+{/* 
+                 <div className="bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl p-6 text-red-900 shadow-xl">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-red-700 text-sm">New This Month</p>
+                                  <p className="text-3xl font-bold">
+                                    {users.filter(user => {
+                                      if (!user.createdAt) return false;
+                                      const userDate = new Date(user.createdAt);
+                                      const currentDate = new Date();
+                                      return userDate.getMonth() === currentDate.getMonth() && 
+                                             userDate.getFullYear() === currentDate.getFullYear();
+                                    }).length}
+                                  </p>
+                                </div>
+                                <Sun className="w-8 h-8 text-red-700" />
+                              </div>
+                            </div> */}
               </div>
             )}
           </div>

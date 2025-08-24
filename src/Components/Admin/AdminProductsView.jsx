@@ -268,7 +268,7 @@ export const AdminProductsView = () => {
                       </td>
                     
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Link to={`/admin/users/${product._id}`}>
+                        <Link to={`/adminsingleproductview/${product._id}`}>
                           <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                             <Eye className="w-4 h-4" />
                             <span className="font-medium">View</span>
@@ -300,37 +300,14 @@ export const AdminProductsView = () => {
             <div className="bg-gradient-to-br from-red-800 to-red-900 rounded-2xl p-6 text-amber-50 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-amber-200 text-sm">Total Users</p>
+                  <p className="text-amber-200 text-sm">Total Products</p>
                   <p className="text-3xl font-bold">{products.length}</p>
                 </div>
                 <Users className="w-8 h-8 text-amber-300" />
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-6 text-red-900 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-700 text-sm">Male Users</p>
-                  {/* <p className="text-3xl font-bold">
-                    {products.filter(products => products.r === 'Male').length}
-                  </p> */}
-                </div>
-                <Star className="w-8 h-8 text-red-700" />
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-red-700 to-red-800 rounded-2xl p-6 text-amber-50 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-amber-200 text-sm">Female Users</p>
-                  {/* <p className="text-3xl font-bold">
-                    {users.filter(user => user.gender === 'Female').length}
-                  </p> */}
-                </div>
-                <Moon className="w-8 h-8 text-amber-300" />
-              </div>
-            </div>
-
+           
             <div className="bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl p-6 text-red-900 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>

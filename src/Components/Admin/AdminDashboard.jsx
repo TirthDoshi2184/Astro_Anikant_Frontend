@@ -67,22 +67,22 @@ export const AdminDashboard = () => {
   const usersCount = users.length || 0;
   const productsCount = products.length || 0;
   const ordersCount = orders.length || 0;
-  const customCount = custom.length || 0;
   
-  const total = usersCount + productsCount + ordersCount + customCount || 1;
+  
+  const total = usersCount + productsCount + ordersCount  || 1;
 
   const data = [
     { name: "Users", count: usersCount },
     { name: "Products", count: productsCount },
     { name: "Orders", count: ordersCount },
-    { name: "Custom", count: customCount },
+    
   ];
 
   const pieData = [
     { name: "Users", value: (usersCount / total) * 100 },
     { name: "Products", value: (productsCount / total) * 100 },
     { name: "Orders", value: (ordersCount / total) * 100 },
-    { name: "Custom", value: (customCount / total) * 100 },
+    
   ];
 
   // Astrology theme colors - red and amber palette

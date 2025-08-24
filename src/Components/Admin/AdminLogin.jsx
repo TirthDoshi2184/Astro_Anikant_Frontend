@@ -1,0 +1,296 @@
+import React, { useState } from 'react';
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Home,
+  Star,
+  Moon,
+  Sun,
+  Shield,
+  Zap
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const AdminLogin = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock successful login
+      if (formData.email === 'admin@astroanekant.com' && formData.password === 'admin123') {
+        // alert('Login successful! Redirecting to dashboard...');
+        // Here you would typically redirect to the admin dashboard
+        window.location.href = '/admindashboard';
+      } else {
+        setErrors({ general: 'Invalid email or password. Please try again.' });
+      }
+    } catch (error) {
+      setErrors({ general: 'Login failed. Please try again later.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-red-50 flex items-center justify-center p-4">
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-br from-red-800/10 to-amber-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-yellow-400/10 to-red-900/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-br from-amber-300/20 to-red-700/20 rounded-full blur-2xl"></div>
+      </div>
+
+      {/* Floating Astro Elements */}
+      <div className="absolute top-20 left-20 text-red-800/20 animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}>
+        <Star className="w-8 h-8" />
+      </div>
+      <div className="absolute top-32 right-32 text-amber-600/20 animate-bounce" style={{animationDelay: '1s', animationDuration: '4s'}}>
+        <Moon className="w-6 h-6" />
+      </div>
+      <div className="absolute bottom-20 left-32 text-yellow-600/20 animate-bounce" style={{animationDelay: '2s', animationDuration: '3.5s'}}>
+        <Sun className="w-7 h-7" />
+      </div>
+      <div className="absolute bottom-32 right-20 text-red-700/20 animate-bounce" style={{animationDelay: '0.5s', animationDuration: '4.5s'}}>
+        <Zap className="w-5 h-5" />
+      </div>
+
+      {/* Main Login Container */}
+      <div className="relative w-full max-w-md">
+        {/* Login Card */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50">
+          {/* Logo Section */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-red-900 to-red-800 rounded-2xl shadow-lg mb-4 relative">
+              <Home className="w-10 h-10 text-amber-100" />
+              <div className="absolute -inset-1 bg-gradient-to-br from-amber-400/30 to-red-700/30 rounded-2xl blur-sm"></div>
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-900 via-red-800 to-red-900 bg-clip-text text-transparent">
+              Astro Anekant
+            </h1>
+            <p className="text-gray-600 font-medium">Admin Panel</p>
+            <Link to="/admindashboard"><p className="text-sm text-gray-500 mt-1">Sign in to access your dashboard</p></Link>
+          </div>
+
+          {/* Login Form */}
+          <div className="space-y-6">
+            {/* General Error Message */}
+            {errors.general && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                <div className="flex items-center">
+                  <Shield className="w-4 h-4 mr-2" />
+                  {errors.general}
+                </div>
+              </div>
+            )}
+
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800 transition-all duration-300 ${
+                    errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-gray-400'
+                  }`}
+                  placeholder="admin@astroanekant.com"
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-600 text-xs mt-1 flex items-center">
+                  <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800 transition-all duration-300 ${
+                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-gray-400'
+                  }`}
+                  placeholder="Enter your password"
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              {errors.password && (
+                <p className="text-red-600 text-xs mt-1 flex items-center">
+                  <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 text-red-800 focus:ring-red-800 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                  Remember me
+                </label>
+              </div>
+              <div className="text-sm">
+                <button
+                  type="button"
+                  className="font-medium text-red-800 hover:text-red-900 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign in to Dashboard
+                  <Shield className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Demo Credentials */}
+          <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-200">
+            <h4 className="text-sm font-medium text-amber-800 mb-2 flex items-center">
+              <Zap className="w-4 h-4 mr-2" />
+              Demo Credentials
+            </h4>
+            <div className="text-xs text-amber-700 space-y-1">
+              <p><strong>Email:</strong> admin@astroanekant.com</p>
+              <p><strong>Password:</strong> admin123</p>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-500">
+              Protected by advanced security measures
+            </p>
+            <div className="flex justify-center items-center mt-2 space-x-4 text-gray-400">
+              <Shield className="w-4 h-4" />
+              <span className="text-xs">SSL Encrypted</span>
+              <Star className="w-4 h-4" />
+            </div>
+          </div>
+        </div>
+
+        {/* Floating Action Hint */}
+        <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+          <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-white/50">
+            <p className="text-xs text-gray-600 flex items-center">
+              <Home className="w-3 h-3 mr-1" />
+              Secure Admin Access
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLogin;
