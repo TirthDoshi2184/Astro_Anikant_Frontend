@@ -12,6 +12,7 @@ import {
   Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -40,50 +41,59 @@ const AdminLogin = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    
+    setErrors({}); // Clear any previous errors
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful login
-      if (formData.email === 'admin@astroanekant.com' && formData.password === 'admin123') {
-        // alert('Login successful! Redirecting to dashboard...');
-        // Here you would typically redirect to the admin dashboard
-        window.location.href = '/admindashboard';
-      } else {
-        setErrors({ general: 'Invalid email or password. Please try again.' });
-      }
-    } catch (error) {
-      setErrors({ general: 'Login failed. Please try again later.' });
-    } finally {
+      // API call to your backend
+      alert("dsjk")
+      const response = await axios.post("https://localhost:1921/admin/singleadmin", formData);
+
+      console.log('API Response:', response.data.data);
+      localStorage.setItem("admin",response.data.data)
+
+      window.location.href = '/admindashboard';
       setIsLoading(false);
+
+    } catch (error) {
+      console.error('Login error:', error);
     }
   };
+
+  // Load remembered email on component mount
+  React.useEffect(() => {
+    const remembered = localStorage.getItem('rememberAdmin');
+    const savedEmail = localStorage.getItem('adminEmail');
+
+    if (remembered === 'true' && savedEmail) {
+      setFormData(prev => ({ ...prev, email: savedEmail }));
+      setRememberMe(true);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-red-50 flex items-center justify-center p-4">
@@ -95,16 +105,16 @@ const AdminLogin = () => {
       </div>
 
       {/* Floating Astro Elements */}
-      <div className="absolute top-20 left-20 text-red-800/20 animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}>
+      <div className="absolute top-20 left-20 text-red-800/20 animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>
         <Star className="w-8 h-8" />
       </div>
-      <div className="absolute top-32 right-32 text-amber-600/20 animate-bounce" style={{animationDelay: '1s', animationDuration: '4s'}}>
+      <div className="absolute top-32 right-32 text-amber-600/20 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
         <Moon className="w-6 h-6" />
       </div>
-      <div className="absolute bottom-20 left-32 text-yellow-600/20 animate-bounce" style={{animationDelay: '2s', animationDuration: '3.5s'}}>
+      <div className="absolute bottom-20 left-32 text-yellow-600/20 animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>
         <Sun className="w-7 h-7" />
       </div>
-      <div className="absolute bottom-32 right-20 text-red-700/20 animate-bounce" style={{animationDelay: '0.5s', animationDuration: '4.5s'}}>
+      <div className="absolute bottom-32 right-20 text-red-700/20 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4.5s' }}>
         <Zap className="w-5 h-5" />
       </div>
 
@@ -122,11 +132,11 @@ const AdminLogin = () => {
               Astro Anekant
             </h1>
             <p className="text-gray-600 font-medium">Admin Panel</p>
-            <Link to="/admindashboard"><p className="text-sm text-gray-500 mt-1">Sign in to access your dashboard</p></Link>
+            <p className="text-sm text-gray-500 mt-1">Sign in to access your dashboard</p>
           </div>
 
           {/* Login Form */}
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* General Error Message */}
             {errors.general && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
@@ -152,9 +162,8 @@ const AdminLogin = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800 transition-all duration-300 ${
-                    errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-gray-400'
-                  }`}
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800 transition-all duration-300 ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-gray-400'
+                    }`}
                   placeholder="admin@astroanekant.com"
                 />
               </div>
@@ -181,9 +190,8 @@ const AdminLogin = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800 transition-all duration-300 ${
-                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-gray-400'
-                  }`}
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-red-800 transition-all duration-300 ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-gray-400'
+                    }`}
                   placeholder="Enter your password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -210,19 +218,7 @@ const AdminLogin = () => {
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-red-800 focus:ring-red-800 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
-                </label>
-              </div>
+            
               <div className="text-sm">
                 <button
                   type="button"
@@ -235,8 +231,7 @@ const AdminLogin = () => {
 
             {/* Submit Button */}
             <button
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               disabled={isLoading}
               className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95"
             >
@@ -252,19 +247,10 @@ const AdminLogin = () => {
                 </>
               )}
             </button>
-          </div>
+          </form>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-200">
-            <h4 className="text-sm font-medium text-amber-800 mb-2 flex items-center">
-              <Zap className="w-4 h-4 mr-2" />
-              Demo Credentials
-            </h4>
-            <div className="text-xs text-amber-700 space-y-1">
-              <p><strong>Email:</strong> admin@astroanekant.com</p>
-              <p><strong>Password:</strong> admin123</p>
-            </div>
-          </div>
+       
 
           {/* Footer */}
           <div className="mt-6 text-center">

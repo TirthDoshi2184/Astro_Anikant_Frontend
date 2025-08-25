@@ -103,7 +103,7 @@ export const AdminSingleUser = () => {
   const handleLogout = () => {
     // Add your logout logic here
     localStorage.removeItem('adminToken');
-    window.location.href = '/';
+    window.location.href = '/adminlogin';
   };
 
   const sidebarItems = [
@@ -111,7 +111,7 @@ export const AdminSingleUser = () => {
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-    { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/visits' },
+    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
   ];

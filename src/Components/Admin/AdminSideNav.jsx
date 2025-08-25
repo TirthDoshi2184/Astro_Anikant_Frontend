@@ -10,7 +10,8 @@ import {
     Home,
     Star,
     Moon,
-    Sun
+    Sun,
+    ShoppingBag
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -42,9 +43,10 @@ export const AdminSideNav = () => {
         { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
         { id: 'astrology', label: 'Products', icon: Star, link: '/admin/products' },
         { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-        { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/Visits' },
+        { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
+
         { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-        { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+        { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
     ];
 
     return (
@@ -77,8 +79,8 @@ export const AdminSideNav = () => {
                                 to={item.link}
                                 onClick={() => setActiveMenuItem(item.id)}
                                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${activeMenuItem === item.id
-                                        ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
-                                        : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
+                                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
+                                    : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
                                     }`}
                             >
                                 <IconComponent className="w-5 h-5" />

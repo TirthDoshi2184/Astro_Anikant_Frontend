@@ -72,16 +72,16 @@ export const AdminProductsView = () => {
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-    { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/visits' },
+    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
   const handleLogout = () => {
     // Add your logout logic here
     // For example: clear localStorage, redirect to login, etc.
     localStorage.removeItem('adminToken'); // if you're using tokens
-    window.location.href = '/'; // or use navigate from useNavigate hook
+    window.location.href = '/adminlogin'; // or use navigate from useNavigate hook
   };
 
   return (

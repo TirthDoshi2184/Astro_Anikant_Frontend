@@ -10,7 +10,8 @@ import {
   Home,
   Star,
   Moon,
-  Sun
+  Sun,
+  ShoppingBag
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -30,7 +31,7 @@ export const AdminUsersView = () => {
     if (path.includes('/adminusers')) return 'users';
     if (path.includes('/adminproducts')) return 'astrology';
     if (path.includes('/admininquiry')) return 'predictions';
-    if (path.includes('/adminvisits')) return 'reports';
+    if (path.includes('/adminorders')) return 'orders';
     if (path.includes('/adminsettings')) return 'settings';
     if (path.includes('/admindashboard')) return 'dashboard';
     return 'users'; // default for this component
@@ -72,7 +73,7 @@ export const AdminUsersView = () => {
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-    { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/visits' },
+    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' }, 
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
   ];
@@ -81,7 +82,7 @@ export const AdminUsersView = () => {
     // Add your logout logic here
     // For example: clear localStorage, redirect to login, etc.
     localStorage.removeItem('adminToken'); // if you're using tokens
-    window.location.href = '/'; // or use navigate from useNavigate hook
+    window.location.href = '/adminlogin'; // or use navigate from useNavigate hook
   };
 
   return (

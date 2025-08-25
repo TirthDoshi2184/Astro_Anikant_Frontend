@@ -22,41 +22,43 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
-  Minus
+  Minus,
+  ShoppingBag
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const IntegratedAdminProductDetail = () => {
   // Sidebar state
   const [activeMenuItem, setActiveMenuItem] = useState('astrology');
-  
+
   // Navigation handler
   const handleNavigation = (item) => {
     setActiveMenuItem(item.id);
-    
+
     // Handle different navigation scenarios
     if (item.id === 'logout') {
       if (window.confirm('Are you sure you want to logout?')) {
         // Clear any stored tokens/session data
         localStorage.removeItem('authToken');
         // Redirect to login or home page
-        window.location.href = item.link;
+        window.location.href = "/adminlogin";
       }
       return;
     }
-    
+
     // For other navigation items, you can either:
     // 1. Use React Router (if available)
     // 2. Use window.location for full page navigation
     // 3. Show different components based on activeMenuItem
-    
+
     // Using window.location for now (you can replace with React Router)
     if (item.link) {
       window.location.href = item.link;
     }
-    
+
     console.log(`Navigating to: ${item.label} (${item.link})`);
   };
-  
+
   // Product detail state
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -64,7 +66,7 @@ const IntegratedAdminProductDetail = () => {
   const [expandedSection, setExpandedSection] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
-  
+
   // Mock product data (replace with your API call)
   const [product, setProduct] = useState({
     name: "Premium Ruby Ring",
@@ -98,7 +100,7 @@ const IntegratedAdminProductDetail = () => {
     salesCount: 89,
     isFeatured: true
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -119,9 +121,9 @@ const IntegratedAdminProductDetail = () => {
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-    { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/visits' },
+    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/admin/login' }
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
   const reviews = [
@@ -196,7 +198,7 @@ const IntegratedAdminProductDetail = () => {
   const getDimensionsDisplay = () => {
     if (product?.dimensions?.length && product?.dimensions?.width) {
       const { length, width, height, unit = 'mm' } = product.dimensions;
-      return height 
+      return height
         ? `${length}×${width}×${height} ${unit}`
         : `${length}×${width} ${unit}`;
     }
@@ -210,7 +212,7 @@ const IntegratedAdminProductDetail = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
       {/* Fixed Sidebar */}
-      <div className="fixed left-0 top-0 w-64 h-full bg-gradient-to-b from-red-900 via-red-800 to-red-900 shadow-2xl z-50">
+      <div className="w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-900 shadow-2xl fixed h-full z-10">
         {/* Logo Section */}
         <div className="p-6 border-b border-red-700/50">
           <div className="flex items-center space-x-3">
@@ -228,27 +230,29 @@ const IntegratedAdminProductDetail = () => {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-120px)]">
+        <nav className="p-4 space-y-2">
           {sidebarItems.map((item) => {
             const IconComponent = item.icon;
+            const handleNavigation = () => {
+              setActiveMenuItem(item.id);
+              if (item.link) {
+                // For React Router navigation, you would use navigate(item.link)
+                // For now, we'll use window.location for demonstration
+                window.location.href = item.link;
+              }
+            };
+
             return (
               <button
                 key={item.id}
-                onClick={() => handleNavigation(item)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
-                  activeMenuItem === item.id
-                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
-                    : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
-                } ${item.id === 'logout' ? 'mt-4 border-t border-red-700/30 pt-4' : ''}`}
-                title={`Go to ${item.label}`}
+                onClick={handleNavigation}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${activeMenuItem === item.id
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
+                  : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
+                  }`}
               >
                 <IconComponent className="w-5 h-5" />
                 <span>{item.label}</span>
-                {item.id === 'logout' && (
-                  <div className="ml-auto">
-                    <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                  </div>
-                )}
               </button>
             );
           })}
@@ -265,7 +269,7 @@ const IntegratedAdminProductDetail = () => {
               <p className="text-gray-600">Manage and view product information</p>
             </div>
             <div className="flex items-center space-x-3">
-              <button 
+              <button
                 onClick={() => window.history.back()}
                 className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
               >
@@ -287,17 +291,16 @@ const IntegratedAdminProductDetail = () => {
                 <div className="relative bg-white rounded-2xl shadow-xl p-8 overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-r from-red-800/5 to-yellow-200/10"></div>
                   <div className="relative">
-                    <img 
-                      src={product.images[selectedImage]} 
+                    <img
+                      src={product.images[selectedImage]}
                       alt={product.name}
                       className="w-full h-96 object-cover rounded-xl group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute top-4 right-4 flex flex-col space-y-2">
-                      <button 
+                      <button
                         onClick={() => setIsWishlisted(!isWishlisted)}
-                        className={`p-2 rounded-full shadow-lg transition-all duration-300 ${
-                          isWishlisted ? 'bg-red-800 text-white' : 'bg-white text-gray-600 hover:bg-red-50'
-                        }`}
+                        className={`p-2 rounded-full shadow-lg transition-all duration-300 ${isWishlisted ? 'bg-red-800 text-white' : 'bg-white text-gray-600 hover:bg-red-50'
+                          }`}
                       >
                         <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                       </button>
@@ -320,9 +323,8 @@ const IntegratedAdminProductDetail = () => {
                       <button
                         key={index}
                         onClick={() => setSelectedImage(index)}
-                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                          selectedImage === index ? 'border-red-800' : 'border-gray-200 hover:border-red-400'
-                        }`}
+                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${selectedImage === index ? 'border-red-800' : 'border-gray-200 hover:border-red-400'
+                          }`}
                       >
                         <img src={image} alt={`${product.name} view ${index + 1}`} className="w-full h-full object-cover" />
                       </button>
@@ -358,13 +360,12 @@ const IntegratedAdminProductDetail = () => {
                       <div className="flex items-center space-x-4 mb-4">
                         <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star 
-                              key={star} 
-                              className={`w-5 h-5 ${
-                                star <= Math.floor(product.averageRating || 0) 
-                                  ? 'text-yellow-400 fill-current' 
+                            <Star
+                              key={star}
+                              className={`w-5 h-5 ${star <= Math.floor(product.averageRating || 0)
+                                  ? 'text-yellow-400 fill-current'
                                   : 'text-gray-300'
-                              }`} 
+                                }`}
                             />
                           ))}
                           <span className="ml-2 text-sm text-gray-600">({product.reviewCount || 0} reviews)</span>
@@ -387,9 +388,8 @@ const IntegratedAdminProductDetail = () => {
                         )}
                       </div>
                       <div className="flex items-center space-x-2 mb-6">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
                           {product.stock > 0 ? `In Stock (${product.stock} available)` : 'Out of Stock'}
                         </span>
                         {product.isFeatured && (
@@ -400,10 +400,10 @@ const IntegratedAdminProductDetail = () => {
                       </div>
 
                       {/* Quantity Selector */}
-                      
+
 
                       {/* Action Buttons */}
-                     
+
                     </div>
                   </div>
                 </div>
@@ -438,11 +438,10 @@ const IntegratedAdminProductDetail = () => {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
-                          activeTab === tab.id
+                        className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                             ? 'border-red-800 text-red-800'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        }`}
+                          }`}
                       >
                         <IconComponent className="w-4 h-4" />
                         <span>{tab.label}</span>
@@ -468,7 +467,7 @@ const IntegratedAdminProductDetail = () => {
                         </ul>
                       </div>
                     )}
-                    
+
                     {product.usage && (
                       <div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-4">How to Use</h3>
@@ -483,7 +482,7 @@ const IntegratedAdminProductDetail = () => {
                       <div className="text-gray-700 bg-gray-50 p-4 rounded-xl">
                         <p>{showFullDescription ? product.description : `${product.description?.substring(0, 200)}...`}</p>
                         {product.description && product.description.length > 200 && (
-                          <button 
+                          <button
                             onClick={() => setShowFullDescription(!showFullDescription)}
                             className="mt-2 text-red-800 font-medium hover:text-red-900"
                           >
@@ -555,7 +554,7 @@ const IntegratedAdminProductDetail = () => {
                         Manage Reviews
                       </button>
                     </div>
-                    
+
                     <div className="space-y-4">
                       {reviews.map((review) => (
                         <div key={review.id} className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
@@ -571,11 +570,10 @@ const IntegratedAdminProductDetail = () => {
                             </div>
                             <div className="flex items-center">
                               {[1, 2, 3, 4, 5].map((star) => (
-                                <Star 
-                                  key={star} 
-                                  className={`w-4 h-4 ${
-                                    star <= review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                  }`} 
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                    }`}
                                 />
                               ))}
                             </div>

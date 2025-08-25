@@ -10,7 +10,8 @@ import {
   Home,
   Star,
   Moon,
-  Sun
+  Sun,
+  ShoppingBag
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -44,9 +45,10 @@ export const AdminSidePanel = () => {
     { id: 'users', label: 'Users', icon: Users, link: '/admin/users' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/admin/products' },
     { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-    { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/Visits' },
+    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
+    
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
   return (

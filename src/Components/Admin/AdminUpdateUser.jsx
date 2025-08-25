@@ -21,7 +21,8 @@ import {
     Globe,
     Hash,
     ToggleLeft,
-    ToggleRight
+    ToggleRight,
+    ShoppingBag
 } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -30,8 +31,8 @@ import { useForm } from 'react-hook-form';
 export const AdminUpdateUser = () => {
     const location = useLocation();
     const { id } = useParams();
-    console.log("id",id);
-    
+    console.log("id", id);
+
     const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm();
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -56,14 +57,15 @@ export const AdminUpdateUser = () => {
         { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
         { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
         { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-        { id: 'reports', label: 'Visits Booked', icon: Sun, link: '/admin/visits' },
+        { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
+
         { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
         { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
     ];
 
     const handleLogout = () => {
         localStorage.removeItem('adminToken');
-        window.location.href = '/';
+        window.location.href = '/adminlogin';
     };
 
     const [activeMenuItem, setActiveMenuItem] = useState(getActiveMenuItem());
@@ -77,10 +79,10 @@ export const AdminUpdateUser = () => {
             try {
                 setLoading(true);
                 setError(null);
-                
+
                 // Updated URL to match your backend
                 const response = await axios.get(`http://localhost:1921/user/getsingleuser/${id}`);
-                
+
 
                 const user = response.data.data;
 
@@ -133,7 +135,7 @@ export const AdminUpdateUser = () => {
             };
 
             const response = await axios.put(`http://localhost:1921/user/updateuser/${id}`, updateData);
-            
+
             if (response.status === 200 || response.status === 201) {
                 alert('User updated successfully!');
                 // Optionally redirect back to users list
@@ -234,7 +236,7 @@ export const AdminUpdateUser = () => {
                                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
                                     <h3 className="font-bold mb-2">Error Loading User Data</h3>
                                     <p className="mb-4">{error}</p>
-                                    <button 
+                                    <button
                                         onClick={() => window.location.reload()}
                                         className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
                                     >
@@ -282,7 +284,7 @@ export const AdminUpdateUser = () => {
                                                     </div>
                                                     <input
                                                         type="email"
-                                                        {...register('email', { 
+                                                        {...register('email', {
                                                             required: 'Email is required',
                                                             pattern: {
                                                                 value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
@@ -309,7 +311,7 @@ export const AdminUpdateUser = () => {
                                                     </div>
                                                     <input
                                                         type="tel"
-                                                        {...register('mobileNo', { 
+                                                        {...register('mobileNo', {
                                                             required: 'Mobile number is required',
                                                             pattern: {
                                                                 value: /^[0-9]{10}$/,
@@ -353,14 +355,12 @@ export const AdminUpdateUser = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => setValue('isActive', isActiveValue === 'true' ? 'false' : 'true')}
-                                                        className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${
-                                                            isActiveValue === 'true' ? 'bg-green-500' : 'bg-gray-400'
-                                                        }`}
+                                                        className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${isActiveValue === 'true' ? 'bg-green-500' : 'bg-gray-400'
+                                                            }`}
                                                     >
                                                         <span
-                                                            className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-                                                                isActiveValue === 'true' ? 'translate-x-6' : 'translate-x-1'
-                                                            }`}
+                                                            className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${isActiveValue === 'true' ? 'translate-x-6' : 'translate-x-1'
+                                                                }`}
                                                         />
                                                     </button>
                                                     <span className={`text-sm font-medium ${isActiveValue === 'true' ? 'text-green-600' : 'text-gray-600'}`}>
@@ -470,7 +470,7 @@ export const AdminUpdateUser = () => {
                                             <ChevronLeft className="w-4 h-4" />
                                             Cancel
                                         </button>
-                                        
+
                                         <button
                                             type="button"
                                             onClick={handleSubmit(onSubmit)}

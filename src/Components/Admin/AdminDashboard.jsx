@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { useEffect, useState } from "react";
-import { Users, Package, ShoppingCart, Star, Moon, Sun, Home, BarChart3, Settings, LogOut, Search, UserPlus, Eye } from "lucide-react";
+import { Users, Package, ShoppingCart, Star, Moon, Sun, Home, BarChart3, Settings, LogOut, Search, UserPlus, Eye, ShoppingBag } from "lucide-react";
 import axios from "axios";
 
 export const AdminDashboard = () => {
@@ -102,9 +102,9 @@ export const AdminDashboard = () => {
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'products', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'inquiry', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
-    { id: 'visits', label: 'Visits Booked', icon: Sun, link: '/admin/visits' },
+    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
   return (
