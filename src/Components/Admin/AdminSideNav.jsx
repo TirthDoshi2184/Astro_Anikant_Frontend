@@ -41,7 +41,7 @@ export const AdminSideNav = () => {
     const sidebarItems = [
         { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
         { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
-        { id: 'astrology', label: 'Products', icon: Star, link: '/admin/products' },
+        { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
         { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
         { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
 

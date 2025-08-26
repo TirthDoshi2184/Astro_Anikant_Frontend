@@ -22,6 +22,7 @@ import { AdminUpdateUser } from "./Components/Admin/AdminUpdateUser";
 import AdminProductDetail from "./Components/Admin/AdminProductDetail";
 import AdminLogin from "./Components/Admin/AdminLogin";
 import { AdminOrders } from "./Components/Admin/AdminOrders";
+import { AdminSingleOrder } from "./Components/Admin/AdminSingleOrder";
 
 function App() {
   const location = useLocation();
@@ -37,7 +38,8 @@ function App() {
     "/adminupdateuser/:id",
     "adminsingleproductview/:id",
     "/adminlogin",
-    "/adminorders"
+    "/adminorders",
+    "/adminorders/:id"
   ];
 
   // check if current path matches any of the patterns
@@ -69,6 +71,8 @@ function App() {
         <Route path='/adminupdateuser/:id' element={<AdminUpdateUser />} />
         <Route path='/adminlogin' element={<AdminLogin />} />
         <Route path='/adminorders' element={<AdminOrders />} />
+        <Route path='/adminorders/:id' element={<AdminSingleOrder />} />
+
 
 
         <Route path='/adminsingleproductview/:id' element={<AdminProductDetail />} />
