@@ -56,11 +56,10 @@ export const AdminUpdateUser = () => {
         { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
         { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
         { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
-        { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
+        { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
         { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
-
-        { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-        { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+    
+        { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
     ];
 
     const handleLogout = () => {
@@ -83,7 +82,6 @@ export const AdminUpdateUser = () => {
                 // Updated URL to match your backend
                 const response = await axios.get(`http://localhost:1921/user/getsingleuser/${id}`);
 
-
                 const user = response.data.data;
 
                 // If address is an array, take the first item
@@ -95,6 +93,7 @@ export const AdminUpdateUser = () => {
                 setValue('gender', user.gender || '');
                 setValue('isActive', user.isActive ? 'true' : 'false');
                 setValue('street', address.street || '');
+                setValue('societyName', address.societyName || '');
                 setValue('city', address.city || '');
                 setValue('state', address.state || '');
                 setValue('pincode', address.pincode || '');
@@ -127,6 +126,7 @@ export const AdminUpdateUser = () => {
                 isActive: data.isActive === 'true',
                 address: [{
                     street: data.street,
+                    societyName: data.societyName,
                     city: data.city,
                     state: data.state,
                     pincode: data.pincode,
@@ -391,6 +391,23 @@ export const AdminUpdateUser = () => {
                                                         {...register('street')}
                                                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
                                                         placeholder="Enter street address"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Society Name */}
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Society Name
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <Building className="h-5 w-5 text-red-800" />
+                                                    </div>
+                                                    <input
+                                                        {...register('societyName')}
+                                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
+                                                        placeholder="Enter society/apartment name"
                                                     />
                                                 </div>
                                             </div>

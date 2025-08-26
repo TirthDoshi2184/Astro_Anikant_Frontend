@@ -25,12 +25,27 @@ export const AdminOrders = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [loading, setLoading] = useState(true)
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1)
+    const [ordersPerPage] = useState(3) // Show 3 orders per page
 
     const getAllOrders = async () => {
         try {
             setLoading(true)
             const response = await axios.get("http://localhost:1921/order/getallorder")
-            console.log(response.data.data);
+            console.log('Raw API response:', response.data.data);
+            
+            // Add debugging to see the actual status values
+            response.data.data.forEach((order, index) => {
+                console.log(`Order ${index + 1}:`, {
+                    status: order?.status,
+                    statusType: typeof order?.status,
+                    statusLength: order?.status?.length,
+                    product: order?.cart?.product?.name,
+                    user: order?.cart?.user?.name
+                });
+            });
+            
             setOrders(response.data.data)
             setFilteredOrders(response.data.data)
         } catch (error) {
@@ -47,17 +62,73 @@ export const AdminOrders = () => {
     // Filter orders based on search and status
     useEffect(() => {
         let filtered = orders.filter(order => {
-            const matchesSearch = 
-                order?.cart?.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                order?.cart?.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                order?.cart?.user?.phone?.includes(searchTerm)
+            // More detailed search matching
+            const productName = order?.cart?.product?.name?.toLowerCase() || ''
+            const userName = order?.cart?.user?.name?.toLowerCase() || ''
+            const userPhone = order?.cart?.user?.phone?.toString() || ''
+            const searchLower = searchTerm.toLowerCase()
             
-            const matchesStatus = statusFilter === 'all' || order?.status === statusFilter
+            const matchesSearch = searchTerm === '' || 
+                productName.includes(searchLower) ||
+                userName.includes(searchLower) ||
+                userPhone.includes(searchLower)
+            
+            const matchesStatus = statusFilter === 'all' || 
+                normalizeStatus(order?.status) === statusFilter.toLowerCase()
+            
+            console.log('Filtering order:', {
+                order: order,
+                productName,
+                userName,
+                userPhone,
+                status: order?.status,
+                normalizedStatus: normalizeStatus(order?.status),
+                searchTerm,
+                statusFilter,
+                matchesSearch,
+                matchesStatus,
+                included: matchesSearch && matchesStatus
+            });
             
             return matchesSearch && matchesStatus
         })
+        
+        console.log('Original orders:', orders.length, 'Filtered orders:', filtered.length);
         setFilteredOrders(filtered)
+        setCurrentPage(1) // Reset to first page when filters change
     }, [searchTerm, statusFilter, orders])
+
+    // Helper function to normalize status for comparison
+    const normalizeStatus = (status) => {
+        return status?.toLowerCase().trim() || 'unknown'
+    }
+
+    // Helper function to get order count by status
+    const getOrderCountByStatus = (targetStatus) => {
+        return orders.filter(order => 
+            normalizeStatus(order?.status) === targetStatus.toLowerCase()
+        ).length
+    }
+
+    // Pagination calculations
+    const indexOfLastOrder = currentPage * ordersPerPage
+    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage
+    const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder)
+    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage)
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber)
+
+    const nextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1)
+        }
+    }
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1)
+        }
+    }
 
     const handleStatusUpdate = async (orderId, newStatus) => {
         try {
@@ -72,7 +143,7 @@ export const AdminOrders = () => {
     }
 
     const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
+        switch (normalizeStatus(status)) {
             case 'pending':
                 return 'bg-yellow-100 text-yellow-800 border-yellow-200'
             case 'confirmed':
@@ -89,7 +160,7 @@ export const AdminOrders = () => {
     }
 
     const getStatusIcon = (status) => {
-        switch (status?.toLowerCase()) {
+        switch (normalizeStatus(status)) {
             case 'pending':
                 return <Clock className="w-4 h-4" />
             case 'confirmed':
@@ -152,7 +223,7 @@ export const AdminOrders = () => {
                                 <div>
                                     <p className="text-red-700 text-sm font-medium">Pending</p>
                                     <p className="text-2xl font-bold text-red-900">
-                                        {orders.filter(o => o.status === 'pending').length}
+                                        {getOrderCountByStatus('pending')}
                                     </p>
                                 </div>
                                 <div className="p-2 bg-yellow-100 rounded-lg">
@@ -165,7 +236,7 @@ export const AdminOrders = () => {
                                 <div>
                                     <p className="text-red-700 text-sm font-medium">Completed</p>
                                     <p className="text-2xl font-bold text-red-900">
-                                        {orders.filter(o => o.status === 'completed').length}
+                                        {getOrderCountByStatus('completed')}
                                     </p>
                                 </div>
                                 <div className="p-2 bg-green-100 rounded-lg">
@@ -178,7 +249,7 @@ export const AdminOrders = () => {
                                 <div>
                                     <p className="text-red-700 text-sm font-medium">Processing</p>
                                     <p className="text-2xl font-bold text-red-900">
-                                        {orders.filter(o => o.status === 'processing').length}
+                                        {getOrderCountByStatus('processing')}
                                     </p>
                                 </div>
                                 <div className="p-2 bg-purple-100 rounded-lg">
@@ -244,6 +315,13 @@ export const AdminOrders = () => {
                                 <ShoppingBag className="w-12 h-12 text-red-300 mx-auto mb-4" />
                                 <p className="text-red-600 text-lg">No orders found</p>
                                 <p className="text-red-400">Try adjusting your search or filters</p>
+                                <div className="mt-4 p-4 bg-gray-100 rounded-lg text-left">
+                                    <p className="font-semibold text-gray-700">Debug Info:</p>
+                                    <p className="text-sm text-gray-600">Total orders: {orders.length}</p>
+                                    <p className="text-sm text-gray-600">Search term: "{searchTerm}"</p>
+                                    <p className="text-sm text-gray-600">Status filter: "{statusFilter}"</p>
+                                    <p className="text-sm text-gray-600">Check console for detailed filtering info</p>
+                                </div>
                             </div>
                         ) : (
                             <table className="w-full">
@@ -258,8 +336,8 @@ export const AdminOrders = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-amber-200">
-                                    {filteredOrders.map((order, index) => (
-                                        <tr key={index} className="hover:bg-amber-50/50 transition-colors duration-200">
+                                    {currentOrders.map((order, index) => (
+                                        <tr key={order?._id || index} className="hover:bg-amber-50/50 transition-colors duration-200">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center space-x-3">
                                                     <div className="p-2 bg-amber-100 rounded-lg">
@@ -312,7 +390,6 @@ export const AdminOrders = () => {
                                                     >
                                                         View
                                                     </Link>
-                                                   
                                                 </div>
                                             </td>
                                         </tr>
@@ -323,13 +400,79 @@ export const AdminOrders = () => {
                     </div>
                 </div>
 
-                {/* Pagination would go here if needed */}
+                {/* Pagination */}
                 {filteredOrders.length > 0 && (
-                    <div className="mt-6 flex justify-between items-center">
-                        <p className="text-red-700">
-                            Showing {filteredOrders.length} of {orders.length} orders
-                        </p>
-                        {/* Add pagination controls here if needed */}
+                    <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div className="text-red-700">
+                            Showing {indexOfFirstOrder + 1} to {Math.min(indexOfLastOrder, filteredOrders.length)} of {filteredOrders.length} orders
+                            {orders.length !== filteredOrders.length && ` (filtered from ${orders.length} total)`}
+                        </div>
+                        
+                        {totalPages > 1 && (
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={prevPage}
+                                    disabled={currentPage === 1}
+                                    className={`px-3 py-2 rounded-lg border ${
+                                        currentPage === 1
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-white text-red-600 border-red-300 hover:bg-red-50'
+                                    }`}
+                                >
+                                    Previous
+                                </button>
+                                
+                                <div className="flex space-x-1">
+                                    {[...Array(totalPages)].map((_, index) => {
+                                        const pageNumber = index + 1
+                                        const isCurrentPage = pageNumber === currentPage
+                                        
+                                        // Show first page, last page, current page and adjacent pages
+                                        if (
+                                            pageNumber === 1 ||
+                                            pageNumber === totalPages ||
+                                            (pageNumber >= currentPage - 2 && pageNumber <= currentPage + 2)
+                                        ) {
+                                            return (
+                                                <button
+                                                    key={pageNumber}
+                                                    onClick={() => paginate(pageNumber)}
+                                                    className={`px-3 py-2 rounded-lg border ${
+                                                        isCurrentPage
+                                                            ? 'bg-red-600 text-white border-red-600'
+                                                            : 'bg-white text-red-600 border-red-300 hover:bg-red-50'
+                                                    }`}
+                                                >
+                                                    {pageNumber}
+                                                </button>
+                                            )
+                                        } else if (
+                                            pageNumber === currentPage - 3 ||
+                                            pageNumber === currentPage + 3
+                                        ) {
+                                            return (
+                                                <span key={pageNumber} className="px-2 py-2 text-gray-500">
+                                                    ...
+                                                </span>
+                                            )
+                                        }
+                                        return null
+                                    })}
+                                </div>
+                                
+                                <button
+                                    onClick={nextPage}
+                                    disabled={currentPage === totalPages}
+                                    className={`px-3 py-2 rounded-lg border ${
+                                        currentPage === totalPages
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-white text-red-600 border-red-300 hover:bg-red-50'
+                                    }`}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

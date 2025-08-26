@@ -104,8 +104,10 @@ export const AdminSingleOrder = () => {
     if (loading) {
         return (
             <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
-                <AdminSideNav />
-                <div className="flex-1 flex items-center justify-center">
+                <div className="fixed left-0 top-0 h-full z-10">
+                    <AdminSideNav />
+                </div>
+                <div className="flex-1 ml-64 flex items-center justify-center">
                     <div className="flex flex-col items-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
                         <span className="text-red-700 text-lg">Loading order details...</span>
@@ -118,8 +120,10 @@ export const AdminSingleOrder = () => {
     if (!order) {
         return (
             <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
-                <AdminSideNav />
-                <div className="flex-1 flex items-center justify-center">
+                <div className="fixed left-0 top-0 h-full z-10">
+                    <AdminSideNav />
+                </div>
+                <div className="flex-1 ml-64 flex items-center justify-center">
                     <div className="text-center">
                         <Package className="w-16 h-16 text-red-300 mx-auto mb-4" />
                         <p className="text-red-600 text-xl mb-2">Order not found</p>
@@ -133,10 +137,12 @@ export const AdminSingleOrder = () => {
     return (
         <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
             {/* Fixed Sidebar */}
-            <AdminSideNav />
+            <div className="fixed left-0 top-0 h-full z-10">
+                <AdminSideNav />
+            </div>
             
             {/* Main Content */}
-            <div className="flex-1 p-8">
+            <div className="flex-1 ml-64 p-8 overflow-y-auto">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center space-x-4 mb-6">

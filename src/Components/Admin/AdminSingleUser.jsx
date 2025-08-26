@@ -110,10 +110,10 @@ export const AdminSingleUser = () => {
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
-    { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
+    { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
   if (loading) {
@@ -281,7 +281,7 @@ export const AdminSingleUser = () => {
                           <div>
                             <p className="text-sm text-red-600 font-medium">Address {index + 1}</p>
                             <p className="font-semibold text-red-900">
-                              {addr.street}, {addr.city}, {addr.state},<br /> {addr.pincode}, {addr.country}
+                              {addr.societyName}, {addr.street}, {addr.city}, {addr.state},<br /> {addr.pincode}, {addr.country}
                             </p>
                           </div>
                         </div>

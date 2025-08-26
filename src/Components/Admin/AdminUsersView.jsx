@@ -30,7 +30,10 @@ export const AdminUsersView = () => {
     const path = location.pathname;
     if (path.includes('/adminusers')) return 'users';
     if (path.includes('/adminproducts')) return 'astrology';
-    if (path.includes('/admininquiry')) return 'predictions';
+    if (path.includes('/adminvisits'
+
+
+    )) return 'predictions';
     if (path.includes('/adminorders')) return 'orders';
     if (path.includes('/adminsettings')) return 'settings';
     if (path.includes('/admindashboard')) return 'dashboard';
@@ -72,10 +75,10 @@ export const AdminUsersView = () => {
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
-    { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
+    { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' }, 
-    { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/' }
+    
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
   const handleLogout = () => {

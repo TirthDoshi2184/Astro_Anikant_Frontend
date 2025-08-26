@@ -44,7 +44,7 @@ export const AdminSidePanel = () => {
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, Link: '/admindashboard' },
     { id: 'users', label: 'Users', icon: Users, link: '/admin/users' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/admin/products' },
-    { id: 'predictions', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
+    { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },

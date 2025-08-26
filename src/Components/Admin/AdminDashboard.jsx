@@ -101,9 +101,9 @@ export const AdminDashboard = () => {
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'products', label: 'Products', icon: Star, link: '/adminproducts' },
-    { id: 'inquiry', label: 'Inquiry', icon: Moon, link: '/admin/inquiry' },
+    { id: 'inquiry', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
-    { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
+    
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
