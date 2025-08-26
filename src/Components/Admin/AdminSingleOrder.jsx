@@ -141,7 +141,7 @@ export const AdminSingleOrder = () => {
                 <div className="mb-8">
                     <div className="flex items-center space-x-4 mb-6">
                         <button 
-                            onClick={() => navigate('/admin/orders')}
+                            onClick={() => navigate('/adminorders')}
                             className="p-2 bg-white/80 backdrop-blur-sm rounded-lg border border-amber-200 hover:bg-white transition-all duration-300 shadow-lg"
                         >
                             <ArrowLeft className="w-5 h-5 text-red-600" />
