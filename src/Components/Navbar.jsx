@@ -1,212 +1,434 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, User, ChevronDown, Lock, LogOut, Eye, Heart, Home, LogIn } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-// Make sure AstrologyNavbar is used inside a <BrowserRouter> in your app entry point
+import { ShoppingCart, User, ChevronDown, Lock, LogOut, Eye, Home, LogIn, Star, Sparkles } from 'lucide-react';
 
 const AstrologyNavbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('home');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
-  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [cartCount, setCartCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Check authentication status on component mount
-  useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    console.log('Auth token on mount:', authToken); // Debug log
-    setIsAuthenticated(!!authToken);
-  }, []);
-
+  // Navigation items
   const navItems = [
-    { id: 'home', label: 'Home', link: '/' },
-    { id: 'products', label: 'Products', link: '/products' },
-    { id: 'about', label: 'About Us', link: '/about' },
-    { id: 'orders', label: 'Orders', link: '/orders' },
-    { id: 'donation', label: 'Donation', link: '/donation' },
-    { id: 'booking', label: 'Book Visit', link: '/booking' }
+    { id: 'home', label: 'Home', path: '/' },
+    { id: 'products', label: 'Products', path: '/products' },
+    { id: 'about', label: 'About Us', path: '/about' },
+    { id: 'order', label: 'Orders', path: '/order' },
+    { id: 'donation', label: 'Donation', path: '/donation' },
+    { id: 'booking', label: 'Book Visit', path: '/booking' }
   ];
 
-  // Dynamic profile menu items based on authentication
+  // Check authentication and fetch user data
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('authToken');
+      const userId = localStorage.getItem('user');
+      
+      console.log('Checking auth - Token exists:', !!token);
+      console.log('Checking auth - User ID:', userId);
+      
+      if (token && userId) {
+        setIsAuthenticated(true);
+        await fetchUserData(userId);
+        await fetchCartCount(userId);
+      } else {
+        console.log('No valid auth data found');
+        setIsAuthenticated(false);
+        setUser(null);
+        setCartCount(0);
+      }
+    };
+
+    checkAuth();
+    
+    // Set active item based on current path
+    const currentPath = window.location.pathname;
+    const currentItem = navItems.find(item => item.path === currentPath);
+    if (currentItem) {
+      setActiveItem(currentItem.id);
+    } else {
+      // Default to home if no match
+      setActiveItem('home');
+    }
+  }, []);
+
+  // Fetch user data from API
+  const fetchUserData = async (userId) => {
+    try {
+      setIsLoading(true);
+      console.log('Fetching user data for ID:', userId);
+      
+      const response = await fetch(`http://localhost:1921/user/getsingleuser/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('User API Response status:', response.status);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('User data received:', result);
+        if (result.data) {
+          setUser(result.data);
+        } else {
+          console.error('No user data in response');
+        }
+      } else {
+        console.error('Failed to fetch user data, status:', response.status);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        // Don't logout immediately, user might still be valid
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      // Don't logout on network error, user might still be valid
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch cart count from API
+  const fetchCartCount = async (userId) => {
+    try {
+      console.log('Fetching cart for user ID:', userId);
+      
+      const response = await fetch(`http://localhost:1921/cart/getsinglecart/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Cart API Response status:', response.status);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Cart data received:', result);
+        
+        if (result.data && Array.isArray(result.data)) {
+          setCartCount(result.data.length);
+        } else {
+          setCartCount(0);
+        }
+      } else if (response.status === 404) {
+        // No cart found is normal for new users
+        console.log('No cart found for user (404) - setting count to 0');
+        setCartCount(0);
+      } else {
+        console.error('Failed to fetch cart data, status:', response.status);
+        setCartCount(0);
+      }
+    } catch (error) {
+      console.error('Error fetching cart count:', error);
+      setCartCount(0);
+    }
+  };
+
+  // Dynamic profile menu items
   const profileMenuItems = isAuthenticated 
     ? [
-        { id: 'profile', label: 'View Profile', icon: Eye, link: '/profile' },
-        { id: 'password', label: 'Change Password', icon: Lock, link: '/change-password' },
+        { id: 'profile', label: 'View Profile', icon: Eye, path: '/profile' },
+        { id: 'password', label: 'Change Password', icon: Lock, path: '/change-password' },
         { id: 'logout', label: 'Logout', icon: LogOut, action: 'logout' }
       ]
     : [
-        { id: 'login', label: 'Login', icon: LogIn, link: '/login' }
+        { id: 'login', label: 'Login', icon: LogIn, path: '/login' }
       ];
 
-  // Modified handlers for navigation
+  // Navigation handler
   const handleNavClick = (item) => {
-    console.log('Nav click:', item); // Debug log
     setActiveItem(item.id);
-    navigate(item.link);
+    window.location.href = item.path;
   };
 
+  // Profile menu handler
   const handleProfileMenuClick = (item) => {
-    console.log('Profile menu click:', item); // Debug log
     if (item.action === 'logout') {
-      // Handle logout
-      localStorage.removeItem('authToken');
-      setIsAuthenticated(false);
-      navigate('/login');
+      handleLogout();
     } else {
-      navigate(item.link);
+      window.location.href = item.path;
     }
     setIsProfileOpen(false);
   };
 
-  // Enhanced cart button handler with detailed logging
-  const handleCartClick = () => {
-    console.log('Cart button clicked!'); // Debug log
-    
-    const authToken = localStorage.getItem('authToken');
-    console.log('Auth token in cart handler:', authToken); // Debug log
-    
-    if (authToken) {
-      console.log('User is authenticated, navigating to /cart'); // Debug log
-      navigate('/cart');
-    } else {
-      console.log('User not authenticated, navigating to /login'); // Debug log
-      navigate('/login');
-    }
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
+    setIsAuthenticated(false);
+    setUser(null);
+    setCartCount(0);
+    window.location.href = '/login';
   };
 
+  // Cart handler with enhanced debugging and proper navigation
+  const handleCartClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Cart button clicked!');
+    console.log('Is authenticated:', isAuthenticated);
+    
+    const authToken = localStorage.getItem('authToken');
+    const userId = localStorage.getItem('user');
+    
+    console.log('Auth token exists:', !!authToken);
+    console.log('User ID exists:', !!userId);
+    
+    if (!authToken || !userId) {
+      console.log('No auth token or user ID, redirecting to login');
+      window.location.assign('/login');
+      return;
+    }
+    
+    console.log('Authenticated user, redirecting to cart');
+    window.location.assign('/cart');
+  };
+
+  // Logo click handler
   const handleLogoClick = () => {
-    console.log('Logo clicked'); // Debug log
     setActiveItem('home');
-    navigate('/');
+    window.location.href = '/';
   };
 
   return (
-    <nav className="relative z-50 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-100 border-b-2 border-red-900/20 shadow-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          
-          {/* Logo Section */}
-          <div 
-            className="flex items-center space-x-3 group cursor-pointer"
-            onClick={handleLogoClick}
-          >
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-800 to-red-900 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300">
-                <Home className="w-6 h-6 text-amber-50 drop-shadow-sm" />
+    <>
+      {/* Mystical floating particles */}
+      <div className="fixed inset-0 pointer-events-none z-10">
+        <div className="absolute top-20 left-1/4 w-2 h-2 bg-gradient-to-r from-yellow-400 to-amber-300 rounded-full animate-pulse opacity-60"></div>
+        <div className="absolute top-32 right-1/3 w-1 h-1 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full animate-bounce opacity-40"></div>
+        <div className="absolute top-28 left-1/2 w-1.5 h-1.5 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full animate-ping opacity-50"></div>
+      </div>
+
+      <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#FEF7D7] via-amber-50 to-[#FEF7D7] border-b-3 border-[#9C0B13]/30 shadow-2xl backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-24">
+            
+            {/* Enhanced Logo Section */}
+            <div 
+              className="flex items-center space-x-4 group cursor-pointer transform transition-all duration-500 hover:scale-105"
+              onClick={handleLogoClick}
+            >
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#9C0B13] via-red-800 to-[#9C0B13] rounded-full flex items-center justify-center shadow-2xl transform group-hover:rotate-12 transition-all duration-500 border-4 border-amber-200">
+                  <div className="relative">
+                    <Star className="w-8 h-8 text-[#FEF7D7] drop-shadow-lg" />
+                    <Sparkles className="w-4 h-4 text-amber-300 absolute -top-1 -right-1 animate-pulse" />
+                  </div>
+                </div>
+                <div className="absolute -inset-2 bg-gradient-to-br from-[#9C0B13]/30 to-red-700/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-lg animate-pulse"></div>
+                {/* Mystical aura rings */}
+                <div className="absolute -inset-4 border-2 border-amber-300/30 rounded-full animate-spin-slow opacity-60"></div>
+                <div className="absolute -inset-6 border border-yellow-400/20 rounded-full animate-reverse-spin opacity-40"></div>
               </div>
-              <div className="absolute -inset-1 bg-gradient-to-br from-red-700 to-red-800 rounded-full opacity-30 group-hover:opacity-60 transition-opacity duration-300 blur-sm"></div>
+              <div className="flex flex-col">
+                <div className="text-3xl font-bold bg-gradient-to-r from-[#9C0B13] to-red-800 bg-clip-text text-transparent tracking-wide">
+                  Astro Anekant
+                </div>
+                <div className="text-sm text-[#9C0B13]/70 font-medium tracking-wider">
+                  ✨ Mystical Treasures ✨
+                </div>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-red-900">
-              Astro Anekant
+
+            {/* Enhanced Navigation Items */}
+            <div className="hidden lg:flex items-center space-x-2">
+              {navItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="relative"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <button
+                    onClick={() => handleNavClick(item)}
+                    className={`relative px-6 py-4 rounded-full font-semibold transition-all duration-300 transform hover:scale-110 group overflow-hidden ${
+                      activeItem === item.id
+                        ? 'text-[#FEF7D7] bg-gradient-to-r from-[#9C0B13] to-red-800 shadow-xl shadow-[#9C0B13]/40 border-2 border-amber-300/50'
+                        : 'text-[#9C0B13] hover:text-[#FEF7D7] hover:bg-gradient-to-r hover:from-[#9C0B13]/90 hover:to-red-800/90 border-2 border-transparent hover:border-amber-300/30'
+                    }`}
+                  >
+                    <span className="relative z-10 flex items-center space-x-2">
+                      {item.label}
+                      {activeItem === item.id && (
+                        <div className="w-2 h-2 bg-amber-300 rounded-full animate-pulse"></div>
+                      )}
+                    </span>
+                    
+                    {/* Magical hover effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                    
+                    {/* Active item mystical glow */}
+                    {activeItem === item.id && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#9C0B13]/30 to-red-800/30 rounded-full animate-pulse blur-md"></div>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Enhanced Right Section */}
+            <div className="flex items-center space-x-6">
+              
+              {/* Enhanced Cart Button */}
+             <div className="relative group">
+  <a 
+    href="/cart"
+    onClick={(e) => {
+      e.preventDefault();
+      const authToken = localStorage.getItem('authToken');
+      if (authToken) {
+        window.location.href = '/cart';
+      } else {
+        window.location.href = '/login';
+      }
+    }}
+    className="block p-4 rounded-full bg-gradient-to-br from-[#9C0B13] via-red-800 to-[#9C0B13] text-[#FEF7D7] shadow-2xl hover:shadow-[#9C0B13]/50 transition-all duration-500 transform hover:scale-110 hover:rotate-6 border-3 border-amber-200/50"
+  >
+    <ShoppingCart className="w-6 h-6 relative z-10" />
+  </a>
+  
+  {cartCount > 0 && (
+    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-[#9C0B13] text-sm rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-lg border-2 border-white animate-bounce">
+      {cartCount > 99 ? '99+' : cartCount}
+    </div>
+  )}
+</div>
+              {/* Enhanced Profile Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  disabled={isLoading}
+                  className={`flex items-center space-x-3 p-4 rounded-full transition-all duration-500 transform hover:scale-105 border-2 ${
+                    isProfileOpen
+                      ? 'bg-gradient-to-br from-[#9C0B13] to-red-800 text-[#FEF7D7] shadow-2xl shadow-[#9C0B13]/40 border-amber-300/50'
+                      : 'bg-gradient-to-br from-[#FEF7D7] to-amber-100 text-[#9C0B13] hover:bg-gradient-to-br hover:from-[#9C0B13]/90 hover:to-red-800/90 hover:text-[#FEF7D7] border-amber-300/30 hover:border-amber-300/60'
+                  } ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  <div className="relative">
+                    <User className="w-6 h-6" />
+                    {isAuthenticated && (
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+                    )}
+                  </div>
+                  <ChevronDown className={`w-5 h-5 transition-transform duration-500 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Enhanced Dropdown Menu */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-4 w-80 bg-gradient-to-br from-[#FEF7D7]/95 via-amber-50/95 to-[#FEF7D7]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border-3 border-[#9C0B13]/20 overflow-hidden animate-in fade-in slide-in-from-top-10 duration-300">
+                    
+                    {/* User info section */}
+                    {isAuthenticated && user && (
+                      <div className="p-6 border-b border-[#9C0B13]/10 bg-gradient-to-r from-[#9C0B13]/5 via-red-800/5 to-[#9C0B13]/5">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-14 h-14 bg-gradient-to-br from-[#9C0B13] to-red-800 rounded-full flex items-center justify-center shadow-xl">
+                            <User className="w-7 h-7 text-[#FEF7D7]" />
+                          </div>
+                          <div>
+                            <div className="text-[#9C0B13] font-bold text-lg">
+                              {user?.name || user?.firstName 
+                                ? (user.firstName && user.lastName 
+                                    ? `${user.firstName} ${user.lastName}` 
+                                    : user.name || user.username || 'User')
+                                : 'Loading...'}
+                            </div>
+                            <div className="text-[#9C0B13]/70 text-sm">
+                              {user?.email || 'Loading...'}
+                            </div>
+                            <div className="flex items-center space-x-1 mt-1">
+                              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                              <span className="text-xs text-green-600 font-medium">Online</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Menu items */}
+                    <div className="py-3">
+                      {profileMenuItems.map((item, index) => {
+                        const IconComponent = item.icon;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => handleProfileMenuClick(item)}
+                            className={`w-full flex items-center space-x-4 px-6 py-4 text-left transition-all duration-300 hover:bg-gradient-to-r group ${
+                              item.id === 'logout' 
+                                ? 'text-red-600 hover:from-red-50 hover:to-red-100 hover:text-red-700' 
+                                : 'text-[#9C0B13] hover:from-[#9C0B13]/5 hover:to-red-800/5 hover:text-[#9C0B13]'
+                            }`}
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <div className={`p-2 rounded-full transition-all duration-300 ${
+                              item.id === 'logout'
+                                ? 'bg-red-100 group-hover:bg-red-200'
+                                : 'bg-amber-100 group-hover:bg-amber-200'
+                            }`}>
+                              <IconComponent className="w-5 h-5" />
+                            </div>
+                            <span className="font-medium">{item.label}</span>
+                            {item.id === 'logout' && (
+                              <div className="ml-auto w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Navigation Items */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item) => (
+        {/* Enhanced Mobile Navigation */}
+        <div className="lg:hidden border-t-2 border-[#9C0B13]/10 bg-gradient-to-r from-[#FEF7D7]/90 via-amber-100/90 to-[#FEF7D7]/90 backdrop-blur-sm">
+          <div className="px-4 py-4 space-y-2">
+            {navItems.map((item, index) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item)}
-                className={`relative px-5 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
+                className={`block w-full text-left px-6 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 ${
                   activeItem === item.id
-                    ? 'text-amber-50 bg-gradient-to-r from-red-800 to-red-900 shadow-lg shadow-red-900/30'
-                    : 'text-red-900 hover:text-amber-50 hover:bg-red-800/80'
+                    ? 'text-[#FEF7D7] bg-gradient-to-r from-[#9C0B13] to-red-800 shadow-xl border-2 border-amber-300/50'
+                    : 'text-[#9C0B13] hover:text-[#FEF7D7] hover:bg-gradient-to-r hover:from-[#9C0B13]/90 hover:to-red-800/90 border-2 border-transparent hover:border-amber-300/30'
                 }`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <span className="relative z-10">{item.label}</span>
-                {activeItem === item.id && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 rounded-full animate-pulse opacity-30"></div>
-                )}
+                <div className="flex items-center justify-between">
+                  <span>{item.label}</span>
+                  {activeItem === item.id && (
+                    <div className="w-3 h-3 bg-amber-300 rounded-full animate-pulse"></div>
+                  )}
+                </div>
               </button>
             ))}
           </div>
-
-          {/* Right Section - Cart & Profile */}
-          <div className="flex items-center space-x-4">
-            
-             {/* Cart Button - with enhanced debugging */}
-              <div className="relative group">
-                <button 
-                  onClick={handleCartClick}
-                  className="p-3 rounded-full bg-gradient-to-br from-red-800 to-red-900 text-amber-50 shadow-lg hover:shadow-red-900/40 transition-all duration-300 transform hover:scale-110"
-                  style={{ cursor: 'pointer' }} // Ensure cursor pointer
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                </button>
-                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-bounce shadow-md">
-                  3
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-red-700 to-red-800 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-md"></div>
-              </div>
-
-            {/* Profile Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className={`flex items-center space-x-2 p-3 rounded-full transition-all duration-300 transform hover:scale-105 ${
-                  isProfileOpen
-                    ? 'bg-gradient-to-br from-red-800 to-red-900 text-amber-50 shadow-lg shadow-red-900/30'
-                    : 'bg-red-800/10 text-red-900 hover:bg-red-800/80 hover:text-amber-50'
-                }`}
-              >
-                <User className="w-5 h-5" />
-                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* Dropdown Menu */}
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-amber-50/95 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-red-900/20 overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200">
-                  {isAuthenticated && (
-                    <div className="p-4 border-b border-red-900/10 bg-gradient-to-r from-red-900/5 to-red-800/5">
-                      <div className="text-red-900 font-semibold">John Doe</div>
-                      <div className="text-red-700 text-sm">john.doe@email.com</div>
-                    </div>
-                  )}
-                  
-                  <div className="py-2">
-                    {profileMenuItems.map((item) => {
-                      const IconComponent = item.icon;
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={() => handleProfileMenuClick(item)}
-                          className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-all duration-200 hover:bg-gradient-to-r hover:from-red-800/10 hover:to-red-900/10 ${
-                            item.id === 'logout' 
-                              ? 'text-red-800 hover:text-red-900 hover:bg-red-100' 
-                              : 'text-red-800 hover:text-red-900'
-                          }`}
-                        >
-                          <IconComponent className="w-4 h-4" />
-                          <span>{item.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Navigation */}
-      <div className="lg:hidden border-t border-red-900/10 bg-gradient-to-r from-amber-100/80 to-yellow-100/80 backdrop-blur-sm">
-        <div className="px-4 py-3 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item)}
-              className={`block w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
-                activeItem === item.id
-                  ? 'text-amber-50 bg-gradient-to-r from-red-800 to-red-900 shadow-lg'
-                  : 'text-red-900 hover:text-amber-50 hover:bg-red-800/80'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    </nav>
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes reverse-spin {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 8s linear infinite;
+        }
+        .animate-reverse-spin {
+          animation: reverse-spin 12s linear infinite;
+        }
+      `}</style>
+    </>
   );
 };
 

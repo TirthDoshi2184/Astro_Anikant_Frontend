@@ -39,7 +39,7 @@ function App() {
     "/adminproducts",
     "/adminusers/:id",
     "/adminupdateuser/:id",
-    "/adminsingleproductview/:id", // Fixed: Added missing forward slash
+    "/adminsingleproductview/:id",
     "/adminlogin",
     "/adminorders",
     "/adminorders/:id",
@@ -49,14 +49,14 @@ function App() {
 
   // Check if current path matches any of the patterns
   const hideLayout = hideLayoutPaths.some(path => {
-    // Handle dynamic routes properly
     const match = matchPath({ path, end: false }, location.pathname);
     return match !== null;
   });
 
   return (
     <>
-      
+      {/* Add navbar here, inside the Router context */}
+      {!hideLayout && <AstrologyNavbar />}
       
       <Routes>
         {/* Public Routes */}

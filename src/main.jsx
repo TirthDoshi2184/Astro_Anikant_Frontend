@@ -8,7 +8,7 @@ import AstrologyNavbar from './Components/Navbar.jsx'
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
     <BrowserRouter>
-    {<AstrologyNavbar />}
+    {/* {<AstrologyNavbar />} */}
       <App />
     </BrowserRouter>
   // </StrictMode>,
