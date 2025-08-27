@@ -32,7 +32,7 @@ export const AdminOrders = () => {
     const getAllOrders = async () => {
         try {
             setLoading(true)
-            const response = await axios.get("http://localhost:1921/order/getallorder")
+            const response = await axios.get("https://astroanikantbackend-2.onrender.com/order/getallorder")
             console.log('Raw API response:', response.data.data);
             
             // Add debugging to see the actual status values
@@ -134,7 +134,7 @@ export const AdminOrders = () => {
         try {
             // Add your API call to update order status
             console.log(`Updating order ${orderId} to status: ${newStatus}`)
-            // await axios.put(`http://localhost:1921/order/update/${orderId}`, { status: newStatus })
+            // await axios.put(`https://astroanikantbackend-2.onrender.com/order/update/${orderId}`, { status: newStatus })
             // Refresh orders after update
             getAllOrders()
         } catch (error) {

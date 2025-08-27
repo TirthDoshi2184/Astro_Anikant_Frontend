@@ -24,7 +24,7 @@ export const AdminSidePanel = () => {
 
   const getAllUsers = async () => {
 
-    const response = await axios.get("http://localhost:1921/user/getalluser")
+    const response = await axios.get("https://astroanikantbackend-2.onrender.com/user/getalluser")
     setUsers(response.data.data)
     console.log(response.data.data);
     

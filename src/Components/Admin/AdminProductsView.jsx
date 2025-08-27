@@ -42,7 +42,7 @@ export const AdminProductsView = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get("http://localhost:1921/product/getallproducts");
+      const response = await axios.get("https://astroanikantbackend-2.onrender.com/product/getallproducts");
       setProducts(response.data.data);
       console.log(response.data.data);
     } catch (err) {

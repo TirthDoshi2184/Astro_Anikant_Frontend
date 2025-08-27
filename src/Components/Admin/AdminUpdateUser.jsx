@@ -80,7 +80,7 @@ export const AdminUpdateUser = () => {
                 setError(null);
 
                 // Updated URL to match your backend
-                const response = await axios.get(`http://localhost:1921/user/getsingleuser/${id}`);
+                const response = await axios.get(`https://astroanikantbackend-2.onrender.com/user/getsingleuser/${id}`);
 
                 const user = response.data.data;
 
@@ -134,7 +134,7 @@ export const AdminUpdateUser = () => {
                 }]
             };
 
-            const response = await axios.put(`http://localhost:1921/user/updateuser/${id}`, updateData);
+            const response = await axios.put(`https://astroanikantbackend-2.onrender.com/user/updateuser/${id}`, updateData);
 
             if (response.status === 200 || response.status === 201) {
                 alert('User updated successfully!');

@@ -13,7 +13,7 @@ export const AdminDashboard = () => {
 
   const getAllproducts = async () => {
     try {
-      const response = await axios.get("http://localhost:1921/product/getallproducts");
+      const response = await axios.get("https://astroanikantbackend-2.onrender.com/product/getallproducts");
       setProducts(response.data.data);
       console.log("Products", response.data.data);
       console.log("Products Length", response.data.data.length);
@@ -24,7 +24,7 @@ export const AdminDashboard = () => {
 
   const getAllUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:1921/user/getalluser");
+      const response = await axios.get("https://astroanikantbackend-2.onrender.com/user/getalluser");
       setUsers(response.data.data);
       console.log("Users", response.data.data);
       console.log("Users Length", response.data.data.length);
@@ -35,7 +35,7 @@ export const AdminDashboard = () => {
 
   const getAllOrder = async () => {
     try {
-      const response = await axios.get("http://localhost:1921/order/getallorder");
+      const response = await axios.get("https://astroanikantbackend-2.onrender.com/order/getallorder");
       setOrders(response.data.data); // Fixed: was setting products instead of orders
       console.log("Order", response.data.data);
       console.log("Order Length", response.data.data.length);

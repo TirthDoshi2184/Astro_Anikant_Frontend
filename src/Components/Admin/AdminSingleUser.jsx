@@ -39,7 +39,7 @@ export const AdminSingleUser = () => {
   console.log(id, "dsknk");
 
   const getSingleUser = async () => {
-    const response = await axios.get(`http://localhost:1921/user/getsingleuser/${id}`)
+    const response = await axios.get(`https://astroanikantbackend-2.onrender.com/user/getsingleuser/${id}`)
     setUser(response.data.data)
     console.log(response.data.data);
     console.log("user", user);
@@ -85,7 +85,7 @@ export const AdminSingleUser = () => {
   const deleteUser = async () => {
     // Mock delete function - replace with actual API call
 
-    const response = await axios.delete(`http://localhost:1921/user/deleteuser/${id}`)
+    const response = await axios.delete(`https://astroanikantbackend-2.onrender.com/user/deleteuser/${id}`)
     navigate("/adminusers")
     alert('User deleted successfully');
 

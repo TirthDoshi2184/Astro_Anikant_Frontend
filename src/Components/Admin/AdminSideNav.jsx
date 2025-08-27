@@ -35,7 +35,7 @@ export const AdminSideNav = () => {
 
     const getAllUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:1921/user/getalluser");
+            const response = await axios.get("https://astroanikantbackend-2.onrender.com/user/getalluser");
             setUsers(response.data.data);
         } catch (error) {
             console.error('Error fetching users:', error);

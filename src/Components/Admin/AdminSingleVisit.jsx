@@ -77,7 +77,7 @@ export const AdminSingleVisit = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await axios.get(`http://localhost:1921/visit/getsinglevisit/${id}`);
+            const response = await axios.get(`https://astroanikantbackend-2.onrender.com/visit/getsinglevisit/${id}`);
             setVisit(response.data.data);
             console.log("Visit data:", response.data.data);
         } catch (error) {

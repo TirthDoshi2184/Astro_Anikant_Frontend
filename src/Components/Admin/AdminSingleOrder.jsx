@@ -35,7 +35,7 @@ export const AdminSingleOrder = () => {
     const getOrder = async () => {
         try {
             setLoading(true)
-            const response = await axios.get(`http://localhost:1921/order/getsingleorder/${id}`)
+            const response = await axios.get(`https://astroanikantbackend-2.onrender.com/order/getsingleorder/${id}`)
             console.log(response.data.data);
             setOrder(response.data.data)
         } catch (error) {

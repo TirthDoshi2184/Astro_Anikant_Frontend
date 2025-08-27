@@ -70,7 +70,7 @@ const AdminLogin = () => {
 
     try {
       // Use http for localhost unless you have HTTPS set up for localhost
-      const response = await axios.post("http://localhost:1921/admin/singleadmin", formData);
+      const response = await axios.post("https://astroanikantbackend-2.onrender.com/admin/singleadmin", formData);
 
       console.log('API Response:', response.data.data);
 
