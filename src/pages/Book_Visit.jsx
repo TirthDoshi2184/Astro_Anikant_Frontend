@@ -23,7 +23,7 @@ const BookVisitPage = () => {
   const [allVisits, setAllVisits] = useState([]);
 
   // API Base URL - Update this to your actual backend URL
-  const API_BASE_URL = 'http://localhost:1921/visit'; // Change this to your backend URL
+  const API_BASE_URL = 'https://astroanikantbackend-2.onrender.com/visit'; // Change this to your backend URL
 
   const createVisit = async (visitData) => {
     try {

@@ -67,7 +67,7 @@ const ProductDetailPage = () => {
     setError(null);
     try {
       console.log('Fetching product with ID:', productID);
-      const response = await axios.get(`http://localhost:1921/product/getsingleproduct/${productID}`);
+      const response = await axios.get(`https://astroanikantbackend-2.onrender.com/product/getsingleproduct/${productID}`);
       console.log('Fetched product:', response.data.data);
       setProduct(response.data.data);
     } catch (error) {
@@ -144,7 +144,7 @@ const ProductDetailPage = () => {
       status: "pending"
     };
 
-    const response = await axios.post('http://localhost:1921/cart/createcart', cartData, {
+    const response = await axios.post('https://astroanikantbackend-2.onrender.com/cart/createcart', cartData, {
       headers: {
         'Content-Type': 'application/json',
         ...(authToken && { 'Authorization': `Bearer ${authToken}` })
@@ -190,7 +190,7 @@ const ProductDetailPage = () => {
   //       }
   //     };
 
-  //     const response = await axios.post('http://localhost:1921/order/createorder', orderData);
+  //     const response = await axios.post('https://astroanikantbackend-2.onrender.com/order/createorder', orderData);
       
   //     if (response.data.message === "Order Placed Successfully") {
   //       alert('Order placed successfully! Redirecting to payment...');

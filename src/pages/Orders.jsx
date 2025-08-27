@@ -45,7 +45,7 @@ const OrderCheckoutPage = () => {
       setError('');
       
       // Fetch cart data from your actual API
-      const response = await fetch(`http://localhost:1921/cart/getsinglecart/${cartId}`);
+      const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getsinglecart/${cartId}`);
       const result = await response.json();
       
       if (response.ok && result.data) {
@@ -136,7 +136,7 @@ const OrderCheckoutPage = () => {
 
       console.log('Submitting order:', orderPayload);
 
-      const response = await fetch('http://localhost:1921/order/createorder', {
+      const response = await fetch('https://astroanikantbackend-2.onrender.com/order/createorder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

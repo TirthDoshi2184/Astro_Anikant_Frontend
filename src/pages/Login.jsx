@@ -32,7 +32,7 @@ export default function AstrologyLogin() {
     setSuccess("");
 
     try {
-      const response = await fetch("http://localhost:1921/user/loginuser", {
+      const response = await fetch("https://astroanikantbackend-2.onrender.com/user/loginuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +106,7 @@ export default function AstrologyLogin() {
 
     try {
       // Updated to match controller fields
-      const response = await fetch("http://localhost:1921/user/useradd", {
+      const response = await fetch("https://astroanikantbackend-2.onrender.com/user/useradd", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

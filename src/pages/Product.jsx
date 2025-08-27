@@ -205,7 +205,7 @@ useEffect(() => {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:1921/product/getallproducts');
+      const response = await axios.get('https://astroanikantbackend-2.onrender.com/product/getallproducts');
       console.log('Fetched products:', response.data.data);
       
       setProducts(response.data.data);

@@ -64,7 +64,7 @@ const CartPage = () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
         
-        const response = await fetch(`http://localhost:1921/cart/getcart/${userId}`, {
+        const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getcart/${userId}`, {
             signal: controller.signal,
             headers: {
                 'Cache-Control': 'no-cache',
@@ -141,7 +141,7 @@ const updateQuantity = useCallback(async (id, newQuantity) => {
         );
 
         // Update in database
-        const response = await fetch(`http://localhost:1921/cart/updatequantity/${id}`, {
+        const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/updatequantity/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ const updateQuantity = useCallback(async (id, newQuantity) => {
       setCartItems(prevItems => prevItems.filter(item => item.id !== id));
 
       // Your route shows deletecart as GET method, which is unusual but following your structure
-      const response = await fetch(`http://localhost:1921/cart/deletecart/${item.cartId}`, {
+      const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/deletecart/${item.cartId}`, {
         method: 'GET' // Following your route structure
       });
       
@@ -218,7 +218,7 @@ const updateQuantity = useCallback(async (id, newQuantity) => {
   // Fixed addToCart to match your API structure
   const addToCart = useCallback(async (productId) => {
     try {
-      const response = await fetch('http://localhost:1921/cart/createcart', {
+      const response = await fetch('https://astroanikantbackend-2.onrender.com/cart/createcart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

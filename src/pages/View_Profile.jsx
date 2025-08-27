@@ -49,7 +49,7 @@ const UserProfile = () => {
       const userId = storedUser._id;
       
       // Make API call with authentication header
-      const response = await fetch(`http://localhost:1921/user/getsingleuser/${userId}`, {
+      const response = await fetch(`https://astroanikantbackend-2.onrender.com/user/getsingleuser/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
