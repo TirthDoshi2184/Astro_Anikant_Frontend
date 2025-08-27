@@ -25,20 +25,21 @@ import { AdminOrders } from "./Components/Admin/AdminOrders";
 import { AdminSingleOrder } from "./Components/Admin/AdminSingleOrder";
 import { AdminVisits } from "./Components/Admin/AdminVisits";
 import { AdminSingleVisit } from "./Components/Admin/AdminSingleVisit";
+import Previous_Order_Page from "./pages/Previous_Order_Page";
 
 function App() {
   const location = useLocation();
 
-  // paths where navbar/footer should be hidden
+  // Paths where navbar/footer should be hidden
   const hideLayoutPaths = [
     "/adminpanel",
-    "/admindashboard",
+    "/admindashboard", 
     "/adminsidenav",
     "/adminusers",
     "/adminproducts",
     "/adminusers/:id",
     "/adminupdateuser/:id",
-    "adminsingleproductview/:id",
+    "/adminsingleproductview/:id", // Fixed: Added missing forward slash
     "/adminlogin",
     "/adminorders",
     "/adminorders/:id",
@@ -46,46 +47,48 @@ function App() {
     "/adminvisits/:id"
   ];
 
-  // check if current path matches any of the patterns
-  const hideLayout = hideLayoutPaths.some(path =>
-    matchPath({ path, end: true }, location.pathname)
-  );
+  // Check if current path matches any of the patterns
+  const hideLayout = hideLayoutPaths.some(path => {
+    // Handle dynamic routes properly
+    const match = matchPath({ path, end: false }, location.pathname);
+    return match !== null;
+  });
 
   return (
     <>
-      {!hideLayout && <AstrologyNavbar />}
-
+      
+      
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<AstrologyHomepage />} />
         <Route path="/login" element={<AstrologyLogin />} />
         <Route path="/products" element={<Product />} />
         <Route path="/about" element={<Aboutus />} />
-        <Route path="/orders" element={<Orders />} />
+        <Route path="/order" element={<Previous_Order_Page/>}/>
+        <Route path="/orders/:id" element={<Orders />} />
         <Route path="/donation" element={<Donation />} />
         <Route path="/booking" element={<Book_Visit />} />
         <Route path="/profile" element={<View_Profile />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/productdetail/:id" element={<ProductDetailPage />} />
-        <Route path='/adminpanel' element={<AdminSidePanel />} />
+        
+        {/* Admin Routes */}
+        <Route path="/adminpanel" element={<AdminSidePanel />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
-        <Route path='/adminsidenav' element={<AdminSideNav />} />
-        <Route path='/adminusers' element={<AdminUsersView />} />
-        <Route path='/adminusers/:id' element={<AdminSingleUser />} />
-        <Route path='/adminproducts' element={<AdminProductsView />} />
-        <Route path='/adminupdateuser/:id' element={<AdminUpdateUser />} />
-        <Route path='/adminlogin' element={<AdminLogin />} />
-        <Route path='/adminorders' element={<AdminOrders />} />
-        <Route path='/adminorders/:id' element={<AdminSingleOrder />} />
-        <Route path='/adminvisits' element={<AdminVisits />} />
-        <Route path='/adminvisits/:id' element={<AdminSingleVisit />} />
-
-
-
-
-
-        <Route path='/adminsingleproductview/:id' element={<AdminProductDetail />} />
-
-
+        <Route path="/adminsidenav" element={<AdminSideNav />} />
+        <Route path="/adminusers" element={<AdminUsersView />} />
+        <Route path="/adminusers/:id" element={<AdminSingleUser />} />
+        <Route path="/adminproducts" element={<AdminProductsView />} />
+        <Route path="/adminupdateuser/:id" element={<AdminUpdateUser />} />
+        <Route path="/adminsingleproductview/:id" element={<AdminProductDetail />} />
+        <Route path="/adminlogin" element={<AdminLogin />} />
+        <Route path="/adminorders" element={<AdminOrders />} />
+        <Route path="/adminorders/:id" element={<AdminSingleOrder />} />
+        <Route path="/adminvisits" element={<AdminVisits />} />
+        <Route path="/adminvisits/:id" element={<AdminSingleVisit />} />
+        
+        {/* 404 Route - should be last */}
+        <Route path="*" element={<div className="p-8 text-center">Page Not Found - 404</div>} />
       </Routes>
 
       {!hideLayout && <Footer />}

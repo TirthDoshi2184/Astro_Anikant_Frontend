@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
-import { ShoppingCart, User, ChevronDown, Lock, LogOut, Eye, Heart, Home } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingCart, User, ChevronDown, Lock, LogOut, Eye, Heart, Home, LogIn } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 // Make sure AstrologyNavbar is used inside a <BrowserRouter> in your app entry point
 
 const AstrologyNavbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('home');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   const navigate = useNavigate();
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    console.log('Auth token on mount:', authToken); // Debug log
+    setIsAuthenticated(!!authToken);
+  }, []);
 
   const navItems = [
     { id: 'home', label: 'Home', link: '/' },
@@ -18,31 +26,55 @@ const AstrologyNavbar = () => {
     { id: 'booking', label: 'Book Visit', link: '/booking' }
   ];
 
-  const profileMenuItems = [
-    { id: 'profile', label: 'View Profile', icon: Eye, link: '/profile' },
-    { id: 'password', label: 'Change Password', icon: Lock, link: '/change-password' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/login' }
-  ];
+  // Dynamic profile menu items based on authentication
+  const profileMenuItems = isAuthenticated 
+    ? [
+        { id: 'profile', label: 'View Profile', icon: Eye, link: '/profile' },
+        { id: 'password', label: 'Change Password', icon: Lock, link: '/change-password' },
+        { id: 'logout', label: 'Logout', icon: LogOut, action: 'logout' }
+      ]
+    : [
+        { id: 'login', label: 'Login', icon: LogIn, link: '/login' }
+      ];
 
   // Modified handlers for navigation
   const handleNavClick = (item) => {
+    console.log('Nav click:', item); // Debug log
     setActiveItem(item.id);
     navigate(item.link);
   };
 
   const handleProfileMenuClick = (item) => {
-    navigate(item.link);
+    console.log('Profile menu click:', item); // Debug log
+    if (item.action === 'logout') {
+      // Handle logout
+      localStorage.removeItem('authToken');
+      setIsAuthenticated(false);
+      navigate('/login');
+    } else {
+      navigate(item.link);
+    }
     setIsProfileOpen(false);
   };
 
-// const handleCartClick = () => {
-//   alert("dsjdjj")
-//   console.log('Cart button clicked - navigating to /cart');
-//     navigate('/cart');
-//     // setActiveItem('cart');
-// };
+  // Enhanced cart button handler with detailed logging
+  const handleCartClick = () => {
+    console.log('Cart button clicked!'); // Debug log
+    
+    const authToken = localStorage.getItem('authToken');
+    console.log('Auth token in cart handler:', authToken); // Debug log
+    
+    if (authToken) {
+      console.log('User is authenticated, navigating to /cart'); // Debug log
+      navigate('/cart');
+    } else {
+      console.log('User not authenticated, navigating to /login'); // Debug log
+      navigate('/login');
+    }
+  };
 
   const handleLogoClick = () => {
+    console.log('Logo clicked'); // Debug log
     setActiveItem('home');
     navigate('/');
   };
@@ -91,22 +123,21 @@ const AstrologyNavbar = () => {
           {/* Right Section - Cart & Profile */}
           <div className="flex items-center space-x-4">
             
-             {/* Cart Button */}
+             {/* Cart Button - with enhanced debugging */}
               <div className="relative group">
-                {/* <button 
+                <button 
                   onClick={handleCartClick}
                   className="p-3 rounded-full bg-gradient-to-br from-red-800 to-red-900 text-amber-50 shadow-lg hover:shadow-red-900/40 transition-all duration-300 transform hover:scale-110"
+                  style={{ cursor: 'pointer' }} // Ensure cursor pointer
                 >
                   <ShoppingCart className="w-5 h-5" />
-                </button> */}
-                <Link to="/cart">
-                  Cart
-                </Link>
+                </button>
                 <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-bounce shadow-md">
                   3
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-br from-red-700 to-red-800 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-md"></div>
               </div>
+
             {/* Profile Dropdown */}
             <div className="relative">
               <button
@@ -124,10 +155,12 @@ const AstrologyNavbar = () => {
               {/* Dropdown Menu */}
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-amber-50/95 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-red-900/20 overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200">
-                  <div className="p-4 border-b border-red-900/10 bg-gradient-to-r from-red-900/5 to-red-800/5">
-                    <div className="text-red-900 font-semibold">John Doe</div>
-                    <div className="text-red-700 text-sm">john.doe@email.com</div>
-                  </div>
+                  {isAuthenticated && (
+                    <div className="p-4 border-b border-red-900/10 bg-gradient-to-r from-red-900/5 to-red-800/5">
+                      <div className="text-red-900 font-semibold">John Doe</div>
+                      <div className="text-red-700 text-sm">john.doe@email.com</div>
+                    </div>
+                  )}
                   
                   <div className="py-2">
                     {profileMenuItems.map((item) => {

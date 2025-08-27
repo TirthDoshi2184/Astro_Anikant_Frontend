@@ -50,93 +50,130 @@ const CartPage = () => {
     };
   }, [cartItems.length]); // Only re-run when cart items change
 
-  // Optimize fetchCartData with useCallback and better error handling
   const fetchCartData = useCallback(async () => {
     if (!userId) {
-      setError('Please log in to view your cart');
-      setLoading(false);
-      return;
+        setError('Please log in to view your cart');
+        setLoading(false);
+        return;
     }
 
     try {
-      setLoading(true);
-      setError(null);
-      
-      // Add timeout to the fetch request
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      const response = await fetch(`http://localhost:1921/cart/getcart/${userId}`, {
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-        }
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log("Fetched cart data:", data);
-      
-      if (data && data.data && Array.isArray(data.data)) {
-        // Optimize data transformation
-        const transformedItems = data.data.map(cartItem => {
-          const product = cartItem.product || {};
-          return {
-            id: cartItem._id,
-            cartId: cartItem._id,
-            productId: product._id,
-            name: product.name || product.title || 'Unknown Product',
-            price: product.price || product.selling_price || 0,
-            originalPrice: product.original_price || product.price || 0,
-            quantity: cartItem.quantity || 1,
-            image: product.image && product.image !== "/api/placeholder/150/150" ? product.image : null,
-            category: product.category?.name || product.category || "General",
-            energized: product.energized !== false, // Default to true
-            description: product.description || '',
-            status: cartItem.status || 'active'
-          };
+        setLoading(true);
+        setError(null);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`http://localhost:1921/cart/getcart/${userId}`, {
+            signal: controller.signal,
+            headers: {
+                'Cache-Control': 'no-cache',
+            }
         });
         
-        setCartItems(transformedItems);
-      } else {
-        setCartItems([]);
-      }
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                setCartItems([]);
+                return;
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.data && Array.isArray(data.data)) {
+            const transformedItems = data.data
+                .filter(cartItem => cartItem.status !== 'ordered') // Filter out ordered items
+                .map(cartItem => {
+                    const product = cartItem.product || {};
+                    return {
+                        id: cartItem._id,
+                        cartId: cartItem._id,
+                        productId: product._id,
+                        name: product.name || product.title || 'Unknown Product',
+                        price: product.price || product.selling_price || 0,
+                        originalPrice: product.original_price || product.price || 0,
+                        quantity: cartItem.quantity || 1,
+                        image: product.image && product.image !== "/api/placeholder/150/150" ? product.image : null,
+                        category: product.category?.name || product.category || "General",
+                        energized: product.energized !== false,
+                        description: product.description || '',
+                        status: cartItem.status || 'In Cart'
+                    };
+                });
+            
+            setCartItems(transformedItems);
+        } else {
+            setCartItems([]);
+        }
     } catch (err) {
-      if (err.name === 'AbortError') {
-        setError('Request timed out. Please check your connection and try again.');
-      } else {
-        setError(err.message || 'Failed to load cart. Please try again.');
-      }
-      console.error('Error fetching cart:', err);
+        if (err.name === 'AbortError') {
+            setError('Request timed out. Please check your connection and try again.');
+        } else {
+            setError(err.message || 'Failed to load cart. Please try again.');
+        }
+        console.error('Error fetching cart:', err);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  }, [userId]);
-
+}, [userId]);
   // Fetch cart data only when userId changes
   useEffect(() => {
     fetchCartData();
   }, [fetchCartData]);
 
-  // Optimize quantity update with debouncing
-  const updateQuantity = useCallback((id, newQuantity) => {
+  // Fixed fetchCartData to match your API structure
+  // Replace the existing updateQuantity function with this:
+const updateQuantity = useCallback(async (id, newQuantity) => {
     if (newQuantity === 0) {
-      removeItem(id);
-      return;
+        removeItem(id);
+        return;
     }
     
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
-      )
-    );
-  }, []);
+    try {
+        // Optimistically update UI first
+        setCartItems(prevItems => 
+            prevItems.map(item => 
+                item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
+            )
+        );
 
+        // Update in database
+        const response = await fetch(`http://localhost:1921/cart/updatequantity/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                quantity: Math.max(1, newQuantity)
+            })
+        });
+
+        if (!response.ok) {
+            // Revert on failure
+            setCartItems(prevItems => 
+                prevItems.map(item => 
+                    item.id === id ? { ...item, quantity: item.quantity } : item
+                )
+            );
+            const data = await response.json();
+            setError(data.message || 'Failed to update quantity');
+        }
+    } catch (err) {
+        setError('Network error while updating quantity');
+        console.error('Error updating quantity:', err);
+        // Revert on error
+        fetchCartData();
+    }
+}, [fetchCartData]);
+
+// Also update the fetchCartData function to handle the quantity field:
+
+  // Since your API doesn't handle quantity updates, we'll just update local state
+
+  // Fixed removeItem to use the correct API endpoint
   const removeItem = useCallback(async (id) => {
     try {
       const item = cartItems.find(item => item.id === id);
@@ -145,8 +182,9 @@ const CartPage = () => {
       // Optimistically remove from UI
       setCartItems(prevItems => prevItems.filter(item => item.id !== id));
 
+      // Your route shows deletecart as GET method, which is unusual but following your structure
       const response = await fetch(`http://localhost:1921/cart/deletecart/${item.cartId}`, {
-        method: 'DELETE'
+        method: 'GET' // Following your route structure
       });
       
       if (!response.ok) {
@@ -177,6 +215,7 @@ const CartPage = () => {
     }
   }, [savedItems]);
 
+  // Fixed addToCart to match your API structure
   const addToCart = useCallback(async (productId) => {
     try {
       const response = await fetch('http://localhost:1921/cart/createcart', {
@@ -188,14 +227,15 @@ const CartPage = () => {
           user: userId,
           product: productId,
           order_dt: new Date().toISOString(),
-          status: 'active'
+          status: 'In Cart'
         })
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
         fetchCartData();
       } else {
-        const data = await response.json();
         setError(data.message || 'Failed to add item to cart');
       }
     } catch (err) {
@@ -214,13 +254,8 @@ const CartPage = () => {
     return { subtotal, shipping, gst, total };
   }, [cartItems, selectedShipping]);
 
-  const recommendedProducts = useMemo(() => [
-    { id: 101, name: "Crystal Pyramid", price: 600, image: "/api/placeholder/100/100" },
-    { id: 102, name: "Ganesha Pendant", price: 400, image: "/api/placeholder/100/100" },
-    { id: 103, name: "Tulsi Mala", price: 300, image: "/api/placeholder/100/100" },
-    { id: 104, name: "Shiva Locket", price: 500, image: "/api/placeholder/100/100" }
-  ], []);
-
+  // Removed recommendedProducts since it's not part of your API
+  
   // Early return for no user ID
   if (!userId && !loading) {
     return (
@@ -242,7 +277,7 @@ const CartPage = () => {
     );
   }
 
-  // Loading state with faster timeout
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#FEF7D7] to-white flex items-center justify-center">
@@ -469,35 +504,6 @@ const CartPage = () => {
                 </div>
               </div>
             )}
-
-            {/* Recommended Products */}
-            {cartItems.length > 0 && (
-              <div id="recommended" className={`transition-all duration-1000 ${isVisible.recommended ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                <h3 className="text-xl font-bold text-[#9C0B13] mb-6 flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2 animate-pulse" />
-                  Recommended for You
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {recommendedProducts.map((product) => (
-                    <div key={product.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 group">
-                      <div className="p-4 text-center">
-                        <div className="w-20 h-20 bg-gray-200 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-[#FEF7D7] transition-colors">
-                          <Star className="w-8 h-8 text-[#9C0B13]" />
-                        </div>
-                        <h4 className="font-semibold text-[#9C0B13] text-sm mb-2 line-clamp-2">{product.name}</h4>
-                        <p className="text-[#9C0B13] font-bold mb-3">₹{product.price?.toLocaleString()}</p>
-                        <button 
-                          onClick={() => addToCart(product.id)}
-                          className="w-full bg-[#9C0B13] text-white py-2 rounded-lg text-sm hover:bg-red-600 transition-colors"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Cart Summary Sidebar */}
@@ -616,11 +622,16 @@ const CartPage = () => {
                   </div>
 
                   {/* Checkout Button */}
-                  <button className="w-full bg-gradient-to-r from-[#9C0B13] to-red-600 text-white py-4 rounded-xl font-bold text-lg hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                  <button 
+                    onClick={() => {
+                      const cartIds = cartItems.map(item => item.cartId).join(',');
+                      window.location.href = `/orders/${cartIds}`;
+                    }}
+                    className="w-full bg-gradient-to-r from-[#9C0B13] to-red-600 text-white py-4 rounded-xl font-bold text-lg hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+                  >
                     <span>Proceed to Checkout</span>
                     <ChevronRight className="w-5 h-5" />
                   </button>
-                  
                   <p className="text-center text-sm text-gray-600 mt-4">
                     Free shipping on orders above ₹2,000
                   </p>
@@ -650,7 +661,7 @@ const CartPage = () => {
                   {selectedShipping === 'standard' && (
                     <div className="mt-4 bg-[#FEF7D7]/20 p-3 rounded-lg">
                       <p className="text-sm">
-                        📅 Expected delivery: {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                        Expected delivery: {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
                       </p>
                     </div>
                   )}
@@ -658,7 +669,7 @@ const CartPage = () => {
                   {selectedShipping === 'express' && (
                     <div className="mt-4 bg-[#FEF7D7]/20 p-3 rounded-lg">
                       <p className="text-sm">
-                        ⚡ Expected delivery: {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                        Expected delivery: {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()}
                       </p>
                     </div>
                   )}
@@ -666,7 +677,7 @@ const CartPage = () => {
                   {selectedShipping === 'same-day' && (
                     <div className="mt-4 bg-[#FEF7D7]/20 p-3 rounded-lg">
                       <p className="text-sm">
-                        🚀 Same day delivery: Order before 2 PM
+                        Same day delivery: Order before 2 PM
                       </p>
                     </div>
                   )}
