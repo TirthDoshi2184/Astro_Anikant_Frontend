@@ -73,7 +73,7 @@ export const AdminVisits = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await axios.get("http://localhost:1921/visit/getallvisit");
+            const response = await axios.get("https://astroanikantbackend-2.onrender.com/visit/getallvisit");
             setVisits(response.data.data);
             console.log(response.data.data);
         } catch (error) {
@@ -119,7 +119,7 @@ export const AdminVisits = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this visit?')) {
             try {
-                await axios.delete(`http://localhost:1921/visit/deletevisit/${id}`);
+                await axios.delete(`https://astroanikantbackend-2.onrender.com/visit/deletevisit/${id}`);
                 // Refresh the visits list
                 getAllVisits();
                 alert('Visit deleted successfully!');
