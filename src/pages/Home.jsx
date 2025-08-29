@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye } from 'lucide-react';
+import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye, TrendingUp, BookOpen, HeartPulse } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 // import { useNavigate } from 'react-router-dom';
 // import axios from 'axios';
@@ -129,11 +129,11 @@ const HomePage = () => {
 
   // Sample data (replace with API data in production)
   const categories = [
-    { id: 1, name: "Precious Gems", icon: Gem, count: "150+ Products", color: "from-red-500 to-pink-600" },
-    { id: 2, name: "Sacred Yantras", icon: Crown, count: "80+ Designs", color: "from-amber-500 to-orange-600" },
-    { id: 3, name: "Prayer Malas", icon: Heart, count: "120+ Varieties", color: "from-purple-500 to-indigo-600" },
-    { id: 4, name: "Pyramids", icon: Shield, count: "60+ Types", color: "from-emerald-500 to-teal-600" }
-  ];
+  { id: 1, name: "Sarv Karya Siddhi", icon: CheckCircle, count: "150+ Remedies", color: "from-red-500 to-pink-600" },
+  { id: 2, name: "Vyapar Vriddhi", icon: TrendingUp, count: "80+ Solutions", color: "from-amber-500 to-orange-600" },
+  { id: 3, name: "Vidhya Prapti", icon: BookOpen, count: "120+ Practices", color: "from-purple-500 to-indigo-600" },
+  { id: 4, name: "Sarv Rog Nivaran", icon: HeartPulse, count: "60+ Treatments", color: "from-emerald-500 to-teal-600" }
+];
 
   const bestSellers = [
     {

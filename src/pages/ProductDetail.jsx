@@ -67,7 +67,7 @@ const ProductDetailPage = () => {
     setError(null);
     try {
       console.log('Fetching product with ID:', productID);
-      const response = await axios.get(`https://astroanikantbackend-2.onrender.com/product/getsingleproduct/${productID}`);
+      const response = await axios.get(`http://localhost:1921/product/getsingleproduct/${productID}`);
       console.log('Fetched product:', response.data.data);
       setProduct(response.data.data);
     } catch (error) {
@@ -140,32 +140,31 @@ const ProductDetailPage = () => {
     const cartData = {
       user: userId,
       product: productID,
+      quantity: quantity, // Include the selected quantity
       order_dt: new Date().toISOString(),
       status: "pending"
     };
 
-    const response = await axios.post('https://astroanikantbackend-2.onrender.com/cart/createcart', cartData, {
+    const response = await axios.post('http://localhost:1921/cart/createcart', cartData, {
       headers: {
         'Content-Type': 'application/json',
         ...(authToken && { 'Authorization': `Bearer ${authToken}` })
       }
     });
     
-    if (response.status === 200 && response.data.message === "Created Cart") {
-      alert('Product added to cart successfully!');
-    } else {
-      throw new Error('Unexpected response');
+    if (response.status === 200) {
+      // Check if it's an update or new creation
+      const message = response.data.message.includes('updated') 
+        ? `Quantity updated! Total items: ${response.data.data.quantity}`
+        : 'Product added to cart successfully!';
+      alert(message);
+      
+      // Reset quantity to 1 after adding to cart
+      setQuantity(1);
     }
   } catch (error) {
     console.error('Error adding to cart:', error.response?.data || error);
-    
-    // Handle duplicate product error
-    if (error.response?.status === 409) {
-      alert('Product is already added to cart!');
-    } else {
-      const errorMessage = error.response?.data?.message || 'Failed to add product to cart. Please try again.';
-      alert(errorMessage);
-    }
+    alert('Failed to add product to cart. Please try again.');
   } finally {
     setIsAddingToCart(false);
   }
@@ -190,7 +189,7 @@ const ProductDetailPage = () => {
   //       }
   //     };
 
-  //     const response = await axios.post('https://astroanikantbackend-2.onrender.com/order/createorder', orderData);
+  //     const response = await axios.post('http://localhost:1921/order/createorder', orderData);
       
   //     if (response.data.message === "Order Placed Successfully") {
   //       alert('Order placed successfully! Redirecting to payment...');
