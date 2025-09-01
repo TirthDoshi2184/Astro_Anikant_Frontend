@@ -14,7 +14,7 @@ const AstrologyNavbar = () => {
     { id: 'home', label: 'Home', path: '/' },
     { id: 'products', label: 'Products', path: '/products' },
     { id: 'about', label: 'About Us', path: '/about' },
-    { id: 'order', label: 'Orders', path: '/order' },
+    { id: 'order', label: 'My Orders', path: '/order' },
     { id: 'donation', label: 'Donation', path: '/donation' },
     { id: 'booking', label: 'Book Visit', path: '/booking' }
   ];
@@ -254,9 +254,9 @@ const AstrologyNavbar = () => {
                   >
                     <span className="relative z-10 flex items-center space-x-2">
                       {item.label}
-                      {activeItem === item.id && (
-                        <div className="w-2 h-2 bg-amber-300 rounded-full animate-pulse"></div>
-                      )}
+                      {/* {activeItem === item.id && (
+                        <div className="w-2 h-2 bg-amber-300 rounded-full animate-pulse">n</div>
+                      )} */}
                     </span>
                     
                     {/* Magical hover effect */}

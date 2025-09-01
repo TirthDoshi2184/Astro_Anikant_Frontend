@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Grid, List, Star, Heart, ShoppingCart, ChevronDown, ChevronLeft, ChevronRight, Eye, Sparkles, Zap, Shield, DollarSign, TrendingUp, X } from 'lucide-react';
-import axios from 'axios';
 
 const ProductPage = () => {
   const [viewMode, setViewMode] = useState('grid');
@@ -46,178 +45,127 @@ const ProductPage = () => {
   // Sample products with more variety
   const sampleProducts = [
     {
-      id: 1,
+      _id: 1,
       name: 'Premium Ruby Gemstone Ring',
       description: 'Authentic Burmese Ruby with 92.5 Silver setting',
       price: 12500,
-      originalPrice: 15000,
-      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400',
-      rating: 4.8,
-      reviews: 234,
+      discountedPrice: 10000,
+      images: [{ url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400', isPrimary: true }],
+      averageRating: 4.8,
+      reviewCount: 234,
       category: 'Gems',
-      benefits: ['Wealth', 'Success', 'Confidence'],
-      inStock: true,
-      isNew: true,
-      isBestSeller: false,
-      weight: '3.2 carats',
-      origin: 'Burma',
-      certification: 'GIA Certified'
+      astrologicalBenefits: ['Wealth', 'Success', 'Confidence'],
+      stock: 5,
+      isActive: true,
+      isFeatured: true,
+      salesCount: 89,
+      stoneType: 'Ruby',
+      weight: { value: 3.2, unit: 'carats' }
     },
     {
-      id: 2,
+      _id: 2,
       name: 'Vastu Crystal Pyramid Set',
       description: 'Set of 9 crystal pyramids for complete Vastu correction',
       price: 3200,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-      rating: 4.9,
-      reviews: 189,
+      images: [{ url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400', isPrimary: true }],
+      averageRating: 4.9,
+      reviewCount: 189,
       category: 'Pyramids',
-      benefits: ['Protection', 'Health', 'Peace'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      size: '2 inches each',
-      material: 'Clear Quartz'
+      astrologicalBenefits: ['Protection', 'Health', 'Peace'],
+      stock: 8,
+      isActive: true,
+      isFeatured: false,
+      salesCount: 67,
+      stoneType: 'Clear Quartz',
+      weight: { value: 250, unit: 'grams' }
     },
     {
-      id: 3,
+      _id: 3,
       name: '108 Beads Rudraksha Mala',
       description: 'Authentic 5 Mukhi Rudraksha beads from Nepal',
       price: 2800,
-      originalPrice: 3500,
-      image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400',
-      rating: 4.7,
-      reviews: 156,
+      discountedPrice: 2200,
+      images: [{ url: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400', isPrimary: true }],
+      averageRating: 4.7,
+      reviewCount: 156,
       category: 'Malas',
-      benefits: ['Spirituality', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      beadSize: '8mm',
-      origin: 'Nepal'
+      astrologicalBenefits: ['Spirituality', 'Peace', 'Health'],
+      stock: 12,
+      isActive: true,
+      isFeatured: false,
+      salesCount: 123,
+      stoneType: 'Rudraksha',
+      weight: { value: 45, unit: 'grams' }
     },
     {
-      id: 4,
+      _id: 4,
       name: 'Shree Yantra Gold Plated',
       description: 'Sacred geometry for abundance and prosperity',
       price: 4500,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-      rating: 4.6,
-      reviews: 98,
+      images: [{ url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400', isPrimary: true }],
+      averageRating: 4.6,
+      reviewCount: 98,
       category: 'Yantras',
-      benefits: ['Wealth', 'Success', 'Spirituality'],
-      inStock: false,
-      isNew: true,
-      isBestSeller: false,
-      size: '3x3 inches',
-      material: 'Copper with Gold Plating'
+      astrologicalBenefits: ['Wealth', 'Success', 'Spirituality'],
+      stock: 0,
+      isActive: true,
+      isFeatured: true,
+      salesCount: 45,
+      stoneType: 'Copper',
+      weight: { value: 150, unit: 'grams' }
     },
     {
-      id: 5,
+      _id: 5,
       name: 'Amethyst Healing Crystal',
       description: 'Natural amethyst cluster for meditation and healing',
       price: 1800,
-      image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400',
-      rating: 4.9,
-      reviews: 276,
+      images: [{ url: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400', isPrimary: true }],
+      averageRating: 4.9,
+      reviewCount: 276,
       category: 'Crystals',
-      benefits: ['Spirituality', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      weight: '250 grams',
-      origin: 'Brazil'
+      astrologicalBenefits: ['Spirituality', 'Peace', 'Health'],
+      stock: 15,
+      isActive: true,
+      isFeatured: false,
+      salesCount: 198,
+      stoneType: 'Amethyst',
+      weight: { value: 250, unit: 'grams' }
     },
     {
-      id: 6,
+      _id: 6,
       name: 'Blue Sapphire Ring',
       description: 'Royal blue sapphire with diamond accents',
       price: 25000,
-      originalPrice: 30000,
-      image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',
-      rating: 4.8,
-      reviews: 89,
+      discountedPrice: 20000,
+      images: [{ url: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400', isPrimary: true }],
+      averageRating: 4.8,
+      reviewCount: 89,
       category: 'Gems',
-      benefits: ['Wealth', 'Success', 'Protection'],
-      inStock: true,
-      isNew: true,
-      isBestSeller: false,
-      weight: '2.5 carats',
-      origin: 'Kashmir',
-      certification: 'GRS Certified'
-    },
-    {
-      id: 7,
-      name: 'Rose Quartz Heart',
-      description: 'Love and compassion crystal for relationships',
-      price: 850,
-      image: 'https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?w=400',
-      rating: 4.7,
-      reviews: 145,
-      category: 'Crystals',
-      benefits: ['Love', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: false,
-      weight: '150 grams',
-      origin: 'Madagascar'
-    },
-    {
-      id: 8,
-      name: 'Copper Meditation Pyramid',
-      description: 'Handcrafted copper pyramid for energy amplification',
-      price: 5500,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-      rating: 4.5,
-      reviews: 67,
-      category: 'Pyramids',
-      benefits: ['Spirituality', 'Health', 'Protection'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: false,
-      size: '6 inches base',
-      material: '99.9% Pure Copper'
-    },
-    {
-      id: 9,
-      name: 'Tulsi Mala Premium',
-      description: 'Sacred Tulsi beads blessed by priests',
-      price: 1200,
-      image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400',
-      rating: 4.8,
-      reviews: 198,
-      category: 'Malas',
-      benefits: ['Spirituality', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      beadCount: '108 beads',
-      origin: 'Vrindavan'
+      astrologicalBenefits: ['Wealth', 'Success', 'Protection'],
+      stock: 3,
+      isActive: true,
+      isFeatured: true,
+      salesCount: 34,
+      stoneType: 'Blue Sapphire',
+      weight: { value: 2.5, unit: 'carats' }
     }
   ];
 
-  // API Integration (commented for future use)
-  
-useEffect(() => {
-    fetchProducts();
+  useEffect(() => {
+    // Simulate API call
+    setIsLoading(true);
+    setTimeout(() => {
+      setProducts(sampleProducts);
+      setIsLoading(false);
+    }, 1000);
   }, []);
 
-  const fetchProducts = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get('https://astroanikantbackend-2.onrender.com/product/getallproducts');
-      console.log('Fetched products:', response.data.data);
-      
-      setProducts(response.data.data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSearch = async () => {
-    await fetchProducts();
+    setIsLoading(true);
+    // Simulate search
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
   };
 
   const toggleCategory = (category) => {
@@ -235,6 +183,7 @@ useEffect(() => {
         : [...prev, benefit]
     );
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Hero Section - Clean and Professional */}
@@ -440,162 +389,160 @@ useEffect(() => {
           </div>
         )}
 
-          {!isLoading && (
-            <div className={`grid gap-6 mb-8 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
-              {products.map(product => (
-                <div
-            key={product._id}
-            className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
-            onClick={() => window.location.href = `/productdetail/${product._id}`}
-                >
-            {/* Product Image */}
-            <div className="relative overflow-hidden">
-              <img 
-                src={product.images && product.images.length > 0 
-                  ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
-                  : '/api/placeholder/300/250'
-                } 
-                alt={product.images && product.images.length > 0 
-                  ? product.images.find(img => img.isPrimary)?.alt || product.name
-                  : product.name
-                }
-                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  e.target.src = '/api/placeholder/300/250';
-                }}
-              />
-              
-              {/* Badges */}
-              <div className="absolute top-3 left-3 flex flex-col gap-1">
-                {product.isFeatured && (
-                  <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">FEATURED</span>
-                )}
-                {product.salesCount > 50 && (
-                  <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">BESTSELLER</span>
-                )}
-                {product.discountedPrice && (
-                  <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
-              {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
-                  </span>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
-                  <Heart size={16} className="text-red-600" />
-                </button>
-                <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
-                  <Eye size={16} className="text-red-600" />
-                </button>
-              </div>
-
-              {/* Stock Status */}
-              <div className="absolute bottom-3 left-3">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                  product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                </span>
-              </div>
-            </div>
-            
-            {/* Product Info */}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
-                {product.name}
-              </h3>
-              
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                {product.shortDescription || product.description}
-              </p>
-              
-              {/* Rating */}
-              <div className="flex items-center gap-2 mb-3">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                size={14} 
-                fill={i < Math.floor(product.averageRating || 0) ? "currentColor" : "none"} 
-              />
-                  ))}
-                </div>
-                <span className="text-sm text-gray-600">
-                  {product.averageRating || 0} ({product.reviewCount || 0})
-                </span>
-              </div>
-
-              {/* Astrological Benefits */}
-              <div className="flex flex-wrap gap-1 mb-3">
-                {product.astrologicalBenefits && product.astrologicalBenefits.slice(0, 2).map((benefit, index) => (
-                  <span key={index} className="text-xs bg-amber-100 text-red-800 px-2 py-1 rounded">
-              {benefit}
-                  </span>
-                ))}
-                {product.astrologicalBenefits && product.astrologicalBenefits.length > 2 && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-              +{product.astrologicalBenefits.length - 2} more
-                  </span>
-                )}
-              </div>
-
-              {/* Stone Type */}
-              {product.stoneType && (
-                <div className="mb-3">
-                  <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
-              {product.stoneType}
-                  </span>
-                </div>
-              )}
-
-              {/* Weight */}
-              {product.weight && product.weight.value && (
-                <div className="text-xs text-gray-500 mb-3">
-                  Weight: {product.weight.value} {product.weight.unit}
-                </div>
-              )}
-
-              {/* Price */}
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <span className="text-xl font-bold text-red-900">
-              ₹{(product.discountedPrice || product.price).toLocaleString()}
-                  </span>
-                  {product.discountedPrice && (
-              <span className="text-sm text-gray-500 line-through ml-2">
-                ₹{product.price.toLocaleString()}
-              </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Add to Cart Button */}
-              {/* Cart logic is remaining */}
-              <button 
-                className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                  product.stock > 0 && product.isActive
-              ? 'bg-red-900 text-white hover:bg-red-800'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={product.stock === 0 || !product.isActive}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (product.stock > 0 && product.isActive) {
-              // Add to cart logic here
-              console.log(`Added ${product.name} to cart`);
-              window.location.href = `/cart`;
-                  }
-                }}
+        {!isLoading && (
+          <div className={`grid gap-6 mb-8 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
+            {products.map(product => (
+              <div
+                key={product._id}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
+                onClick={() => console.log(`Navigate to product ${product._id}`)}
               >
-                <ShoppingCart size={18} />
-                {product.stock > 0 && product.isActive ? 'Add to Cart' : 'Out of Stock'}
-              </button>
-            </div>
+                {/* Product Image */}
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={product.images && product.images.length > 0 
+                      ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+                      : 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400'
+                    } 
+                    alt={product.images && product.images.length > 0 
+                      ? product.images.find(img => img.isPrimary)?.alt || product.name
+                      : product.name
+                    }
+                    className="w-full h-48 sm:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400';
+                    }}
+                  />
+                  
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-1">
+                    {product.isFeatured && (
+                      <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">FEATURED</span>
+                    )}
+                    {product.salesCount > 50 && (
+                      <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">BESTSELLER</span>
+                    )}
+                    {product.discountedPrice && (
+                      <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
+                        {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
+                      <Heart size={16} className="text-red-600" />
+                    </button>
+                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
+                      <Eye size={16} className="text-red-600" />
+                    </button>
+                  </div>
+
+                  {/* Stock Status */}
+                  <div className="absolute bottom-3 left-3">
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+                
+                {/* Product Info */}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                    {product.name}
+                  </h3>
+                  
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    {product.shortDescription || product.description}
+                  </p>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          size={14} 
+                          fill={i < Math.floor(product.averageRating || 0) ? "currentColor" : "none"} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      {product.averageRating || 0} ({product.reviewCount || 0})
+                    </span>
+                  </div>
+
+                  {/* Astrological Benefits */}
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {product.astrologicalBenefits && product.astrologicalBenefits.slice(0, 2).map((benefit, index) => (
+                      <span key={index} className="text-xs bg-amber-100 text-red-800 px-2 py-1 rounded">
+                        {benefit}
+                      </span>
+                    ))}
+                    {product.astrologicalBenefits && product.astrologicalBenefits.length > 2 && (
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                        +{product.astrologicalBenefits.length - 2} more
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Stone Type */}
+                  {product.stoneType && (
+                    <div className="mb-3">
+                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                        {product.stoneType}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Weight */}
+                  {product.weight && product.weight.value && (
+                    <div className="text-xs text-gray-500 mb-3">
+                      Weight: {product.weight.value} {product.weight.unit}
+                    </div>
+                  )}
+
+                  {/* Price */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <span className="text-xl font-bold text-red-900">
+                        ₹{(product.discountedPrice || product.price).toLocaleString()}
+                      </span>
+                      {product.discountedPrice && (
+                        <span className="text-sm text-gray-500 line-through ml-2">
+                          ₹{product.price.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  <button 
+                    className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                      product.stock > 0 && product.isActive
+                        ? 'bg-red-900 text-white hover:bg-red-800'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                    disabled={product.stock === 0 || !product.isActive}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (product.stock > 0 && product.isActive) {
+                        console.log(`Added ${product.name} to cart`);
+                      }
+                    }}
+                  >
+                    <ShoppingCart size={18} />
+                    {product.stock > 0 && product.isActive ? 'Add to Cart' : 'Out of Stock'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {!isLoading && products.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-500 text-lg mb-4">No products found</div>
