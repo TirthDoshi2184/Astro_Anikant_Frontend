@@ -248,10 +248,11 @@ const updateQuantity = useCallback(async (id, newQuantity) => {
   const calculations = useMemo(() => {
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shipping = selectedShipping === 'express' ? 200 : selectedShipping === 'same-day' ? 500 : 100;
-    const gst = Math.round(subtotal * 0.18);
-    const total = subtotal + shipping + gst;
+    const gst= Math.round(subtotal * 0.18);
+    const packaging = 50; // Fixed packaging fee
+    const total = subtotal + shipping + gst + packaging;
     
-    return { subtotal, shipping, gst, total };
+    return { subtotal, shipping, gst, total, packaging };
   }, [cartItems, selectedShipping]);
 
   // Removed recommendedProducts since it's not part of your API
@@ -524,12 +525,17 @@ const updateQuantity = useCallback(async (id, newQuantity) => {
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-700">Shipping</span>
+                      <span className="text-gray-700">Handling Fee</span>
                       <span className="font-semibold text-[#9C0B13]">₹{calculations.shipping?.toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-700">Packaging Fee</span>
+                      <span className="font-semibold text-[#9C0B13]">₹{calculations.packaging?.toLocaleString()}</span>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-700">GST (18%)</span>
+                      <span className="text-gray-700">Taxes (18%)</span>
                       <span className="font-semibold text-[#9C0B13]">₹{calculations.gst?.toLocaleString()}</span>
                     </div>
                     

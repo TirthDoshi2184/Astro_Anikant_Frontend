@@ -13,8 +13,25 @@ import {
   Heart,
   Shield,
   Star,
-  Sparkles
+  Sparkles,
+  CheckCircle,
+  TrendingUp,
+  BookOpen,
+  HeartPulse,
+  Droplets,
+  MessageCircle,
+  AwardIcon,
+  TrendingUpIcon,
+  GraduationCap,
+  Activity,
+  GemIcon
 } from 'lucide-react';
+import { SiFacebook, SiInstagram, SiWhatsapp, SiYoutube } from 'react-icons/si';
+import { BsTwitterX } from 'react-icons/bs';
+// react-icons (best matching icons from FontAwesome & others)
+import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat } from "react-icons/fa";
+import { GiLotus, GiPrayerBeads } from "react-icons/gi"; // for Rudraksha (spiritual)
+
 
 const Footer = () => {
   // Navigation function for SPA routing
@@ -35,31 +52,68 @@ const Footer = () => {
     { name: "Terms & Conditions", path: "/terms-conditions" },
     { name: "Shipping Info", path: "/shipping-info" },
     { name: "Returns Policy", path: "/returns-policy" },
-    { name: "Book a Visit", path: "/book-visit" },
+    { name: "Book a Consultation", path: "/book-visit" },
     { name: "Donation", path: "/donation" }
   ];
 
-  const productCategories = [
-    { name: "Precious Gems", icon: Gem, path: "/products?category=gems" },
-    { name: "Sacred Yantras", icon: Crown, path: "/products?category=yantras" },
-    { name: "Prayer Malas", icon: Heart, path: "/products?category=malas" },
-    { name: "Pyramids", icon: Shield, path: "/products?category=pyramids" },
-    { name: "Crystals", icon: Star, path: "/products?category=crystals" },
-    { name: "Spiritual Items", icon: Sparkles, path: "/products?category=spiritual" }
-  ];
+
+const productCategories = [
+  { 
+    id: 1, 
+    name: "Sarv Karya Siddhi", 
+    icon: FaAward, // success / siddhi / accomplishment
+    count: "150+ Remedies", 
+    color: "from-red-500 to-pink-600", 
+    path: "/products?category=sarv-karya-siddhi" 
+  },
+  { 
+    id: 2, 
+    name: "Vyapar Vriddhi", 
+    icon: FaBusinessTime, // business growth / prosperity
+    count: "80+ Solutions", 
+    color: "from-amber-500 to-orange-600", 
+    path: "/products?category=vyapar-vriddhi" 
+  },
+  { 
+    id: 3, 
+    name: "Vidhya Prapti", 
+    icon: FaBookReader, // knowledge, learning, wisdom
+    count: "120+ Practices", 
+    color: "from-purple-500 to-indigo-600", 
+    path: "/products?category=vidhya-prapti" 
+  },
+  { 
+    id: 4, 
+    name: "Sarv Rog Nivaran", 
+    icon: FaHeartbeat, // health, disease cure
+    count: "60+ Treatments", 
+    color: "from-emerald-500 to-teal-600", 
+    path: "/products?category=sarv-rog-nivaran" 
+  },
+  { 
+    id: 5, 
+    name: "Rudraksha", 
+    icon: GiPrayerBeads, // spirituality / meditation / beads
+    count: "90+ Beads", 
+    color: "from-yellow-500 to-amber-700", 
+    path: "/products?category=rudraksha" 
+  }
+];
 
   const contactInfo = {
     phone: "+91 98765 43210",
-    email: "info@AstroAnekant.com",
+    email: "astroanekant@gmail.com",
     whatsapp: "+91 98765 43210"
   };
 
-  const socialLinks = [
-    { name: "Facebook", icon: Facebook, url: "https://facebook.com/AstroAnekant" },
-    { name: "Instagram", icon: Instagram, url: "https://instagram.com/AstroAnekant" },
-    { name: "Twitter", icon: Twitter, url: "https://twitter.com/AstroAnekant" },
-    { name: "YouTube", icon: Youtube, url: "https://youtube.com/AstroAnekant" }
-  ];
+const socialLinks = [
+  { name: "Facebook", icon: SiFacebook, url: "https://facebook.com/AstroAnekant", color: "#1877F2" },
+  { name: "Instagram", icon: SiInstagram, url: "https://instagram.com/AstroAnekant", color: "#E4405F" },
+  { name: "Twitter", icon: BsTwitterX, url: "https://twitter.com/AstroAnekant", color: "#1DA1F2" },
+  { name: "YouTube", icon: SiYoutube, url: "https://youtube.com/%40ASTROANEKANT", color: "#FF0000" },
+  { name: "WhatsApp Community", icon: SiWhatsapp, url: "https://whatsapp.com/channel/0029VbBakTvFCCoa5ei2aZ0h", color: "#25D366" },
+];
+
 
   const paymentMethods = [
     { name: "Visa", logo: "💳" },
@@ -71,9 +125,9 @@ const Footer = () => {
   ];
 
   const supportHours = {
-    weekdays: "Monday - Friday: 9:00 AM - 8:00 PM",
+    weekdays: "Monday - Friday: 10:00 AM - 6:00 PM",
     saturday: "Saturday: 10:00 AM - 6:00 PM",
-    sunday: "Sunday: 11:00 AM - 5:00 PM"
+    sunday: "Sunday: 10:00 AM - 6:00 PM"
   };
 
   return (
@@ -101,16 +155,7 @@ const Footer = () => {
                 </p>
               </div>
               
-              {/* Address */}
-              <div className="bg-white/60 p-4 rounded-lg border border-amber-200 shadow-sm">
-                <div className="flex items-start space-x-3">
-                  <MapPin className="w-5 h-5 text-orange-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-amber-900 text-sm mb-1">Our Location</h4>
-                    <p className="text-amber-800 text-sm leading-relaxed">{companyInfo.address}</p>
-                  </div>
-                </div>
-              </div>
+              
             </div>
 
             {/* Quick Links */}
@@ -138,7 +183,7 @@ const Footer = () => {
             <div>
               <h3 className="text-xl font-bold text-amber-900 mb-6 flex items-center">
                 <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-amber-400 rounded mr-3"></div>
-                Our Products
+                Our Products Category
               </h3>
               <ul className="space-y-3">
                 {productCategories.map((category, index) => (
@@ -164,13 +209,7 @@ const Footer = () => {
               
               {/* Contact Details */}
               <div className="bg-white/60 p-4 rounded-lg border border-amber-200 shadow-sm space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Phone className="w-4 h-4 text-orange-600" />
-                  <div>
-                    <p className="text-amber-900 font-semibold text-sm">Phone</p>
-                    <p className="text-amber-800 text-sm">{contactInfo.phone}</p>
-                  </div>
-                </div>
+               
                 <div className="flex items-center space-x-3">
                   <Mail className="w-4 h-4 text-orange-600" />
                   <div>
@@ -199,18 +238,18 @@ const Footer = () => {
               <div>
                 <h4 className="text-amber-900 font-semibold mb-3 text-sm">Follow Our Journey</h4>
                 <div className="flex space-x-3">
-                  {socialLinks.map((social, index) => (
-                    <a
-                      key={index}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full flex items-center justify-center text-white hover:from-orange-500 hover:to-amber-500 transform hover:scale-110 transition-all duration-300 shadow-md hover:shadow-lg"
-                      aria-label={social.name}
-                    >
-                      <social.icon className="w-5 h-5" />
-                    </a>
-                  ))}
+{socialLinks.map(({ name, icon: Icon, url, color }) => (
+  <a
+    key={name}
+    href={url}
+    target="_blank"
+    rel="noreferrer"
+    className="inline-flex items-center gap-2 p-2"
+  >
+    <Icon className="h-6 w-6" style={{ color }} />
+  </a>
+))}
+
                 </div>
               </div>
             </div>

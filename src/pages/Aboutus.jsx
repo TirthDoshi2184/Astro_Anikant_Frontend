@@ -274,81 +274,6 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Physical Store Section */}
-      <section id="store" className={`py-20 bg-gradient-to-br from-[#9C0B13] to-red-600 text-white transition-all duration-1000 ${isVisible.store ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-bold mb-8">Visit Our Sacred Space</h2>
-              <p className="text-xl leading-relaxed mb-8 opacity-90">
-                Experience the divine energy of our physical store, where every corner resonates with spiritual vibrations 
-                and ancient wisdom. Our sacred space is designed to provide a transformative shopping experience.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                  <MapPin className="w-6 h-6 text-[#FEF7D7]" />
-                  <div>
-                    <p className="font-semibold">123 Spiritual Street, Ahmedabad, Gujarat 380001</p>
-                    <p className="opacity-80">Near Swaminarayan Temple</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-4">
-                  <Clock className="w-6 h-6 text-[#FEF7D7]" />
-                  <div>
-                    <p className="font-semibold">Open Daily: 9:00 AM - 8:00 PM</p>
-                    <p className="opacity-80">Special Puja Hours: 6:00 AM - 7:00 AM</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-4">
-                  <Phone className="w-6 h-6 text-[#FEF7D7]" />
-                  <div>
-                    <p className="font-semibold">+91 98765 43210</p>
-                    <p className="opacity-80">Free consultation available</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-4">
-                  <Mail className="w-6 h-6 text-[#FEF7D7]" />
-                  <div>
-                    <p className="font-semibold">info@astromystic.com</p>
-                    <p className="opacity-80">24/7 spiritual guidance</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 flex space-x-4">
-                <button className="bg-[#FEF7D7] text-[#9C0B13] px-6 py-3 rounded-xl font-semibold hover:bg-white transition-colors duration-300 flex items-center space-x-2">
-                  <Eye className="w-5 h-5" />
-                  <span>Virtual Tour</span>
-                </button>
-                <button className="border-2 border-[#FEF7D7] text-[#FEF7D7] px-6 py-3 rounded-xl font-semibold hover:bg-[#FEF7D7] hover:text-[#9C0B13] transition-all duration-300">
-                  Get Directions
-                </button>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <div className="bg-[#FEF7D7]/20 p-6 rounded-2xl backdrop-blur-sm">
-                <div className="bg-gray-200 h-64 rounded-xl mb-4 flex items-center justify-center">
-                  <span className="text-gray-500 text-lg">Store Interior Image</span>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-200 h-20 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">Gallery 1</span>
-                  </div>
-                  <div className="bg-gray-200 h-20 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">Gallery 2</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Awards & Recognition */}
       <section id="awards" className={`py-20 bg-gradient-to-br from-[#FEF7D7] to-white transition-all duration-1000 ${isVisible.awards ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -404,7 +329,7 @@ const AboutUs = () => {
               Explore Products
             </button>
             <button className="border-2 border-[#FEF7D7] text-[#FEF7D7] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#FEF7D7] hover:text-[#9C0B13] transition-all duration-300 transform hover:scale-105">
-              Book Store Visit
+              Book Consultation 
             </button>
           </div>
         </div>

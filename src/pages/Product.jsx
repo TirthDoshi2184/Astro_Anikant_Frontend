@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Grid, List, Star, Heart, ShoppingCart, ChevronDown, ChevronLeft, ChevronRight, Eye, Sparkles, Zap, Shield, DollarSign, TrendingUp, X } from 'lucide-react';
 import axios from 'axios';
+import { Navigate } from 'react-router-dom';
 
 const ProductPage = () => {
   const [viewMode, setViewMode] = useState('grid');
@@ -43,179 +44,55 @@ const ProductPage = () => {
     { name: 'Mystic Treasures', rating: 4.8, products: 98 }
   ];
 
-  // Sample products with more variety
-  const sampleProducts = [
-    {
-      id: 1,
-      name: 'Premium Ruby Gemstone Ring',
-      description: 'Authentic Burmese Ruby with 92.5 Silver setting',
-      price: 12500,
-      originalPrice: 15000,
-      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400',
-      rating: 4.8,
-      reviews: 234,
-      category: 'Gems',
-      benefits: ['Wealth', 'Success', 'Confidence'],
-      inStock: true,
-      isNew: true,
-      isBestSeller: false,
-      weight: '3.2 carats',
-      origin: 'Burma',
-      certification: 'GIA Certified'
-    },
-    {
-      id: 2,
-      name: 'Vastu Crystal Pyramid Set',
-      description: 'Set of 9 crystal pyramids for complete Vastu correction',
-      price: 3200,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-      rating: 4.9,
-      reviews: 189,
-      category: 'Pyramids',
-      benefits: ['Protection', 'Health', 'Peace'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      size: '2 inches each',
-      material: 'Clear Quartz'
-    },
-    {
-      id: 3,
-      name: '108 Beads Rudraksha Mala',
-      description: 'Authentic 5 Mukhi Rudraksha beads from Nepal',
-      price: 2800,
-      originalPrice: 3500,
-      image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400',
-      rating: 4.7,
-      reviews: 156,
-      category: 'Malas',
-      benefits: ['Spirituality', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      beadSize: '8mm',
-      origin: 'Nepal'
-    },
-    {
-      id: 4,
-      name: 'Shree Yantra Gold Plated',
-      description: 'Sacred geometry for abundance and prosperity',
-      price: 4500,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-      rating: 4.6,
-      reviews: 98,
-      category: 'Yantras',
-      benefits: ['Wealth', 'Success', 'Spirituality'],
-      inStock: false,
-      isNew: true,
-      isBestSeller: false,
-      size: '3x3 inches',
-      material: 'Copper with Gold Plating'
-    },
-    {
-      id: 5,
-      name: 'Amethyst Healing Crystal',
-      description: 'Natural amethyst cluster for meditation and healing',
-      price: 1800,
-      image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400',
-      rating: 4.9,
-      reviews: 276,
-      category: 'Crystals',
-      benefits: ['Spirituality', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      weight: '250 grams',
-      origin: 'Brazil'
-    },
-    {
-      id: 6,
-      name: 'Blue Sapphire Ring',
-      description: 'Royal blue sapphire with diamond accents',
-      price: 25000,
-      originalPrice: 30000,
-      image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',
-      rating: 4.8,
-      reviews: 89,
-      category: 'Gems',
-      benefits: ['Wealth', 'Success', 'Protection'],
-      inStock: true,
-      isNew: true,
-      isBestSeller: false,
-      weight: '2.5 carats',
-      origin: 'Kashmir',
-      certification: 'GRS Certified'
-    },
-    {
-      id: 7,
-      name: 'Rose Quartz Heart',
-      description: 'Love and compassion crystal for relationships',
-      price: 850,
-      image: 'https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?w=400',
-      rating: 4.7,
-      reviews: 145,
-      category: 'Crystals',
-      benefits: ['Love', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: false,
-      weight: '150 grams',
-      origin: 'Madagascar'
-    },
-    {
-      id: 8,
-      name: 'Copper Meditation Pyramid',
-      description: 'Handcrafted copper pyramid for energy amplification',
-      price: 5500,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-      rating: 4.5,
-      reviews: 67,
-      category: 'Pyramids',
-      benefits: ['Spirituality', 'Health', 'Protection'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: false,
-      size: '6 inches base',
-      material: '99.9% Pure Copper'
-    },
-    {
-      id: 9,
-      name: 'Tulsi Mala Premium',
-      description: 'Sacred Tulsi beads blessed by priests',
-      price: 1200,
-      image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400',
-      rating: 4.8,
-      reviews: 198,
-      category: 'Malas',
-      benefits: ['Spirituality', 'Peace', 'Health'],
-      inStock: true,
-      isNew: false,
-      isBestSeller: true,
-      beadCount: '108 beads',
-      origin: 'Vrindavan'
-    }
-  ];
-
   // API Integration (commented for future use)
   
 useEffect(() => {
     fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
+    
+    // Listen for URL changes to refetch products
+    const handleUrlChange = () => {
+        fetchProducts();
+    };
+    
+    window.addEventListener('popstate', handleUrlChange);
+    
+    return () => {
+        window.removeEventListener('popstate', handleUrlChange);
+    };
+}, []);
+const fetchProducts = async (categoryFilter = null) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('https://astroanikantbackend-2.onrender.com/product/getallproducts');
-      console.log('Fetched products:', response.data.data);
-      
-      setProducts(response.data.data);
+        // Get category from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryFromUrl = urlParams.get('category');
+        
+        // Use the category filter parameter or URL parameter
+        const categoryToFetch = categoryFilter || categoryFromUrl;
+        
+        let url = 'https://astroanikantbackend-2.onrender.com/product/getallproducts';
+        if (categoryToFetch) {
+            url += `?category=${categoryToFetch}`;
+        }
+        
+        const response = await axios.get(url);
+        console.log('Fetched products:', response.data.data);
+        
+        setProducts(response.data.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+        console.error('Error fetching products:', error);
+        
+        // Check if it's a 404 (no products found for category)
+        if (error.response && error.response.status === 404) {
+            setProducts([]); // Set empty array to show "no products" message
+        } else {
+            // For other errors, you might want to show all products or handle differently
+            setProducts([]);
+        }
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
-
+};
   const handleSearch = async () => {
     await fetchProducts();
   };
@@ -235,6 +112,11 @@ useEffect(() => {
         : [...prev, benefit]
     );
   };
+
+  const clearCategoryFilter = () => {
+    navigate('/products');
+    fetchProducts(); // Fetch all products
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Hero Section - Clean and Professional */}
@@ -262,28 +144,85 @@ useEffect(() => {
           </div>
         </div>
       </div>
-
+      {/* Free Delivery Banner */}
+{/* Enhanced Free Delivery Banner */}
+{/* Enhanced Free Delivery Banner - Theme Matched */}
+<div className="relative bg-gradient-to-r from-red-800 via-red-700 to-orange-700 text-white overflow-hidden">
+  {/* Animated background elements */}
+  <div className="absolute inset-0 opacity-25">
+    <div className="absolute top-2 left-10 animate-pulse">✨</div>
+    <div className="absolute top-4 right-20 animate-bounce">🕉️</div>
+    <div className="absolute bottom-3 left-32 animate-pulse">💎</div>
+    <div className="absolute bottom-2 right-40 animate-bounce">⭐</div>
+    <div className="absolute top-3 left-1/2 animate-pulse">🌟</div>
+  </div>
+  
+  {/* Main content */}
+  <div className="relative text-center py-4">
+    <div className="flex items-center justify-center gap-3">
+      {/* Truck icon with glow effect */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-yellow-300 rounded-full blur-sm opacity-40 animate-pulse"></div>
+        <div className="relative bg-white/20 rounded-full p-2">
+          <span className="text-xl">🚚</span>
+        </div>
+      </div>
+      
+      {/* Main text */}
+      <div className="flex flex-col sm:flex-row items-center gap-2">
+        <span className="text-lg font-bold tracking-wide">
+          🌟 DIVINE BLESSING 🌟
+        </span>
+        <span className="hidden sm:inline text-white/80">•</span>
+        <span className="text-base font-semibold">
+          FREE SACRED DELIVERY ON ALL ORDERS
+        </span>
+      </div>
+      
+      {/* Sacred symbol */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-yellow-300 rounded-full blur-sm opacity-40 animate-pulse"></div>
+        <div className="relative text-xl animate-spin-slow">
+          🔮
+        </div>
+      </div>
+    </div>
+    
+    {/* Subtitle */}
+    <div className="mt-1 text-sm opacity-90 font-medium">
+      Bringing spiritual energy to your doorstep with love & care ✨
+    </div>
+  </div>
+  
+  {/* Decorative border */}
+  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400"></div>
+</div>
       <div className="container mx-auto px-6 py-8">
         {/* Category Description */}
         <div className="bg-gradient-to-r from-red-900 to-red-800 text-white rounded-xl p-8 mb-8">
-          <h2 className="text-3xl font-bold mb-4">Spiritual Gems & Crystals</h2>
+          <h2 className="text-3xl font-bold mb-4">Spiritual Collections</h2>
           <p className="text-lg mb-6 opacity-90">
             Our carefully curated collection of spiritual products harnesses ancient wisdom to bring positive energy into your life.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/10 rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Perfect Selection</h4>
-              <p className="text-sm opacity-80">Choose based on your zodiac and spiritual goals</p>
-            </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Sacred Care</h4>
-              <p className="text-sm opacity-80">Cleanse under moonlight and store properly</p>
-            </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <h4 className="font-semibold mb-2">100% Authentic</h4>
-              <p className="text-sm opacity-80">Certified genuine with authenticity guarantee</p>
-            </div>
-          </div>
+<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <div className="bg-white/10 rounded-lg p-4">
+    <h4 className="font-semibold mb-2">Perfect Selection</h4>
+    <p className="text-sm opacity-80">Choose based on your zodiac and spiritual goals</p>
+  </div>
+  <div className="bg-white/10 rounded-lg p-4">
+  <h4 className="font-semibold mb-2">Free Delivery</h4>
+  <p className="text-sm opacity-80">Free shipping on all orders nationwide</p>
+</div>
+  <div className="bg-white/10 rounded-lg p-4">
+    <h4 className="font-semibold mb-2">Powerful Energy</h4>
+    <p className="text-sm opacity-80">Amplify your aura and manifest positive vibrations</p>
+  </div>
+  <div className="bg-white/10 rounded-lg p-4">
+    <h4 className="font-semibold mb-2">100% Authentic</h4>
+    <p className="text-sm opacity-80">Certified genuine with authenticity guarantee</p>
+  </div>
+
+</div>      
         </div>
 
         {/* Filter Toggle & Sort Options */}
@@ -300,6 +239,7 @@ useEffect(() => {
                   {selectedCategories.length + selectedBenefits.length}
                 </span>
               )}
+              
             </button>
             
             <select 
@@ -313,6 +253,7 @@ useEffect(() => {
               <option value="rating">Highest Rated</option>
               <option value="newest">Newest First</option>
             </select>
+  
           </div>
           
           <div className="flex items-center gap-2">
@@ -329,6 +270,7 @@ useEffect(() => {
             >
               <List size={20} />
             </button>
+  
           </div>
         </div>
 
@@ -412,6 +354,16 @@ useEffect(() => {
                 </div>
               </div>
             </div>
+                              {/* // Add this after your filter buttons */}
+{window.location.search.includes('category') && (
+    <button 
+        onClick={clearCategoryFilter}
+        className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800"
+    >
+        <X size={16} />
+        Clear Category Filter
+    </button>
+)}
 
             <div className="flex justify-end mt-6">
               <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2">
@@ -572,6 +524,12 @@ useEffect(() => {
 
               {/* Add to Cart Button */}
               {/* Cart logic is remaining */}
+              {/* Free Delivery Info */}
+{/* Product card delivery info - Theme matched */}
+<div className="flex items-center gap-1 text-red-700 text-xs mb-2">
+  <span>✨</span>
+  <span className="font-medium">Sacred Delivery Included</span>
+</div>
               <button 
                 className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
                   product.stock > 0 && product.isActive
@@ -588,7 +546,9 @@ useEffect(() => {
                   }
                 }}
               >
+                
                 <ShoppingCart size={18} />
+                
                 {product.stock > 0 && product.isActive ? 'Add to Cart' : 'Out of Stock'}
               </button>
             </div>
@@ -597,11 +557,27 @@ useEffect(() => {
             </div>
           )}
         {!isLoading && products.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-500 text-lg mb-4">No products found</div>
-            <div className="text-gray-400">Try adjusting your search or filters</div>
-          </div>
+    <div className="text-center py-12">
+        <div className="text-gray-500 text-lg mb-4">
+            {new URLSearchParams(window.location.search).get('category') 
+                ? `No products found for category: ${new URLSearchParams(window.location.search).get('category')}`
+                : 'No products found'
+            }
+        </div>
+        <div className="text-gray-400 mb-6">Try browsing other categories or check back later</div>
+        {new URLSearchParams(window.location.search).get('category') && (
+            <button 
+                onClick={() => {
+                    window.history.pushState({}, '', '/products');
+                    fetchProducts();
+                }}
+                className="bg-red-900 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition-colors"
+            >
+                View All Products
+            </button>
         )}
+    </div>
+)}
 
         {/* Simple Pagination */}
         {!isLoading && products.length > 0 && (
@@ -640,5 +616,13 @@ useEffect(() => {
     </div>
   );
 };
-
+<style jsx>{`
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+`}</style>
 export default ProductPage;

@@ -2,19 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, Phone, Mail, Calendar, Users, Star, CheckCircle, AlertCircle, Home, User } from 'lucide-react';
 
 const BookVisitPage = () => {
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: {
-      societyName: '',
-      street: '',
-      city: '',
-      state: '',
-      pincode: ''
-    }
+    birthdate: '',
+    message: ''
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
@@ -34,11 +27,11 @@ const BookVisitPage = () => {
         },
         body: JSON.stringify(visitData),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to create visit');
       }
-      
+
       return await response.json();
     } catch (error) {
       throw error;
@@ -90,9 +83,7 @@ const BookVisitPage = () => {
     setError('');
 
     // Validate required fields
-    if (!formData.name || !formData.email || !formData.phone || !selectedDate || !selectedTime || 
-        !formData.address.societyName || !formData.address.street || !formData.address.city || 
-        !formData.address.state || !formData.address.pincode) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.birthdate || !formData.message) {
       setError('Please fill in all required fields');
       setLoading(false);
       return;
@@ -103,23 +94,16 @@ const BookVisitPage = () => {
         name: formData.name,
         phone: parseInt(formData.phone),
         email: formData.email,
-        address: {
-          societyName: formData.address.societyName,
-          street: formData.address.street,
-          city: formData.address.city,
-          state: formData.address.state,
-          pincode: parseInt(formData.address.pincode)
-        },
-        visit_date: selectedDate,
-        time: selectedTime
+        birthdate: formData.birthdate,
+        message: formData.message,
       };
 
       const result = await createVisit(visitData);
-      
+
       if (result.message === "Visit Added Successfully") {
         setBookingDetails(result.data);
         setShowConfirmation(true);
-        
+
         // Refresh the visits list
         const updatedVisits = await getAllVisits();
         setAllVisits(updatedVisits.data || []);
@@ -133,10 +117,9 @@ const BookVisitPage = () => {
     }
   };
 
-  const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM'];
 
   const FloatingElement = ({ children, delay = 0 }) => (
-    <div 
+    <div
       className="animate-bounce"
       style={{ animationDelay: `${delay}s`, animationDuration: '3s' }}
     >
@@ -152,16 +135,16 @@ const BookVisitPage = () => {
         <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 rounded-full opacity-20 animate-ping"></div>
         <div className="absolute bottom-10 right-10 w-16 h-16 bg-orange-400 rounded-full opacity-30 animate-pulse"></div>
         <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-pink-400 rounded-full opacity-25 animate-bounce"></div>
-        
+
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center">
             <FloatingElement>
               <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                Book Home Visit
+                Book Consultation
               </h1>
             </FloatingElement>
             <p className="text-xl md:text-2xl mb-8 text-yellow-100">
-              Expert Astrologers Come to Your Doorstep
+              Expert Astrologers at Your Fingertips
             </p>
             <div className="flex justify-center space-x-8 text-lg flex-wrap gap-4">
               <div className="flex items-center animate-fadeIn">
@@ -171,10 +154,6 @@ const BookVisitPage = () => {
               <div className="flex items-center animate-fadeIn" style={{ animationDelay: '0.2s' }}>
                 <User className="mr-2 text-green-400" />
                 <span>Expert Astrologers</span>
-              </div>
-              <div className="flex items-center animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-                <Calendar className="mr-2 text-blue-400" />
-                <span>Flexible Timing</span>
               </div>
             </div>
           </div>
@@ -186,8 +165,8 @@ const BookVisitPage = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-[#9C0B13] mb-4">Book Your Home Visit</h2>
-              <p className="text-xl text-gray-600">Fill in your details and we'll bring the expertise to your doorstep</p>
+              <h2 className="text-4xl font-bold text-[#9C0B13] mb-4">Book Your Consultation </h2>
+              <p className="text-xl text-gray-600">Fill in your details and we'll bring the expertise</p>
             </div>
 
             {error && (
@@ -208,7 +187,7 @@ const BookVisitPage = () => {
                         type="text"
                         required
                         value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
                         placeholder="Enter your full name"
                       />
@@ -219,158 +198,71 @@ const BookVisitPage = () => {
                         type="tel"
                         required
                         value={formData.phone}
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
                         placeholder="Enter 10-digit phone number"
                       />
                     </div>
-                    <div className="md:col-span-2">
+                    <div>
                       <label className="block text-[#9C0B13] font-bold mb-2">Email Address *</label>
                       <input
                         type="email"
                         required
                         value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
                         placeholder="your.email@example.com"
                       />
                     </div>
+                    <div>
+                      <label className="block text-[#9C0B13] font-bold mb-2">Date of Birth *</label>
+                      <input
+                        type="date"
+                        required
+                        value={formData.birthdate}
+                        onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })}
+                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Address Details */}
+                {/* Consultation Purpose */}
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl shadow-lg">
                   <h3 className="text-2xl font-bold text-[#9C0B13] mb-6 flex items-center">
-                    <MapPin className="mr-3 animate-pulse" />
-                    Home Address
+                    <User className="mr-3 animate-pulse" />
+                    Purpose of Consultation
                   </h3>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">Society/Building Name *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.address.societyName}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          address: {...formData.address, societyName: e.target.value}
-                        })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="Society/Building name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">Street Address *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.address.street}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          address: {...formData.address, street: e.target.value}
-                        })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="Street address"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">City *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.address.city}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          address: {...formData.address, city: e.target.value}
-                        })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="Your city"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">State *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.address.state}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          address: {...formData.address, state: e.target.value}
-                        })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="Your state"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-[#9C0B13] font-bold mb-2">PIN Code *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.address.pincode}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          address: {...formData.address, pincode: e.target.value}
-                        })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="6-digit PIN code"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Date and Time Selection */}
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="bg-gradient-to-r from-orange-50 to-[#FEF7D7] p-6 rounded-2xl shadow-lg">
-                    <label className="block text-[#9C0B13] font-bold mb-3 flex items-center">
-                      <Calendar className="mr-2 animate-pulse" />
-                      Select Date *
-                    </label>
-                    <input
-                      type="date"
+                  <div>
+                    <label className="block text-[#9C0B13] font-bold mb-2">Tell us about your consultation needs *</label>
+                    <textarea
                       required
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
+                      value={formData.message}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        message: e.target.value
+                      })}
+                      rows={4}
                       className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
+                      placeholder="Describe what you'd like to discuss - career, relationships, health, business, etc."
                     />
                   </div>
-
-                  <div className="bg-gradient-to-r from-orange-50 to-[#FEF7D7] p-6 rounded-2xl shadow-lg">
-                    <label className="block text-[#9C0B13] font-bold mb-3 flex items-center">
-                      <Clock className="mr-2 animate-pulse" />
-                      Select Time *
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {timeSlots.map((time) => (
-                        <button
-                          key={time}
-                          type="button"
-                          onClick={() => setSelectedTime(time)}
-                          className={`p-2 rounded-lg border-2 transition-all duration-300 text-sm ${
-                            selectedTime === time
-                              ? 'bg-[#9C0B13] text-white border-[#9C0B13]'
-                              : 'border-[#9C0B13] text-[#9C0B13] hover:bg-[#9C0B13] hover:text-white'
-                          }`}
-                        >
-                          {time}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
+
+
 
                 {/* Payment Summary */}
                 <div className="bg-gradient-to-r from-yellow-100 to-orange-100 p-6 rounded-2xl shadow-lg">
                   <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Payment Summary</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-700">Visit Fee:</span>
-                      <span className="font-bold text-[#9C0B13]">₹99</span>
+                      <span className="text-gray-700">Fee:</span>
+                      <span className="font-bold text-[#9C0B13]">₹11</span>
                     </div>
                     <div className="border-t-2 border-[#9C0B13] pt-3">
                       <div className="flex justify-between items-center">
                         <span className="text-xl font-bold text-[#9C0B13]">Total Amount:</span>
-                        <span className="text-2xl font-bold text-[#9C0B13]">₹99</span>
+                        <span className="text-2xl font-bold text-[#9C0B13]">₹11</span>
                       </div>
                     </div>
                   </div>
@@ -380,10 +272,10 @@ const BookVisitPage = () => {
                 <div className="text-center">
                   <button
                     onClick={handleSubmit}
-                    disabled={loading || !selectedDate || !selectedTime || !formData.name || !formData.phone || !formData.email || !formData.address.societyName || !formData.address.street || !formData.address.city || !formData.address.state || !formData.address.pincode}
+                    disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message}
                     className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Booking...' : 'Confirm Home Visit - ₹99'}
+                    {loading ? 'Booking...' : 'Confirm  - ₹11'}
                   </button>
                 </div>
               </div>
@@ -391,9 +283,9 @@ const BookVisitPage = () => {
               /* Confirmation Section */
               <div className="text-center bg-gradient-to-r from-green-50 to-emerald-50 p-12 rounded-3xl shadow-2xl">
                 <CheckCircle className="mx-auto text-green-600 mb-6 animate-bounce" size={80} />
-                <h3 className="text-3xl font-bold text-green-800 mb-4">Home Visit Confirmed!</h3>
+                <h3 className="text-3xl font-bold text-green-800 mb-4">Consultation Confirmed!</h3>
                 <p className="text-xl text-green-700 mb-6">Your booking has been successfully created</p>
-                
+
                 {bookingDetails && (
                   <div className="bg-white p-6 rounded-2xl shadow-lg inline-block text-left max-w-md">
                     <h4 className="font-bold text-[#9C0B13] mb-3">Booking Details:</h4>
@@ -401,9 +293,8 @@ const BookVisitPage = () => {
                       <p><strong>Name:</strong> {bookingDetails.name}</p>
                       <p><strong>Phone:</strong> {bookingDetails.phone}</p>
                       <p><strong>Email:</strong> {bookingDetails.email}</p>
-                      <p><strong>Date:</strong> {new Date(bookingDetails.visit_date).toLocaleDateString()}</p>
-                      <p><strong>Time:</strong> {bookingDetails.time}</p>
-                      <p><strong>Address:</strong> {bookingDetails.address.societyName}, {bookingDetails.address.street}, {bookingDetails.address.city}, {bookingDetails.address.state} - {bookingDetails.address.pincode}</p>
+                      <p><strong>Date of Birth:</strong> {bookingDetails.birthdate}</p>
+                      <p><strong>Message:</strong> {bookingDetails.message}</p>
                       <p><strong>Amount:</strong> ₹{bookingDetails.amount}</p>
                       <p><strong>Status:</strong> {bookingDetails.status}</p>
                       <p><strong>Booking ID:</strong> #{bookingDetails._id}</p>
@@ -426,21 +317,14 @@ const BookVisitPage = () => {
                         name: '',
                         email: '',
                         phone: '',
-                        address: {
-                          societyName: '',
-                          street: '',
-                          city: '',
-                          state: '',
-                          pincode: ''
-                        }
+                        birthdate: '',
+                        message: ''
                       });
-                      setSelectedDate('');
-                      setSelectedTime('');
                       setBookingDetails(null);
                     }}
                     className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                   >
-                    Book Another Visit
+                    Book Another Consultation
                   </button>
                 </div>
               </div>
@@ -455,7 +339,7 @@ const BookVisitPage = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-[#9C0B13] text-center mb-12">Important Guidelines</h2>
-            
+
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-gradient-to-r from-[#FEF7D7] to-yellow-50 p-6 rounded-2xl shadow-lg">
                 <div className="flex items-center mb-4">
@@ -466,31 +350,29 @@ const BookVisitPage = () => {
                   <li>• Ensure clean and peaceful space for consultation</li>
                   <li>• Keep birth details ready (date, time, place)</li>
                   <li>• Prepare any specific questions or concerns</li>
-                  <li>• Keep water available for the astrologer</li>
                 </ul>
               </div>
 
               <div className="bg-gradient-to-r from-orange-50 to-[#FEF7D7] p-6 rounded-2xl shadow-lg">
                 <div className="flex items-center mb-4">
                   <Clock className="text-orange-500 mr-3" />
-                  <h3 className="text-xl font-bold text-[#9C0B13]">Timing & Duration</h3>
+                  <h3 className="text-xl font-bold text-[#9C0B13]">Flexible Consultation</h3>
                 </div>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• Astrologer will arrive within 15 minutes of scheduled time</li>
-                  <li>• Standard consultation duration is 60 minutes</li>
-                  <li>• Please be available for the entire duration</li>
-                  <li>• Allow buffer time for travel delays</li>
+                  <li>• Instant access from the comfort of your home</li>
+                  <li>• Choose chat, audio, or video as per your preference</li>
+                  <li>• We will get in touch with you as soon as possible</li>
                 </ul>
               </div>
+
             </div>
 
             <div className="mt-12 text-center">
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-2xl shadow-lg">
                 <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Contact Information</h3>
                 <div className="">
-        
+
                   <div className="flex items-center justify-center">
-                    <Mail className="text-blue-600 mr-3" />
                     <span className="text-lg font-semibold">📧 astroanekant@gmail.com</span>
                   </div>
                 </div>
