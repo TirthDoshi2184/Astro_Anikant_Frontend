@@ -9,11 +9,11 @@ const BookVisitPage = () => {
     birthdate: '',
     message: ''
   });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [allVisits, setAllVisits] = useState([]);
 
   // API Base URL - Update this to your actual backend URL
   const API_BASE_URL = 'https://astroanikantbackend-2.onrender.com/visit'; // Change this to your backend URL
@@ -66,18 +66,6 @@ const BookVisitPage = () => {
   };
 
   // Load all visits on component mount
-  useEffect(() => {
-    const fetchVisits = async () => {
-      try {
-        const result = await getAllVisits();
-        setAllVisits(result.data || []);
-      } catch (error) {
-        console.error('Error fetching visits:', error);
-      }
-    };
-    fetchVisits();
-  }, []);
-
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
@@ -105,8 +93,6 @@ const BookVisitPage = () => {
         setShowConfirmation(true);
 
         // Refresh the visits list
-        const updatedVisits = await getAllVisits();
-        setAllVisits(updatedVisits.data || []);
       } else {
         setError('Failed to book visit. Please try again.');
       }
@@ -267,16 +253,56 @@ const BookVisitPage = () => {
                     </div>
                   </div>
                 </div>
-
+{/* Terms & Conditions */}
+<div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-2xl shadow-lg">
+  <h3 className="text-2xl font-bold text-[#9C0B13] mb-4 flex items-center">
+    <AlertCircle className="mr-3 text-yellow-500" />
+    Terms & Conditions
+  </h3>
+  <div className="space-y-3">
+    <div className="flex items-start">
+      <input
+        type="checkbox"
+        id="terms"
+        checked={acceptedTerms}
+        onChange={(e) => setAcceptedTerms(e.target.checked)}
+        className="mt-1 mr-3 h-4 w-4 text-[#9C0B13] focus:ring-[#9C0B13] border-2 border-[#9C0B13] rounded"
+        required
+      />
+      <label htmlFor="terms" className="text-gray-700 text-sm leading-relaxed">
+        <span className="text-red-500">*</span> I agree to the{' '}
+        <button
+          type="button"
+          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
+          onClick={() => {
+            window.open('/terms', '_blank');
+          }}
+        >
+          Terms & Conditions
+        </button>
+        {' '}and{' '}
+        <button
+          type="button"
+          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
+          onClick={() => {
+            window.open('/privacy', '_blank');
+          }}
+        >
+          Privacy Policy
+        </button>
+      </label>
+    </div>
+  </div>
+</div>
                 {/* Submit Button */}
                 <div className="text-center">
-                  <button
-                    onClick={handleSubmit}
-                    disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message}
-                    className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Booking...' : 'Confirm  - ₹11'}
-                  </button>
+                 <button
+  onClick={handleSubmit}
+  disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message || !acceptedTerms}
+  className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {loading ? 'Booking...' : 'Confirm Booking - ₹11'}
+</button>
                 </div>
               </div>
             ) : (

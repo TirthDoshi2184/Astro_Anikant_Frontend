@@ -26,11 +26,9 @@ const OrderCheckoutPage = () => {
 
   // Get cart_id from URL params or use demo ID
   const getCartIdFromUrl = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const pathSegments = window.location.pathname.split('/');
-    // Try to get ID from path (like /checkout/cartId) or query params
-    return pathSegments[pathSegments.length - 1] || urlParams.get('cart_id') || '64a1b2c3d4e5f6789012345';
-  };
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('userId') || 'demo-user-id';
+};
 
   const cartId = getCartIdFromUrl();
 
@@ -39,48 +37,88 @@ const OrderCheckoutPage = () => {
     fetchCartDetails(cartId);
   }, [cartId]);
 
-  const fetchCartDetails = async (cartId) => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      // Fetch cart data from your actual API
-      const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getsinglecart/${cartId}`);
-      const result = await response.json();
-      
-      if (response.ok && result.data) {
-        setCartData(result.data);
-        
-        // Pre-fill form with user data if available
-        if (result.data.user) {
-          const user = result.data.user;
-          setFormData(prev => ({
-            ...prev,
-            firstName: user.name ? user.name.split(' ')[0] : '',
-            lastName: user.name ? user.name.split(' ').slice(1).join(' ') : '',
-            email: user.email || '',
-            phone: user.phone || '',
-            address: user.address?.street || user.address?.societyName || '',
-            city: user.address?.city || '',
-            state: user.address?.state || '',
-            pincode: user.address?.pincode || ''
-          }));
-        }
-      } else {
-        // If cart not found or error, show fallback message
-        setError(result.message || 'Cart not found or has expired');
-        setCartData(null);
-      }
-      
-    } catch (err) {
-      console.error('Error fetching cart:', err);
-      setError('Network error. Please check your connection and try again.');
-      setCartData(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  fetchCartDetails(cartId);
+}, [cartId]);
 
+const fetchCartDetails = async (cartId) => {
+  try {
+    setLoading(true);
+    setError('');
+    
+    // First try to get user ID from localStorage
+    const user = localStorage.getItem("user");
+    let userId = null;
+    
+    if (user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        userId = parsedUser.userId || parsedUser.id || parsedUser._id;
+      } catch (e) {
+        console.error("Error parsing user from localStorage", e);
+      }
+    }
+    
+    if (!userId) {
+      setError('Please log in to continue with checkout');
+      return;
+    }
+    
+    // Use the same endpoint as cart page - get user's cart, not single cart
+    const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getcart/${userId}`);
+    const result = await response.json();
+    
+    console.log('API Response:', result);
+    
+    if (response.ok && result.data) {
+      setCartData(result.data);
+      
+      // Pre-fill form with user data if available
+      if (result.data.user) {
+        const user = result.data.user;
+        setFormData(prev => ({
+          ...prev,
+          firstName: user.name ? user.name.split(' ')[0] : '',
+          lastName: user.name ? user.name.split(' ').slice(1).join(' ') : '',
+          email: user.email || '',
+          phone: user.phone || '',
+          address: user.address?.street || user.address?.societyName || '',
+          city: user.address?.city || '',
+          state: user.address?.state || '',
+          pincode: user.address?.pincode || ''
+        }));
+      }
+    } else {
+      setError(result.message || 'Cart not found or has expired');
+      setCartData(null);
+    }
+    
+  } catch (err) {
+    console.error('Error fetching cart:', err);
+    setError('Network error. Please check your connection and try again.');
+    setCartData(null);
+  } finally {
+    setLoading(false);
+  }
+};
+
+if (!cartData || !cartData.items || !Array.isArray(cartData.items) || cartData.items.length === 0) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
+      <div className="text-center">
+        <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Cart is Empty</h2>
+        <p className="text-gray-600 mb-4">Your cart doesn't have any items or has expired.</p>
+        <button 
+          onClick={() => window.location.href = '/products'} 
+          className="bg-red-800 text-white px-6 py-3 rounded-lg hover:bg-red-900 transition-colors"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  );
+}
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -116,79 +154,92 @@ const OrderCheckoutPage = () => {
 
     return true;
   };
+const handleSubmitOrder = async () => {
+  if (!validateForm()) return;
+  if (!cartData) {
+    setError('Cart data not available');
+    return;
+  }
 
-  const handleSubmitOrder = async () => {
-    if (!validateForm()) return;
-    if (!cartData) {
-      setError('Cart data not available');
-      return;
-    }
+  try {
+    setSubmitting(true);
+    setError('');
 
-    try {
-      setSubmitting(true);
-      setError('');
+    // Create order payload matching your backend structure
+    const orderPayload = {
+      cart: cartData._id, // Use the cart ID from the fetched cart data // This should be the cart ID string
+      typeOfPayment: paymentMethod,
+      // You might want to add more fields here if your backend expects them
+      // shippingAddress: {
+      //   firstName: formData.firstName,
+      //   lastName: formData.lastName,
+      //   address: formData.address,
+      //   city: formData.city,
+      //   state: formData.state,
+      //   pincode: formData.pincode
+      // }
+    };
 
-      // Create order payload matching your backend structure
-      const orderPayload = {
-        cart: cartId, // This should match the cart ID
-        typeOfPayment: paymentMethod
-      };
+    console.log('Cart Data:', cartData);
+console.log('Order Payload:', orderPayload);
 
-      console.log('Submitting order:', orderPayload);
+    console.log('Submitting order:', orderPayload);
 
-      const response = await fetch('https://astroanikantbackend-2.onrender.com/order/createorder', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderPayload)
+    const response = await fetch('https://astroanikantbackend-2.onrender.com/order/createorder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderPayload)
+    });
+
+    const result = await response.json();
+    console.log('Order response:', result);
+
+    if (response.ok && result.data) {
+      setSuccess('Order placed successfully! Redirecting to confirmation...');
+      
+      // Clear form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        state: '',
+        pincode: '',
+        deliveryInstructions: '',
+        orderNotes: '',
+        deliveryPreference: 'standard'
       });
 
-      const result = await response.json();
-      console.log('Order response:', result);
-
-      if (response.ok && result.data) {
-        setSuccess('Order placed successfully! Redirecting to confirmation...');
-        
-        // Clear form
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          address: '',
-          city: '',
-          state: '',
-          pincode: '',
-          deliveryInstructions: '',
-          orderNotes: '',
-          deliveryPreference: 'standard'
-        });
-
-        // Redirect after success
-        setTimeout(() => {
-          // You can navigate to order confirmation page
-          window.location.href = `/order-confirmation/${result.data._id}`;
-        }, 2000);
-        
-      } else {
-        setError(result.message || 'Failed to place order. Please try again.');
-      }
-    } catch (err) {
-      console.error('Order submission error:', err);
-      setError('Network error. Please check your connection and try again.');
-    } finally {
-      setSubmitting(false);
+      // Redirect after success
+      setTimeout(() => {
+        // Navigate to order confirmation page
+        window.location.href = `/order-confirmation/${result.data._id}`;
+      }, 2000);
+      
+    } else {
+      setError(result.message || 'Failed to place order. Please try again.');
     }
-  };
+  } catch (err) {
+    console.error('Order submission error:', err);
+    setError('Network error. Please check your connection and try again.');
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const calculateSubtotal = () => {
-    if (!cartData) return 0;
-    // Calculate based on product price and quantity
-    const price = cartData.product?.price || 0;
-    const quantity = cartData.quantity || 1;
-    return price * quantity;
-  };
+  if (!cartData || !cartData.items || !Array.isArray(cartData.items)) return 0;
+  
+  return cartData.items.reduce((total, item) => {
+    const price = item.product?.discountedPrice || item.product?.price || 0;
+    const quantity = item.quantity || 1;
+    return total + (price * quantity);
+  }, 0);
+};
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
@@ -504,39 +555,52 @@ const OrderCheckoutPage = () => {
             <div className="bg-white rounded-2xl shadow-xl p-8 sticky top-8 border border-red-100">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Order Review</h2>
               
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300">
-                  <img 
-                    src={cartData.product?.image || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop'} 
-                    alt={cartData.product?.name || 'Product'} 
-                    className="w-16 h-16 rounded-lg object-cover shadow-md" 
-                  />
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-800 text-sm">{cartData.product?.name}</p>
-                    <p className="text-xs text-gray-600">Qty: {cartData.quantity || 1}</p>
-                    {cartData.product?.weight && (
-                      <p className="text-xs text-gray-500">
-                        {typeof cartData.product.weight === 'object' 
-                          ? `${cartData.product.weight.value}${cartData.product.weight.unit}` 
-                          : `${cartData.product.weight}g`}
-                      </p>
-                    )}
-                    {cartData.product?.category && (
-                      <p className="text-xs text-gray-500">Category: {cartData.product.category}</p>
-                    )}
-                    <p className="text-xs text-gray-400">Status: {cartData.status}</p>
-                  </div>
-                  <div className="text-right">
-                    {cartData.product?.originalPrice > cartData.product?.price && (
-                      <p className="text-xs text-gray-400 line-through">₹{cartData.product.originalPrice}</p>
-                    )}
-                    <p className="font-bold text-red-800">₹{cartData.product?.price}</p>
-                    {cartData.quantity > 1 && (
-                      <p className="text-xs text-gray-600">₹{cartData.product?.price * cartData.quantity} total</p>
-                    )}
-                  </div>
-                </div>
-              </div>
+            <div className="space-y-4 mb-6">
+  {cartData.items && Array.isArray(cartData.items) ? cartData.items.map((item, index) => (
+    <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300">
+      <img 
+        src={item.product?.images?.[0]?.url || item.product?.images?.[0] || item.product?.image || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop'} 
+        alt={item.product?.name || 'Product'} 
+        className="w-16 h-16 rounded-lg object-cover shadow-md" 
+        onError={(e) => {
+          e.target.src = 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop';
+        }}
+      />
+      <div className="flex-1">
+        <p className="font-semibold text-gray-800 text-sm">{item.product?.name || 'Unknown Product'}</p>
+        <p className="text-xs text-gray-600">Qty: {item.quantity || 1}</p>
+        {item.product?.weight && (
+          <p className="text-xs text-gray-500">
+            {typeof item.product.weight === 'object' 
+              ? `${item.product.weight.value}${item.product.weight.unit}` 
+              : `${item.product.weight}g`}
+          </p>
+        )}
+        {item.product?.category && (
+          <p className="text-xs text-gray-500">Category: {item.product.category}</p>
+        )}
+        <p className="text-xs text-gray-400">Status: {cartData.status}</p>
+      </div>
+      <div className="text-right">
+        {item.product?.price && item.product?.discountedPrice && item.product.discountedPrice < item.product.price && (
+          <p className="text-xs text-gray-400 line-through">₹{item.product.price}</p>
+        )}
+        <p className="font-bold text-red-800">
+          ₹{item.product?.discountedPrice || item.product?.price || 0}
+        </p>
+        {item.quantity > 1 && (
+          <p className="text-xs text-gray-600">
+            ₹{(item.product?.discountedPrice || item.product?.price || 0) * item.quantity} total
+          </p>
+        )}
+      </div>
+    </div>
+  )) : (
+    <div className="text-center py-4 text-gray-500">
+      No items found in cart
+    </div>
+  )}
+</div>
 
               {subtotal >= 2000 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">

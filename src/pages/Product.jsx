@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Grid, List, Star, Heart, ShoppingCart, ChevronDown, ChevronLeft, ChevronRight, Eye, Sparkles, Zap, Shield, DollarSign, TrendingUp, X } from 'lucide-react';
 import axios from 'axios';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const ProductPage = () => {
   const [viewMode, setViewMode] = useState('grid');
@@ -15,6 +15,7 @@ const ProductPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const navigate = useNavigate();
 
   const categories = [
     { name: 'Gems', icon: '💎', count: 245 },
@@ -402,7 +403,7 @@ const fetchProducts = async (categoryFilter = null) => {
               <div
                 key={product._id}
                 className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
-                onClick={() => console.log(`Navigate to product ${product._id}`)}
+                onClick={() => navigate(`/productdetail/${product._id}`)}
               >
                 {/* Product Image */}
                 <div className="relative overflow-hidden">
@@ -573,39 +574,77 @@ const fetchProducts = async (categoryFilter = null) => {
     </div>
 )}
 
-        {/* Simple Pagination */}
-        {!isLoading && products.length > 0 && (
-          <div className="flex justify-between items-center bg-white rounded-lg p-4 shadow-md">
-            <div className="flex items-center gap-4">
-              <span className="text-gray-700">Items per page:</span>
-              <select 
-                value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value={12}>12</option>
-                <option value={24}>24</option>
-                <option value={48}>48</option>
-              </select>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
-                <ChevronLeft size={20} />
-              </button>
-              <span className="px-4 py-2 bg-red-900 text-white rounded">1</span>
-              <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">2</button>
-              <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">3</button>
-              <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
-                <ChevronRight size={20} />
-              </button>
-            </div>
+        {/* Responsive Pagination */}
+{!isLoading && products.length > 0 && (
+  <div className="bg-white rounded-lg p-4 shadow-md">
+    {/* Desktop Layout */}
+    <div className="hidden md:flex justify-between items-center">
+      <div className="flex items-center gap-4">
+        <span className="text-gray-700">Items per page:</span>
+        <select 
+          value={itemsPerPage}
+          onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
+          className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          <option value={12}>12</option>
+          <option value={24}>24</option>
+          <option value={48}>48</option>
+        </select>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
+          <ChevronLeft size={20} />
+        </button>
+        <span className="px-4 py-2 bg-red-900 text-white rounded">1</span>
+        <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">2</button>
+        <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">3</button>
+        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
+          <ChevronRight size={20} />
+        </button>
+      </div>
 
-            <div className="text-sm text-gray-600">
-              Showing 1-{Math.min(itemsPerPage, products.length)} of {products.length} products
-            </div>
-          </div>
-        )}
+      <div className="text-sm text-gray-600">
+        Showing 1-{Math.min(itemsPerPage, products.length)} of {products.length} products
+      </div>
+    </div>
+
+    {/* Mobile Layout */}
+    <div className="md:hidden space-y-4">
+      {/* Items per page - Mobile */}
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-gray-700">Items per page:</span>
+        <select 
+          value={itemsPerPage}
+          onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
+          className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          <option value={12}>12</option>
+          <option value={24}>24</option>
+          <option value={48}>48</option>
+        </select>
+      </div>
+
+      {/* Page navigation - Mobile */}
+      <div className="flex items-center justify-center gap-2">
+        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
+          <ChevronLeft size={18} />
+        </button>
+        <span className="px-3 py-2 bg-red-900 text-white rounded text-sm">1</span>
+        <button className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100 text-sm">2</button>
+        <button className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100 text-sm">3</button>
+        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
+          <ChevronRight size={18} />
+        </button>
+      </div>
+
+      {/* Results info - Mobile */}
+      <div className="text-center text-sm text-gray-600">
+        Showing 1-{Math.min(itemsPerPage, products.length)} of {products.length} products
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

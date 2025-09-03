@@ -27,13 +27,11 @@ const AstrologyNavbar = () => {
       const token = localStorage.getItem('authToken');
       const userId = localStorage.getItem('user');
       
-      console.log('Checking auth - Token exists:', !!token);
-      console.log('Checking auth - User ID:', userId);
       
       if (token && userId) {
         setIsAuthenticated(true);
-        await fetchUserData(userId);
-        await fetchCartCount(userId);
+        // await fetchUserData(userId);
+        // await fetchCartCount(userId);
       } else {
         console.log('No valid auth data found');
         setIsAuthenticated(false);
@@ -56,80 +54,80 @@ const AstrologyNavbar = () => {
   }, []);
 
   // Fetch user data from API
-  const fetchUserData = async (userId) => {
-    try {
-      setIsLoading(true);
-      console.log('Fetching user data for ID:', userId);
+  // const fetchUserData = async (userId) => {
+  //   try {
+  //     setIsLoading(true);
+  //     console.log('Fetching user data for ID:', userId);
       
-      const response = await fetch(`https://astroanikantbackend-2.onrender.com/user/getsingleuser/${userId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-          'Content-Type': 'application/json'
-        }
-      });
+  //     const response = await fetch(`https://astroanikantbackend-2.onrender.com/user/getsingleuser/${userId}`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
 
-      console.log('User API Response status:', response.status);
+  //     console.log('User API Response status:', response.status);
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('User data received:', result);
-        if (result.data) {
-          setUser(result.data);
-        } else {
-          console.error('No user data in response');
-        }
-      } else {
-        console.error('Failed to fetch user data, status:', response.status);
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        // Don't logout immediately, user might still be valid
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      // Don't logout on network error, user might still be valid
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     if (response.ok) {
+  //       const result = await response.json();
+  //       // console.log('User data received:', result);
+  //       if (result.data) {
+  //         setUser(result.data);
+  //       } else {
+  //         console.error('No user data in response');
+  //       }
+  //     } else {
+  //       console.error('Failed to fetch user data, status:', response.status);
+  //       const errorText = await response.text();
+  //       console.error('Error response:', errorText);
+  //       // Don't logout immediately, user might still be valid
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching user data:', error);
+  //     // Don't logout on network error, user might still be valid
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // Fetch cart count from API
-  const fetchCartCount = async (userId) => {
-    try {
-      console.log('Fetching cart for user ID:', userId);
+  // const fetchCartCount = async (userId) => {
+  //   try {
+  //     console.log('Fetching cart for user ID:', userId);
       
-      const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getsinglecart/${userId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-          'Content-Type': 'application/json'
-        }
-      });
+  //     const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getsinglecart/${userId}`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
 
-      console.log('Cart API Response status:', response.status);
+  //     console.log('Cart API Response status:', response.status);
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Cart data received:', result);
+  //     if (response.ok) {
+  //       const result = await response.json();
+  //       console.log('Cart data received:', result);
         
-        if (result.data && Array.isArray(result.data)) {
-          setCartCount(result.data.length);
-        } else {
-          setCartCount(0);
-        }
-      } else if (response.status === 404) {
-        // No cart found is normal for new users
-        console.log('No cart found for user (404) - setting count to 0');
-        setCartCount(0);
-      } else {
-        console.error('Failed to fetch cart data, status:', response.status);
-        setCartCount(0);
-      }
-    } catch (error) {
-      console.error('Error fetching cart count:', error);
-      setCartCount(0);
-    }
-  };
+  //       if (result.data && Array.isArray(result.data)) {
+  //         setCartCount(result.data.length);
+  //       } else {
+  //         setCartCount(0);
+  //       }
+  //     } else if (response.status === 404) {
+  //       // No cart found is normal for new users
+  //       console.log('No cart found for user (404) - setting count to 0');
+  //       setCartCount(0);
+  //     } else {
+  //       console.error('Failed to fetch cart data, status:', response.status);
+  //       setCartCount(0);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching cart count:', error);
+  //     setCartCount(0);
+  //   }
+  // };
 
   // Dynamic profile menu items
   const profileMenuItems = isAuthenticated 

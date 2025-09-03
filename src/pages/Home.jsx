@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye, TrendingUp, BookOpen, HeartPulse, Stars, Infinity, Pill } from 'lucide-react';
+import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye, TrendingUp, BookOpen, HeartPulse, Stars, Infinity, Pill, Droplets, Package, User, Phone, Mail, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 // Sample data (replace with API data in production)
 import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat } from "react-icons/fa";
@@ -8,6 +8,31 @@ import { GiPrayerBeads } from "react-icons/gi";
 // import axios from 'axios';
 
 const HomePage = () => {
+
+  const [formData, setFormData] = useState({
+    productName: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    additionalInfo: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.productName || !formData.fullName || !formData.email || !formData.phone) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    console.log('Form submitted:', formData);
+    alert('Thank you! Your product inquiry has been submitted. Our team will contact you soon.');
+  };
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState({});
@@ -402,210 +427,187 @@ const categories = [
         </div>
 
         <div className="container mx-auto relative z-10">
-          {/* Enhanced Header */}
-          <div className="text-center mb-16">
-            {/* Central Sacred Symbol */}
-            <div className="mb-10 flex justify-center">
-              <div className="relative">
-                {/* Main Icon with Orbiting Elements */}
-                <div className="w-28 h-28 bg-gradient-to-br from-[#FEF7D7]/30 to-yellow-200/30 rounded-full flex items-center justify-center animate-spin-slow border-4 border-[#FEF7D7]/40 shadow-2xl shadow-[#FEF7D7]/20">
-                  <Eye className="w-14 h-14 text-[#FEF7D7] animate-pulse" />
-                </div>
-                
-                {/* Orbiting Sacred Symbols */}
-                <div className="absolute inset-0 animate-spin-reverse">
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-7 h-7 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center">
-                    <Crown className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="absolute top-1/2 -right-3 transform -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-[#FEF7D7] to-yellow-300 rounded-full flex items-center justify-center">
-                    <Gem className="w-4 h-4 text-[#9C0B13]" />
-                  </div>
-                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-7 h-7 bg-gradient-to-br from-red-400 to-rose-500 rounded-full flex items-center justify-center">
-                    <Heart className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-                    <Shield className="w-4 h-4 text-white" />
-                  </div>
-                </div>
-                
-                {/* Pulsing Rings */}
-                <div className="absolute inset-0 rounded-full border-2 border-[#FEF7D7]/30 animate-ping"></div>
+           <div className="text-center mb-16">
+        {/* Central Sacred Symbol */}
+        <div className="mb-10 flex justify-center">
+          <div className="relative">
+            {/* Main Icon with Orbiting Elements */}
+            <div className="w-28 h-28 bg-gradient-to-br from-[#FEF7D7]/30 to-yellow-200/30 rounded-full flex items-center justify-center animate-spin-slow border-4 border-[#FEF7D7]/40 shadow-2xl shadow-[#FEF7D7]/20">
+              <Eye className="w-14 h-14 text-[#FEF7D7] animate-pulse" />
+            </div>
+            
+            {/* Orbiting Sacred Symbols */}
+            <div className="absolute inset-0 animate-spin-reverse">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-7 h-7 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center">
+                <Crown className="w-4 h-4 text-white" />
+              </div>
+              <div className="absolute top-1/2 -right-3 transform -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-[#FEF7D7] to-yellow-300 rounded-full flex items-center justify-center">
+                <Gem className="w-4 h-4 text-[#9C0B13]" />
+              </div>
+              <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-7 h-7 bg-gradient-to-br from-red-400 to-rose-500 rounded-full flex items-center justify-center">
+                <Heart className="w-4 h-4 text-white" />
+              </div>
+              <div className="absolute top-1/2 -left-3 transform -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Shield className="w-4 h-4 text-white" />
               </div>
             </div>
-
-            <h2 className="text-5xl md:text-6xl font-bold text-[#FEF7D7] mb-6">
-              Product Guidance Center
-            </h2>
-            <p className="text-2xl text-[#FEF7D7]/90 font-semibold mb-4">
-              Get Expert Product Insights
-            </p>
-            <p className="text-lg text-[#FEF7D7]/80 max-w-3xl mx-auto mb-6">
-              Have questions about our spiritual products? Get detailed information and expert recommendations from our astrologers
-            </p>
             
-            {/* Decorative Divider */}
-            <div className="flex justify-center items-center space-x-4">
-              <div className="w-20 h-1 bg-gradient-to-r from-transparent to-[#FEF7D7] animate-pulse"></div>
-              <Sparkles className="w-6 h-6 text-yellow-300 animate-spin-slow" />
-              <div className="w-20 h-1 bg-gradient-to-r from-[#FEF7D7] to-transparent animate-pulse"></div>
+            {/* Pulsing Rings */}
+            <div className="absolute inset-0 rounded-full border-2 border-[#FEF7D7]/30 animate-ping"></div>
+          </div>
+        </div>
+
+        <h2 className="text-5xl md:text-6xl font-bold text-[#FEF7D7] mb-6">
+          Special Product Request
+        </h2>
+        <p className="text-2xl text-[#FEF7D7]/90 font-semibold mb-4">
+          Looking for Something Unique?
+        </p>
+        <p className="text-lg text-[#FEF7D7]/80 max-w-3xl mx-auto mb-6">
+          Can't find what you're looking for? Tell us about the spiritual product you need and we'll help you find it or create a custom solution
+        </p>
+        
+        {/* Decorative Divider */}
+        <div className="flex justify-center items-center space-x-4">
+          <div className="w-20 h-1 bg-gradient-to-r from-transparent to-[#FEF7D7] animate-pulse"></div>
+          <Sparkles className="w-6 h-6 text-yellow-300 animate-spin-slow" />
+          <div className="w-20 h-1 bg-gradient-to-r from-[#FEF7D7] to-transparent animate-pulse"></div>
+        </div>
+      </div>
+
+      {/* Form Section */}
+      <div className="bg-gradient-to-br from-[#FEF7D7]/10 to-yellow-200/10 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#FEF7D7]/20 shadow-2xl mb-12">
+        <div className="space-y-8">
+          {/* Product Name Field */}
+          <div className="group">
+            <label className="flex items-center text-xl font-semibold text-[#FEF7D7] mb-4">
+              <Package className="w-6 h-6 mr-3 text-yellow-300" />
+              Product Name You're Looking For
+            </label>
+            <input
+              type="text"
+              name="productName"
+              value={formData.productName}
+              onChange={handleInputChange}
+              placeholder="e.g., Rudraksha Mala, Crystal Healing Set, Sacred Yantra..."
+              className="w-full px-6 py-4 bg-white/90 border-2 border-transparent rounded-2xl text-[#9C0B13] text-lg font-medium placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:bg-white transition-all duration-300 shadow-lg"
+              required
+            />
+          </div>
+
+          {/* Personal Information */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Full Name */}
+            <div className="group">
+              <label className="flex items-center text-xl font-semibold text-[#FEF7D7] mb-4">
+                <User className="w-6 h-6 mr-3 text-yellow-300" />
+                Full Name
+              </label>
+              <input
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                placeholder="Your full name"
+                className="w-full px-6 py-4 bg-white/90 border-2 border-transparent rounded-2xl text-[#9C0B13] text-lg font-medium placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:bg-white transition-all duration-300 shadow-lg"
+                required
+              />
+            </div>
+
+            {/* Phone Number */}
+            <div className="group">
+              <label className="flex items-center text-xl font-semibold text-[#FEF7D7] mb-4">
+                <Phone className="w-6 h-6 mr-3 text-yellow-300" />
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                placeholder="+91 XXXXX XXXXX"
+                className="w-full px-6 py-4 bg-white/90 border-2 border-transparent rounded-2xl text-[#9C0B13] text-lg font-medium placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:bg-white transition-all duration-300 shadow-lg"
+                required
+              />
             </div>
           </div>
 
-          {/* Main Content Card */}
-          <div className="max-w-6xl mx-auto">
-            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border-2 border-[#FEF7D7]/30 shadow-2xl">
-              {/* Card Inner Glow */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#FEF7D7]/5 to-yellow-200/5 animate-pulse"></div>
-              
-              <div className="relative grid lg:grid-cols-3 gap-12">
-                {/* Left Side - Enhanced Form (2 columns) */}
-                <div className="lg:col-span-2 space-y-8">
-                  <div className="text-center lg:text-left mb-8">
-                    <h3 className="text-3xl font-bold text-[#FEF7D7] mb-3 flex items-center justify-center lg:justify-start">
-                      <BookOpen className="w-8 h-8 mr-3 text-yellow-300 animate-bounce" />
-                      Product Inquiry
-                    </h3>
-                    <p className="text-[#FEF7D7]/80">Ask about any product's benefits, usage, or suitability for you</p>
-                  </div>
+          {/* Email Address */}
+          <div className="group">
+            <label className="flex items-center text-xl font-semibold text-[#FEF7D7] mb-4">
+              <Mail className="w-6 h-6 mr-3 text-yellow-300" />
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="your.email@example.com"
+              className="w-full px-6 py-4 bg-white/90 border-2 border-transparent rounded-2xl text-[#9C0B13] text-lg font-medium placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:bg-white transition-all duration-300 shadow-lg"
+              required
+            />
+          </div>
 
-                  <div className="space-y-6">
-                    {/* Enhanced Query Field */}
-                    <div className="relative group">
-                      <label className="block text-[#FEF7D7] font-bold mb-3 text-lg flex items-center">
-                        <Sparkles className="w-5 h-5 mr-2 text-yellow-300 animate-pulse" />
-                        Your Product Question *
-                      </label>
-                      <div className="relative">
-                        <textarea
-                          placeholder="Which product are you interested in? Ask about gemstone benefits, yantra uses, rudraksha effects, crystal properties, or any specific product details..."
-                          rows="4"
-                          className="w-full px-6 py-4 bg-white/20 border-2 border-[#FEF7D7]/40 rounded-2xl text-[#FEF7D7] placeholder-[#FEF7D7]/60 focus:outline-none focus:ring-4 focus:ring-[#FEF7D7]/30 focus:border-[#FEF7D7]/70 backdrop-blur-sm transition-all duration-300 group-hover:border-[#FEF7D7]/60 resize-none"
-                        ></textarea>
-                        <div className="absolute top-4 right-4 w-8 h-8 bg-[#FEF7D7]/20 rounded-full flex items-center justify-center">
-                          <Eye className="w-4 h-4 text-[#FEF7D7]/70" />
-                        </div>
-                      </div>
-                    </div>
+          {/* Additional Information */}
+          <div className="group">
+            <label className="flex items-center text-xl font-semibold text-[#FEF7D7] mb-4">
+              <Sparkles className="w-6 h-6 mr-3 text-yellow-300" />
+              Additional Details (Optional)
+            </label>
+            <textarea
+              name="additionalInfo"
+              value={formData.additionalInfo}
+              onChange={handleInputChange}
+              rows="4"
+              placeholder="Please describe any specific requirements, size preferences, material preferences, or any other details that would help us find the perfect product for you..."
+              className="w-full px-6 py-4 bg-white/90 border-2 border-transparent rounded-2xl text-[#9C0B13] text-lg font-medium placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:bg-white transition-all duration-300 shadow-lg resize-none"
+            />
+          </div>
 
-                    {/* Name Field */}
-                    <div className="relative group">
-                      <label className="block text-[#FEF7D7] font-bold mb-3 flex items-center">
-                        <Heart className="w-5 h-5 mr-2 text-rose-300 animate-pulse" />
-                        Your Name *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter your full name"
-                        className="w-full px-6 py-4 bg-white/20 border-2 border-[#FEF7D7]/40 rounded-2xl text-[#FEF7D7] placeholder-[#FEF7D7]/60 focus:outline-none focus:ring-4 focus:ring-[#FEF7D7]/30 focus:border-[#FEF7D7]/70 backdrop-blur-sm transition-all duration-300 group-hover:border-[#FEF7D7]/60"
-                      />
-                    </div>
+          {/* Submit Button */}
+          <div className="text-center pt-6">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-[#9C0B13] px-12 py-4 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center mx-auto"
+            >
+              <Send className="w-6 h-6 mr-3 group-hover:animate-pulse" />
+              Submit Product Request
+            </button>
+            <p className="text-[#FEF7D7]/70 mt-4 text-sm">
+              We'll get back to you within 24 hours with availability and pricing information
+            </p>
+          </div>
+        </div>
+      </div>
 
-                    {/* Email & Phone Grid */}
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="relative group">
-                        <label className="block text-[#FEF7D7] font-bold mb-3 flex items-center">
-                          <Zap className="w-5 h-5 mr-2 text-yellow-300 animate-pulse" />
-                          Email Address *
-                        </label>
-                        <input
-                          type="email"
-                          placeholder="your@email.com"
-                          className="w-full px-6 py-4 bg-white/20 border-2 border-[#FEF7D7]/40 rounded-2xl text-[#FEF7D7] placeholder-[#FEF7D7]/60 focus:outline-none focus:ring-4 focus:ring-[#FEF7D7]/30 focus:border-[#FEF7D7]/70 backdrop-blur-sm transition-all duration-300 group-hover:border-[#FEF7D7]/60"
-                        />
-                      </div>
-                      
-                      <div className="relative group">
-                        <label className="block text-[#FEF7D7] font-bold mb-3 flex items-center">
-                          <Crown className="w-5 h-5 mr-2 text-amber-300 animate-pulse" />
-                          Phone Number *
-                        </label>
-                        <input
-                          type="tel"
-                          placeholder="+91 XXXXX XXXXX"
-                          className="w-full px-6 py-4 bg-white/20 border-2 border-[#FEF7D7]/40 rounded-2xl text-[#FEF7D7] placeholder-[#FEF7D7]/60 focus:outline-none focus:ring-4 focus:ring-[#FEF7D7]/30 focus:border-[#FEF7D7]/70 backdrop-blur-sm transition-all duration-300 group-hover:border-[#FEF7D7]/60"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Enhanced Submit Button */}
-                  <button className="group relative w-full py-5 bg-gradient-to-r from-[#FEF7D7] to-yellow-200 text-[#9C0B13] rounded-2xl font-bold text-xl transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-[#FEF7D7]/40 overflow-hidden">
-                    <span className="relative z-10 flex items-center justify-center">
-                      <Sparkles className="w-6 h-6 mr-3 group-hover:animate-spin" />
-                      Get Product Details
-                      <Zap className="w-6 h-6 ml-3 group-hover:animate-pulse" />
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-200 to-[#FEF7D7] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-                  </button>
-                </div>
-
-                {/* Right Side - Benefits (1 column) */}
-                <div className="lg:col-span-1 space-y-6">
-                  <div className="text-center lg:text-left">
-                    <h3 className="text-2xl font-bold text-[#FEF7D7] mb-6 flex items-center justify-center lg:justify-start">
-                      <Crown className="w-7 h-7 mr-3 text-yellow-300 animate-pulse" />
-                      Product Support
-                    </h3>
-                  </div>
-
-                  <div className="space-y-5">
-                    {[
-                      {
-                        icon: CheckCircle,
-                        title: "Product Information",
-                        description: "Detailed info about benefits, usage, and authenticity"
-                      },
-                      {
-                        icon: TrendingUp,
-                        title: "Suitability Check",
-                        description: "Expert advice on which products suit your needs"
-                      },
-                      {
-                        icon: HeartPulse,
-                        title: "Usage Guidelines",
-                        description: "Proper methods for maximum spiritual benefits"
-                      },
-                      {
-                        icon: Droplets,
-                        title: "Product Comparison",
-                        description: "Compare similar products to make the right choice"
-                      }
-                    ].map((feature, index) => (
-                      <div key={index} className="group flex items-start space-x-4 p-5 bg-white/10 rounded-2xl backdrop-blur-sm border border-[#FEF7D7]/20 hover:border-[#FEF7D7]/40 hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-1">
-                        <div className="flex-shrink-0">
-                          <div className="w-12 h-12 bg-gradient-to-br from-[#FEF7D7]/30 to-yellow-200/30 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 border border-[#FEF7D7]/30">
-                            <feature.icon className="w-6 h-6 text-[#FEF7D7] group-hover:animate-pulse" />
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-[#FEF7D7] font-bold text-lg mb-1 group-hover:text-yellow-200 transition-colors duration-300">
-                            {feature.title}
-                          </h4>
-                          <p className="text-[#FEF7D7]/80 text-sm leading-relaxed">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Response Time Card */}
-                  <div className="mt-8 p-5 bg-gradient-to-br from-[#FEF7D7]/20 to-yellow-200/20 rounded-2xl border-2 border-[#FEF7D7]/40 text-center backdrop-blur-sm shadow-lg">
-                    <div className="flex items-center justify-center mb-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#FEF7D7] to-yellow-300 rounded-full flex items-center justify-center mr-3 shadow-lg animate-bounce">
-                        <Zap className="w-5 h-5 text-[#9C0B13]" />
-                      </div>
-                      <span className="text-[#FEF7D7] font-bold text-lg">Swift Response</span>
-                    </div>
-                    <p className="text-[#FEF7D7]/90 font-semibold text-sm">
-                      Product expert replies within 24 hours
-                    </p>
-                  </div>
-                </div>
+      {/* Additional Info Section */}
+      <div className="text-center">
+        <div className="bg-gradient-to-br from-yellow-400/20 to-amber-500/20 rounded-2xl p-8 border border-yellow-300/30">
+          <h3 className="text-2xl font-bold text-[#FEF7D7] mb-4">What Happens Next?</h3>
+          <div className="grid md:grid-cols-3 gap-6 text-[#FEF7D7]/90">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mb-3">
+                <span className="text-[#9C0B13] font-bold text-lg">1</span>
               </div>
+              <p className="text-sm font-medium">We review your request and search our network</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mb-3">
+                <span className="text-[#9C0B13] font-bold text-lg">2</span>
+              </div>
+              <p className="text-sm font-medium">Our experts find or create the perfect match</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mb-3">
+                <span className="text-[#9C0B13] font-bold text-lg">3</span>
+              </div>
+              <p className="text-sm font-medium">We contact you with availability and pricing</p>
             </div>
           </div>
         </div>
+      </div>        </div>
 
         {/* Background Enhancement */}
         <div className="absolute inset-0 pointer-events-none">
