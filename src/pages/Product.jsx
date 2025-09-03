@@ -94,7 +94,11 @@ const fetchProducts = async (categoryFilter = null) => {
     }
 };
   const handleSearch = async () => {
-    await fetchProducts();
+    setIsLoading(true);
+    // Simulate search
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
   };
 
   const toggleCategory = (category) => {
@@ -392,170 +396,160 @@ const fetchProducts = async (categoryFilter = null) => {
           </div>
         )}
 
-          {!isLoading && (
-            <div className={`grid gap-6 mb-8 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
-              {products.map(product => (
-                <div
-            key={product._id}
-            className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
-            onClick={() => window.location.href = `/productdetail/${product._id}`}
-                >
-            {/* Product Image */}
-            <div className="relative overflow-hidden">
-              <img 
-                src={product.images && product.images.length > 0 
-                  ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
-                  : '/api/placeholder/300/250'
-                } 
-                alt={product.images && product.images.length > 0 
-                  ? product.images.find(img => img.isPrimary)?.alt || product.name
-                  : product.name
-                }
-                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  e.target.src = '/api/placeholder/300/250';
-                }}
-              />
-              
-              {/* Badges */}
-              <div className="absolute top-3 left-3 flex flex-col gap-1">
-                {product.isFeatured && (
-                  <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">FEATURED</span>
-                )}
-                {product.salesCount > 50 && (
-                  <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">BESTSELLER</span>
-                )}
-                {product.discountedPrice && (
-                  <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
-              {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
-                  </span>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
-                  <Heart size={16} className="text-red-600" />
-                </button>
-                <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
-                  <Eye size={16} className="text-red-600" />
-                </button>
-              </div>
-
-              {/* Stock Status */}
-              <div className="absolute bottom-3 left-3">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                  product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                </span>
-              </div>
-            </div>
-            
-            {/* Product Info */}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
-                {product.name}
-              </h3>
-              
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                {product.shortDescription || product.description}
-              </p>
-              
-              {/* Rating */}
-              <div className="flex items-center gap-2 mb-3">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                size={14} 
-                fill={i < Math.floor(product.averageRating || 0) ? "currentColor" : "none"} 
-              />
-                  ))}
-                </div>
-                <span className="text-sm text-gray-600">
-                  {product.averageRating || 0} ({product.reviewCount || 0})
-                </span>
-              </div>
-
-              {/* Astrological Benefits */}
-              <div className="flex flex-wrap gap-1 mb-3">
-                {product.astrologicalBenefits && product.astrologicalBenefits.slice(0, 2).map((benefit, index) => (
-                  <span key={index} className="text-xs bg-amber-100 text-red-800 px-2 py-1 rounded">
-              {benefit}
-                  </span>
-                ))}
-                {product.astrologicalBenefits && product.astrologicalBenefits.length > 2 && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-              +{product.astrologicalBenefits.length - 2} more
-                  </span>
-                )}
-              </div>
-
-              {/* Stone Type */}
-              {product.stoneType && (
-                <div className="mb-3">
-                  <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
-              {product.stoneType}
-                  </span>
-                </div>
-              )}
-
-              {/* Weight */}
-              {product.weight && product.weight.value && (
-                <div className="text-xs text-gray-500 mb-3">
-                  Weight: {product.weight.value} {product.weight.unit}
-                </div>
-              )}
-
-              {/* Price */}
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <span className="text-xl font-bold text-red-900">
-              ₹{(product.discountedPrice || product.price).toLocaleString()}
-                  </span>
-                  {product.discountedPrice && (
-              <span className="text-sm text-gray-500 line-through ml-2">
-                ₹{product.price.toLocaleString()}
-              </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Add to Cart Button */}
-              {/* Cart logic is remaining */}
-              {/* Free Delivery Info */}
-{/* Product card delivery info - Theme matched */}
-<div className="flex items-center gap-1 text-red-700 text-xs mb-2">
-  <span>✨</span>
-  <span className="font-medium">Sacred Delivery Included</span>
-</div>
-              <button 
-                className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                  product.stock > 0 && product.isActive
-              ? 'bg-red-900 text-white hover:bg-red-800'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={product.stock === 0 || !product.isActive}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (product.stock > 0 && product.isActive) {
-              // Add to cart logic here
-              console.log(`Added ${product.name} to cart`);
-              window.location.href = `/cart`;
-                  }
-                }}
+        {!isLoading && (
+          <div className={`grid gap-6 mb-8 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
+            {products.map(product => (
+              <div
+                key={product._id}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
+                onClick={() => console.log(`Navigate to product ${product._id}`)}
               >
-                
-                <ShoppingCart size={18} />
-                
-                {product.stock > 0 && product.isActive ? 'Add to Cart' : 'Out of Stock'}
-              </button>
-            </div>
+                {/* Product Image */}
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={product.images && product.images.length > 0 
+                      ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+                      : 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400'
+                    } 
+                    alt={product.images && product.images.length > 0 
+                      ? product.images.find(img => img.isPrimary)?.alt || product.name
+                      : product.name
+                    }
+                    className="w-full h-48 sm:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400';
+                    }}
+                  />
+                  
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-1">
+                    {product.isFeatured && (
+                      <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">FEATURED</span>
+                    )}
+                    {product.salesCount > 50 && (
+                      <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">BESTSELLER</span>
+                    )}
+                    {product.discountedPrice && (
+                      <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
+                        {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
+                      <Heart size={16} className="text-red-600" />
+                    </button>
+                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
+                      <Eye size={16} className="text-red-600" />
+                    </button>
+                  </div>
+
+                  {/* Stock Status */}
+                  <div className="absolute bottom-3 left-3">
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+                
+                {/* Product Info */}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                    {product.name}
+                  </h3>
+                  
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    {product.shortDescription || product.description}
+                  </p>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          size={14} 
+                          fill={i < Math.floor(product.averageRating || 0) ? "currentColor" : "none"} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      {product.averageRating || 0} ({product.reviewCount || 0})
+                    </span>
+                  </div>
+
+                  {/* Astrological Benefits */}
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {product.astrologicalBenefits && product.astrologicalBenefits.slice(0, 2).map((benefit, index) => (
+                      <span key={index} className="text-xs bg-amber-100 text-red-800 px-2 py-1 rounded">
+                        {benefit}
+                      </span>
+                    ))}
+                    {product.astrologicalBenefits && product.astrologicalBenefits.length > 2 && (
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                        +{product.astrologicalBenefits.length - 2} more
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Stone Type */}
+                  {product.stoneType && (
+                    <div className="mb-3">
+                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                        {product.stoneType}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Weight */}
+                  {product.weight && product.weight.value && (
+                    <div className="text-xs text-gray-500 mb-3">
+                      Weight: {product.weight.value} {product.weight.unit}
+                    </div>
+                  )}
+
+                  {/* Price */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <span className="text-xl font-bold text-red-900">
+                        ₹{(product.discountedPrice || product.price).toLocaleString()}
+                      </span>
+                      {product.discountedPrice && (
+                        <span className="text-sm text-gray-500 line-through ml-2">
+                          ₹{product.price.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  <button 
+                    className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                      product.stock > 0 && product.isActive
+                        ? 'bg-red-900 text-white hover:bg-red-800'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                    disabled={product.stock === 0 || !product.isActive}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (product.stock > 0 && product.isActive) {
+                        console.log(`Added ${product.name} to cart`);
+                      }
+                    }}
+                  >
+                    <ShoppingCart size={18} />
+                    {product.stock > 0 && product.isActive ? 'Add to Cart' : 'Out of Stock'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {!isLoading && products.length === 0 && (
     <div className="text-center py-12">
         <div className="text-gray-500 text-lg mb-4">

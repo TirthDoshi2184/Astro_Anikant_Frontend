@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye, TrendingUp, BookOpen, HeartPulse, Droplets } from 'lucide-react';
+import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye, TrendingUp, BookOpen, HeartPulse, Stars, Infinity, Pill } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 // Sample data (replace with API data in production)
 import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat } from "react-icons/fa";
@@ -141,7 +141,7 @@ const categories = [
   { 
     id: 1, 
     name: "Sarv Karya Siddhi", 
-    icon: FaAward, // success / siddhi / accomplishment
+    icon: Infinity, // success / siddhi / accomplishment
     count: "150+ Remedies", 
     color: "from-red-500 to-pink-600" 
   },
@@ -162,7 +162,7 @@ const categories = [
   { 
     id: 4, 
     name: "Sarv Rog Nivaran", 
-    icon: FaHeartbeat, // health / healing
+    icon: Pill, // health / healing
     count: "60+ Treatments", 
     color: "from-emerald-500 to-teal-600" 
   },
@@ -174,6 +174,7 @@ const categories = [
     color: "from-yellow-500 to-amber-700" 
   }
 ];
+
 
   const bestSellers = [
     {
