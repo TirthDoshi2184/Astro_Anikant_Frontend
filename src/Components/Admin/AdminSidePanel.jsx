@@ -11,7 +11,8 @@ import {
   Star,
   Moon,
   Sun,
-  ShoppingBag
+  ShoppingBag,
+  Package
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -46,8 +47,9 @@ export const AdminSidePanel = () => {
     { id: 'astrology', label: 'Products', icon: Star, link: '/admin/products' },
     { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
+    { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
     
-    { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
+    
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 

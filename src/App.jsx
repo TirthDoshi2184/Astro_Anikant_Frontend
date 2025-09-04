@@ -26,6 +26,7 @@ import { AdminSingleOrder } from "./Components/Admin/AdminSingleOrder";
 import { AdminVisits } from "./Components/Admin/AdminVisits";
 import { AdminSingleVisit } from "./Components/Admin/AdminSingleVisit";
 import Previous_Order_Page from "./pages/Previous_Order_Page";
+import { AdminProductRequest } from "./Components/Admin/AdminProductRequest";
 
 function App() {
   const location = useLocation();
@@ -44,7 +45,8 @@ function App() {
     "/adminorders",
     "/adminorders/:id",
     "/adminvisits",
-    "/adminvisits/:id"
+    "/adminvisits/:id",
+    "/adminproductrequest"
   ];
 
   // Check if current path matches any of the patterns
@@ -86,6 +88,8 @@ function App() {
         <Route path="/adminorders/:id" element={<AdminSingleOrder />} />
         <Route path="/adminvisits" element={<AdminVisits />} />
         <Route path="/adminvisits/:id" element={<AdminSingleVisit />} />
+        <Route path="/adminproductrequest" element={<AdminProductRequest />} />
+
         
         {/* 404 Route - should be last */}
         <Route path="*" element={<div className="p-8 text-center">Page Not Found - 404</div>} />

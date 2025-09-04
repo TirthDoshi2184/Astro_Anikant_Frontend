@@ -23,7 +23,8 @@ import {
   ChevronUp,
   Plus,
   Minus,
-  ShoppingBag
+  ShoppingBag,
+  Package
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -122,7 +123,9 @@ const IntegratedAdminProductDetail = () => {
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
+    { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
+    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' },
+
   ];
 
   const reviews = [

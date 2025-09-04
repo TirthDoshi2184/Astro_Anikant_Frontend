@@ -59,7 +59,7 @@ export const AdminDashboard = () => {
         setLoading(false);
       }
     };
-    
+
     fetchAllData();
   }, []);
 
@@ -67,22 +67,22 @@ export const AdminDashboard = () => {
   const usersCount = users.length || 0;
   const productsCount = products.length || 0;
   const ordersCount = orders.length || 0;
-  
-  
-  const total = usersCount + productsCount + ordersCount  || 1;
+
+
+  const total = usersCount + productsCount + ordersCount || 1;
 
   const data = [
     { name: "Users", count: usersCount },
     { name: "Products", count: productsCount },
     { name: "Orders", count: ordersCount },
-    
+
   ];
 
   const pieData = [
     { name: "Users", value: (usersCount / total) * 100 },
     { name: "Products", value: (productsCount / total) * 100 },
     { name: "Orders", value: (ordersCount / total) * 100 },
-    
+
   ];
 
   // Astrology theme colors - red and amber palette
@@ -103,7 +103,8 @@ export const AdminDashboard = () => {
     { id: 'products', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'inquiry', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
-    
+    { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
+
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
@@ -180,202 +181,202 @@ export const AdminDashboard = () => {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 max-w-7xl mx-auto">
-          <div className="mb-8">
-            <div className="flex items-center space-x-3 mb-6">
-              <BarChart3 className="w-8 h-8 text-red-800" />
-              <h2 className="text-3xl font-bold text-red-900">Analytics & Insights</h2>
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <BarChart3 className="w-8 h-8 text-red-800" />
+                <h2 className="text-3xl font-bold text-red-900">Analytics & Insights</h2>
+              </div>
+              <p className="text-red-700 text-lg">Real-time data and performance metrics</p>
             </div>
-            <p className="text-red-700 text-lg">Real-time data and performance metrics</p>
-          </div>
 
-          {/* Stats Cards */}
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {[...Array(4)].map((_, i) => (
-                <CardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {data.map((item, index) => {
-                const IconComponent = cardIcons[index];
-                return (
-                  <div
-                    key={index}
-                    className="relative group cursor-pointer transform hover:scale-105 transition-all duration-300"
-                  >
-                    <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-amber-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+            {/* Stats Cards */}
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {[...Array(4)].map((_, i) => (
+                  <CardSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {data.map((item, index) => {
+                  const IconComponent = cardIcons[index];
+                  return (
                     <div
-                      className="relative h-36 p-6 flex flex-col justify-between rounded-2xl shadow-xl border-2 border-red-900/20"
-                      style={{
-                        background: `linear-gradient(135deg, ${STAT_COLORS[index]} 0%, ${STAT_COLORS[index]}dd 100%)`,
-                      }}
+                      key={index}
+                      className="relative group cursor-pointer transform hover:scale-105 transition-all duration-300"
                     >
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-amber-100 text-lg font-medium">
-                          {cardLabels[index]}
-                        </h3>
-                        <div className="bg-amber-400/20 p-3 rounded-xl">
-                          <IconComponent className="w-6 h-6 text-amber-300" />
+                      <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-amber-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                      <div
+                        className="relative h-36 p-6 flex flex-col justify-between rounded-2xl shadow-xl border-2 border-red-900/20"
+                        style={{
+                          background: `linear-gradient(135deg, ${STAT_COLORS[index]} 0%, ${STAT_COLORS[index]}dd 100%)`,
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-amber-100 text-lg font-medium">
+                            {cardLabels[index]}
+                          </h3>
+                          <div className="bg-amber-400/20 p-3 rounded-xl">
+                            <IconComponent className="w-6 h-6 text-amber-300" />
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-end justify-between">
-                        <span className="text-4xl font-bold text-amber-50">
-                          {item.count}
-                        </span>
-                        <div className="text-amber-200 text-sm font-medium">
-                          Total {item.name}
+                        <div className="flex items-end justify-between">
+                          <span className="text-4xl font-bold text-amber-50">
+                            {item.count}
+                          </span>
+                          <div className="text-amber-200 text-sm font-medium">
+                            Total {item.name}
+                          </div>
                         </div>
                       </div>
                     </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Bar Chart */}
+              <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border-2 border-red-900/20">
+                <div className="bg-gradient-to-r from-red-800 to-red-900 -mx-6 -mt-6 mb-6 px-6 py-4 rounded-t-2xl">
+                  <h3 className="text-xl font-semibold text-amber-50">
+                    Data Overview
+                  </h3>
+                  <p className="text-amber-200 text-sm">Distribution across categories</p>
+                </div>
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" opacity={0.3} />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#7F1D1D"
+                        fontSize={12}
+                        fontWeight="600"
+                      />
+                      <YAxis
+                        stroke="#7F1D1D"
+                        fontSize={12}
+                        fontWeight="600"
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "rgba(255, 255, 255, 0.95)",
+                          borderColor: "#DC2626",
+                          borderRadius: "12px",
+                          border: "2px solid #DC2626"
+                        }}
+                        itemStyle={{ color: "#7F1D1D", fontWeight: "600" }}
+                        labelStyle={{ color: "#7F1D1D", fontWeight: "700" }}
+                      />
+                      <Bar
+                        dataKey="count"
+                        barSize={60}
+                        fill="url(#barGradient)"
+                        radius={[8, 8, 0, 0]}
+                      />
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#DC2626" />
+                          <stop offset="100%" stopColor="#7F1D1D" />
+                        </linearGradient>
+                      </defs>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Pie Chart */}
+              <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border-2 border-red-900/20">
+                <div className="bg-gradient-to-r from-red-800 to-red-900 -mx-6 -mt-6 mb-6 px-6 py-4 rounded-t-2xl">
+                  <h3 className="text-xl font-semibold text-amber-50">
+                    Distribution Analysis
+                  </h3>
+                  <p className="text-amber-200 text-sm">Percentage breakdown</p>
+                </div>
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData.map(item => ({ ...item, value: Math.round(item.value * 10) / 10 }))}
+                        cx="50%"
+                        cy="40%"
+                        outerRadius={70}
+                        innerRadius={25}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label={({ value }) => `${value.toFixed(1)}%`}
+                        labelLine={false}
+                        fontSize={11}
+                        fontWeight="600"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value, name) => [`${value.toFixed(1)}%`, name]}
+                        contentStyle={{
+                          backgroundColor: "rgba(255, 255, 255, 0.95)",
+                          borderColor: "#DC2626",
+                          borderRadius: "12px",
+                          border: "2px solid #DC2626"
+                        }}
+                        itemStyle={{ color: "#7F1D1D", fontWeight: "600" }}
+                      />
+                      <Legend
+                        layout="horizontal"
+                        verticalAlign="bottom"
+                        align="center"
+                        fontSize={12}
+                        iconSize={12}
+                        wrapperStyle={{ paddingTop: '10px', color: '#7F1D1D', fontWeight: '600' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Stats Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div className="bg-gradient-to-br from-red-800 to-red-900 rounded-2xl p-6 text-amber-50 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-amber-200 text-sm">Active Sessions</p>
+                    <p className="text-3xl font-bold">24</p>
+                    <p className="text-amber-300 text-xs mt-1">+12% from yesterday</p>
                   </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Bar Chart */}
-            <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border-2 border-red-900/20">
-              <div className="bg-gradient-to-r from-red-800 to-red-900 -mx-6 -mt-6 mb-6 px-6 py-4 rounded-t-2xl">
-                <h3 className="text-xl font-semibold text-amber-50">
-                  Data Overview
-                </h3>
-                <p className="text-amber-200 text-sm">Distribution across categories</p>
-              </div>
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" opacity={0.3} />
-                    <XAxis
-                      dataKey="name"
-                      stroke="#7F1D1D"
-                      fontSize={12}
-                      fontWeight="600"
-                    />
-                    <YAxis
-                      stroke="#7F1D1D"
-                      fontSize={12}
-                      fontWeight="600"
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "rgba(255, 255, 255, 0.95)",
-                        borderColor: "#DC2626",
-                        borderRadius: "12px",
-                        border: "2px solid #DC2626"
-                      }}
-                      itemStyle={{ color: "#7F1D1D", fontWeight: "600" }}
-                      labelStyle={{ color: "#7F1D1D", fontWeight: "700" }}
-                    />
-                    <Bar
-                      dataKey="count"
-                      barSize={60}
-                      fill="url(#barGradient)"
-                      radius={[8, 8, 0, 0]}
-                    />
-                    <defs>
-                      <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#DC2626" />
-                        <stop offset="100%" stopColor="#7F1D1D" />
-                      </linearGradient>
-                    </defs>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Pie Chart */}
-            <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border-2 border-red-900/20">
-              <div className="bg-gradient-to-r from-red-800 to-red-900 -mx-6 -mt-6 mb-6 px-6 py-4 rounded-t-2xl">
-                <h3 className="text-xl font-semibold text-amber-50">
-                  Distribution Analysis
-                </h3>
-                <p className="text-amber-200 text-sm">Percentage breakdown</p>
-              </div>
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData.map(item => ({ ...item, value: Math.round(item.value * 10) / 10 }))}
-                      cx="50%"
-                      cy="40%"
-                      outerRadius={70}
-                      innerRadius={25}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ value }) => `${value.toFixed(1)}%`}
-                      labelLine={false}
-                      fontSize={11}
-                      fontWeight="600"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value, name) => [`${value.toFixed(1)}%`, name]}
-                      contentStyle={{
-                        backgroundColor: "rgba(255, 255, 255, 0.95)",
-                        borderColor: "#DC2626",
-                        borderRadius: "12px",
-                        border: "2px solid #DC2626"
-                      }}
-                      itemStyle={{ color: "#7F1D1D", fontWeight: "600" }}
-                    />
-                    <Legend
-                      layout="horizontal"
-                      verticalAlign="bottom"
-                      align="center"
-                      fontSize={12}
-                      iconSize={12}
-                      wrapperStyle={{ paddingTop: '10px', color: '#7F1D1D', fontWeight: '600' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Stats Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="bg-gradient-to-br from-red-800 to-red-900 rounded-2xl p-6 text-amber-50 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-amber-200 text-sm">Active Sessions</p>
-                  <p className="text-3xl font-bold">24</p>
-                  <p className="text-amber-300 text-xs mt-1">+12% from yesterday</p>
+                  <Moon className="w-8 h-8 text-amber-300" />
                 </div>
-                <Moon className="w-8 h-8 text-amber-300" />
               </div>
-            </div>
 
-            <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-6 text-red-900 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-700 text-sm">Revenue Today</p>
-                  <p className="text-3xl font-bold">₹12.5k</p>
-                  <p className="text-red-700 text-xs mt-1">+8% from last week</p>
+              <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-6 text-red-900 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-700 text-sm">Revenue Today</p>
+                    <p className="text-3xl font-bold">₹12.5k</p>
+                    <p className="text-red-700 text-xs mt-1">+8% from last week</p>
+                  </div>
+                  <Sun className="w-8 h-8 text-red-700" />
                 </div>
-                <Sun className="w-8 h-8 text-red-700" />
               </div>
-            </div>
 
-            <div className="bg-gradient-to-br from-red-700 to-red-800 rounded-2xl p-6 text-amber-50 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-amber-200 text-sm">Satisfaction Rate</p>
-                  <p className="text-3xl font-bold">98.5%</p>
-                  <p className="text-amber-300 text-xs mt-1">+2.1% this month</p>
+              <div className="bg-gradient-to-br from-red-700 to-red-800 rounded-2xl p-6 text-amber-50 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-amber-200 text-sm">Satisfaction Rate</p>
+                    <p className="text-3xl font-bold">98.5%</p>
+                    <p className="text-amber-300 text-xs mt-1">+2.1% this month</p>
+                  </div>
+                  <Star className="w-8 h-8 text-amber-300" />
                 </div>
-                <Star className="w-8 h-8 text-amber-300" />
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };

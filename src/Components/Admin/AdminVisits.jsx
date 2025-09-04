@@ -26,7 +26,8 @@ import {
     Calendar,
     Trash2,
     EyeIcon,
-    Filter
+    Filter,
+    Package
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -55,7 +56,9 @@ export const AdminVisits = () => {
         { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
         { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
         { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
-        { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
+        { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
+        { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' },
+
     ];
 
     const handleLogout = () => {
@@ -337,14 +340,14 @@ export const AdminVisits = () => {
                                                             <Link
 
                                                                 to={`/adminvisits/${visit?._id}`}
-                                                                
+
                                                                 className="flex items-center gap-1 text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-lg transition-all duration-200"
                                                                 title="View Details"
                                                             >
                                                                 <EyeIcon className="w-4 h-4" />
                                                                 View
                                                             </Link>
-                                                         
+
                                                         </div>
                                                     </td>
                                                 </tr>

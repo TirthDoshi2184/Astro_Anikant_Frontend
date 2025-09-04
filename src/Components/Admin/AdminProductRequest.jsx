@@ -12,13 +12,17 @@ import {
   Moon,
   Sun,
   ShoppingBag,
-  Package
+  Package,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-export const AdminUsersView = () => {
-  const [users, setUsers] = useState([]);
+export const AdminProductRequest = () => {
+  const [productRequests, setProductRequests] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,35 +35,33 @@ export const AdminUsersView = () => {
     const path = location.pathname;
     if (path.includes('/adminusers')) return 'users';
     if (path.includes('/adminproducts')) return 'astrology';
-    if (path.includes('/adminvisits'
-
-
-    )) return 'predictions';
+    if (path.includes('/adminvisits')) return 'predictions';
     if (path.includes('/adminorders')) return 'orders';
+    if (path.includes('/adminproductrequest')) return 'product-requests';
     if (path.includes('/adminsettings')) return 'settings';
     if (path.includes('/admindashboard')) return 'dashboard';
-    return 'users'; // default for this component
+    return 'product-requests'; // default for this component
   };
 
   const [activeMenuItem, setActiveMenuItem] = useState(getActiveMenuItem());
 
-  const getAllUsers = async () => {
+  const getAllProductRequests = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get("https://astroanikantbackend-2.onrender.com/user/getalluser");
-      setUsers(response.data.data);
-      console.log(response.data.data);
+      const response = await axios.get("http://localhost:1921/productrequest/getallrequest");
+      setProductRequests(response.data.data || response.data);
+      console.log(response.data);
     } catch (err) {
-      console.error('Error fetching users:', err);
-      setError('Failed to fetch users. Please try again.');
+      console.error('Error fetching product requests:', err);
+      setError('Failed to fetch product requests. Please try again.');
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    getAllUsers();
+    getAllProductRequests();
   }, []);
 
   // Update active menu item when location changes
@@ -67,9 +69,11 @@ export const AdminUsersView = () => {
     setActiveMenuItem(getActiveMenuItem());
   }, [location.pathname]);
 
-  // Filter users by search term
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase())
+  // Filter product requests by search term
+  const filteredRequests = productRequests.filter((request) =>
+    (request.productName?.toLowerCase().includes(search.toLowerCase()) ||
+     request.customerName?.toLowerCase().includes(search.toLowerCase()) ||
+     request.email?.toLowerCase().includes(search.toLowerCase()))
   );
 
   const sidebarItems = [
@@ -77,17 +81,40 @@ export const AdminUsersView = () => {
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
     { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
-    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' }, 
+    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
-    
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 
   const handleLogout = () => {
-    // Add your logout logic here
-    // For example: clear localStorage, redirect to login, etc.
-    localStorage.removeItem('adminToken'); // if you're using tokens
-    window.location.href = '/adminlogin'; // or use navigate from useNavigate hook
+    localStorage.removeItem('adminToken');
+    window.location.href = '/adminlogin';
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return <Clock className="w-4 h-4" />;
+      case 'approved':
+        return <CheckCircle className="w-4 h-4" />;
+      case 'rejected':
+        return <XCircle className="w-4 h-4" />;
+      default:
+        return <AlertCircle className="w-4 h-4" />;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'approved':
+        return 'bg-green-100 text-green-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
@@ -156,8 +183,8 @@ export const AdminUsersView = () => {
           <div className="px-8 py-6">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-bold text-amber-50 mb-2">Registered Users</h1>
-                <p className="text-amber-200">Manage your astrology community members</p>
+                <h1 className="text-3xl font-bold text-amber-50 mb-2">Product Requests</h1>
+                <p className="text-amber-200">Manage customer product requests and inquiries</p>
               </div>
 
               {/* Action Buttons */}
@@ -169,20 +196,21 @@ export const AdminUsersView = () => {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search users..."
+                    placeholder="Search requests..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-80 pl-10 pr-4 py-3 border-2 border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent bg-white/90 text-red-900 placeholder-red-600/70"
                   />
                 </div>
 
-                {/* Add User Button */}
-                <Link to="/admin/add-user">
-                  <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 rounded-xl shadow-lg hover:shadow-amber-500/40 transition-all duration-300 transform hover:scale-105">
-                    <UserPlus className="w-5 h-5" />
-                    <span className="font-semibold">Add User</span>
-                  </button>
-                </Link>
+                {/* Refresh Button */}
+                <button 
+                  onClick={getAllProductRequests}
+                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 rounded-xl shadow-lg hover:shadow-amber-500/40 transition-all duration-300 transform hover:scale-105"
+                >
+                  <Package className="w-5 h-5" />
+                  <span className="font-semibold">Refresh</span>
+                </button>
               </div>
             </div>
           </div>
@@ -195,7 +223,7 @@ export const AdminUsersView = () => {
             {loading && (
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-800"></div>
-                <span className="ml-3 text-red-800">Loading users...</span>
+                <span className="ml-3 text-red-800">Loading product requests...</span>
               </div>
             )}
 
@@ -205,7 +233,7 @@ export const AdminUsersView = () => {
                 <div className="flex items-center justify-between">
                   <span>{error}</span>
                   <button 
-                    onClick={getAllUsers}
+                    onClick={getAllProductRequests}
                     className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
                   >
                     Retry
@@ -214,12 +242,12 @@ export const AdminUsersView = () => {
               </div>
             )}
 
-            {/* Users Table */}
+            {/* Product Requests Table */}
             {!loading && !error && (
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-red-900/20 overflow-hidden mb-8">
                 {/* Table Header */}
                 <div className="bg-gradient-to-r from-red-800 to-red-900 px-6 py-4">
-                  <h3 className="text-xl font-semibold text-amber-50">User Directory</h3>
+                  <h3 className="text-xl font-semibold text-amber-50">Product Request Directory</h3>
                 </div>
 
                 {/* Table Content */}
@@ -228,71 +256,65 @@ export const AdminUsersView = () => {
                     <thead className="bg-gradient-to-r from-red-700 to-red-800">
                       <tr>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-50 uppercase tracking-wider">
-                          ID
+                          Request ID
                         </th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-50 uppercase tracking-wider">
-                          Name
+                          Customer Name
                         </th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-50 uppercase tracking-wider">
                           Email
                         </th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-50 uppercase tracking-wider">
-                          Phone
+                          Product Name
+                        </th>
+                      
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-amber-50 uppercase tracking-wider">
+                          Phone No
                         </th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-50 uppercase tracking-wider">
-                          Gender
-                        </th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-amber-50 uppercase tracking-wider">
-                          Actions
+                          Details
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-red-200/50">
-                      {filteredUsers.map((user, index) => (
+                      {filteredRequests.map((request, index) => (
                         <tr
-                          key={user._id}
+                          key={request._id}
                           className={`hover:bg-gradient-to-r hover:from-amber-100/50 hover:to-yellow-100/50 transition-all duration-300 ${
                             index % 2 === 0 ? 'bg-white/50' : 'bg-amber-50/30'
                           }`}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 font-mono">
-                            {user._id ? user._id.slice(-8) + '...' : 'N/A'}
+                            {request._id ? request._id.slice(-8) + '...' : 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="w-8 h-8 bg-gradient-to-br from-red-800 to-red-900 rounded-full flex items-center justify-center mr-3">
                                 <span className="text-amber-50 font-semibold text-sm">
-                                  {user.name ? user.name.charAt(0) : 'U'}
+                                  {request.fullname ? request.fullname.charAt(0) : 'C'}
                                 </span>
                               </div>
-                              <div className="text-sm font-medium text-red-900">{user.name || 'N/A'}</div>
+                              <div className="text-sm font-medium text-red-900">{request.fullname || 'N/A'}</div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-red-700">
-                            {user.email || 'N/A'}
+                            {request.email || 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-red-700">
-                            {user.phone || 'N/A'}
+                            {request.productName || 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              user.gender === 'Male'
-                                ? 'bg-blue-100 text-blue-800'
-                                : user.gender === 'Female'
-                                ? 'bg-pink-100 text-pink-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {user.gender || 'N/A'}
-                            </span>
+                            <div className="flex items-center">
+                              <Package className="w-4 h-4 text-red-600 mr-2" />
+                              <span className="text-sm font-medium text-red-900">{request.productName || 'N/A'}</span>
+                            </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <Link to={`/adminusers/${user._id}`}>
-                              <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-                                <Eye className="w-4 h-4" />
-                                <span className="font-medium">View</span>
-                              </button>
-                            </Link>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-red-700 max-w-xs truncate" title={request.additionalDetails}>
+                              {request.additionalDetails || 'No additional details'}
+                            </div>
                           </td>
+                          
                         </tr>
                       ))}
                     </tbody>
@@ -300,12 +322,12 @@ export const AdminUsersView = () => {
                 </div>
 
                 {/* Empty State */}
-                {filteredUsers.length === 0 && (
+                {filteredRequests.length === 0 && (
                   <div className="text-center py-12">
-                    <Users className="mx-auto h-12 w-12 text-red-400" />
-                    <h3 className="mt-2 text-lg font-medium text-red-900">No users found</h3>
+                    <Package className="mx-auto h-12 w-12 text-red-400" />
+                    <h3 className="mt-2 text-lg font-medium text-red-900">No product requests found</h3>
                     <p className="mt-1 text-red-600">
-                      {search ? 'Try adjusting your search criteria.' : 'No users have been registered yet.'}
+                      {search ? 'Try adjusting your search criteria.' : 'No product requests have been submitted yet.'}
                     </p>
                   </div>
                 )}
@@ -318,54 +340,38 @@ export const AdminUsersView = () => {
                 <div className="bg-gradient-to-br from-red-800 to-red-900 rounded-2xl p-6 text-amber-50 shadow-xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-amber-200 text-sm">Total Users</p>
-                      <p className="text-3xl font-bold">{users.length}</p>
+                      <p className="text-amber-200 text-sm">Total Requests</p>
+                      <p className="text-3xl font-bold">{productRequests.length}</p>
                     </div>
-                    <Users className="w-8 h-8 text-amber-300" />
+                    <Package className="w-8 h-8 text-amber-300" />
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-6 text-red-900 shadow-xl">
+              
+
+                <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-6 text-amber-50 shadow-xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-red-700 text-sm">Male Users</p>
+                      <p className="text-green-200 text-sm">Approved Requests</p>
                       <p className="text-3xl font-bold">
-                        {users.filter(user => user.gender === 'Male').length}
+                        {productRequests.filter(request => request.status?.toLowerCase() === 'approved').length}
                       </p>
                     </div>
-                    <Star className="w-8 h-8 text-red-700" />
+                    <CheckCircle className="w-8 h-8 text-green-200" />
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-red-700 to-red-800 rounded-2xl p-6 text-amber-50 shadow-xl">
+                <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-2xl p-6 text-amber-50 shadow-xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-amber-200 text-sm">Female Users</p>
+                      <p className="text-red-200 text-sm">Rejected Requests</p>
                       <p className="text-3xl font-bold">
-                        {users.filter(user => user.gender === 'Female').length}
+                        {productRequests.filter(request => request.status?.toLowerCase() === 'rejected').length}
                       </p>
                     </div>
-                    <Moon className="w-8 h-8 text-amber-300" />
+                    <XCircle className="w-8 h-8 text-red-200" />
                   </div>
                 </div>
-{/* 
-                 <div className="bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl p-6 text-red-900 shadow-xl">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="text-red-700 text-sm">New This Month</p>
-                                  <p className="text-3xl font-bold">
-                                    {users.filter(user => {
-                                      if (!user.createdAt) return false;
-                                      const userDate = new Date(user.createdAt);
-                                      const currentDate = new Date();
-                                      return userDate.getMonth() === currentDate.getMonth() && 
-                                             userDate.getFullYear() === currentDate.getFullYear();
-                                    }).length}
-                                  </p>
-                                </div>
-                                <Sun className="w-8 h-8 text-red-700" />
-                              </div>
-                            </div> */}
               </div>
             )}
           </div>
@@ -375,4 +381,4 @@ export const AdminUsersView = () => {
   );
 };
 
-export default AdminUsersView;
+export default AdminProductRequest;
