@@ -25,7 +25,8 @@ import {
   MapPinIcon,
   MapPin,
   GalleryVerticalEnd,
-  VenusAndMars
+  VenusAndMars,
+  Package
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -113,6 +114,8 @@ export const AdminSingleUser = () => {
     { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
+    { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
+
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 

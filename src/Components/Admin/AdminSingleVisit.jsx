@@ -28,7 +28,8 @@ import {
     CheckCircle,
     AlertCircle,
     XCircle,
-    Users as UsersIcon
+    Users as UsersIcon,
+    Package
 } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -59,6 +60,8 @@ export const AdminSingleVisit = () => {
         { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
         { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
         { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
+    { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
+
         { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
     ];
 
