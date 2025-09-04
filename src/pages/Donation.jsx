@@ -88,11 +88,22 @@ const Donation = () => {
               </div>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-[#9C0B13] mb-6">
-              Sacred Donations
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              Support Our Spiritual Mission & Help Us Spread Ancient Wisdom
-            </p>
+  Sacred Donations
+</h1>
+<div className="mb-6 p-4 bg-gradient-to-r from-[#9C0B13]/10 to-red-600/10 rounded-2xl border-2 border-[#9C0B13]/20 max-w-4xl mx-auto">
+  <p className="text-lg md:text-xl font-bold text-[#9C0B13] mb-2">
+    अनेकांत ज्योतिष एवं वास्तु शोध केंद्र
+  </p>
+  <p className="text-base md:text-lg font-semibold text-gray-700">
+    Anekant Astrology and Vastu Research Center
+  </p>
+  <p className="text-sm md:text-base text-gray-600 italic mt-1">
+    "An institute dedicated to Astrology, Vastu, Yantra, and Gemstone Science"
+  </p>
+</div>
+<p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+  Support Our Spiritual Mission & Help Us Spread Ancient Wisdom
+</p>
             <div className="mt-8 flex justify-center">
               <div className="w-24 h-1 bg-gradient-to-r from-[#9C0B13] to-red-600 rounded-full"></div>
             </div>
