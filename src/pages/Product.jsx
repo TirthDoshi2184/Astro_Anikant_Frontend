@@ -541,7 +541,6 @@ const fetchProducts = async (categoryFilter = null) => {
         }
       }}
     >
-      <Eye size={18} />
       {product.stock > 0 && product.isActive ? 'View Product' : 'Out of Stock'}
     </button>
   </div>

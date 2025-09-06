@@ -34,7 +34,11 @@ const ProductDetailPage = () => {
   const [isBuyingNow, setIsBuyingNow] = useState(false);
 
   const { id: productID } = useParams();
-
+const isUserLoggedIn = () => {
+  const authToken = localStorage.getItem("authToken");
+  const user = localStorage.getItem("user");
+  return authToken && user;
+};
   // Static data that might not come from API
   const relatedProducts = [
     {
@@ -560,42 +564,37 @@ const ProductDetailPage = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="">
-                    <button
-                      onClick={handleAddToCart}
-                      className="bg-red-800 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      disabled={product.stock === 0 || isAddingToCart}
-                    >
-                      {isAddingToCart ? (
-                        <>
-                          <div className="animate-spin rounded-full border-b-2 border-white mr-2"></div>
-                          Adding...
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingCart className="w-5 h-5 mr-2" />
-                          Add to Cart
-                        </>
-                      )}
-                    </button>
-                    {/* <button 
-                      onClick={handleBuyNow}
-                      className="bg-yellow-200 text-red-800 py-3 px-6 rounded-xl font-semibold hover:bg-yellow-300 transform hover:scale-105 transition-all duration-300 shadow-lg border-2 border-red-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      disabled={product.stock === 0 || isBuyingNow}
-                    >
-                      {isBuyingNow ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-800 mr-2"></div>
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-5 h-5 mr-2" />
-                          Buy Now
-                        </>
-                      )}
-                    </button> */}
-                  </div>
+                <div className="">
+  {!isUserLoggedIn() ? (
+    // Show login button if user is not logged in
+    <button
+      onClick={() => window.location.href = "/login"} // or use your routing method
+      className="bg-red-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-700 transform hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center w-full"
+    >
+      <MessageCircle className="w-5 h-5 mr-2" />
+      Login to Add to Cart
+    </button>
+  ) : (
+    // Show normal add to cart button if user is logged in
+    <button
+      onClick={handleAddToCart}
+      className="bg-red-800 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+      disabled={product.stock === 0 || isAddingToCart}
+    >
+      {isAddingToCart ? (
+        <>
+          <div className="animate-spin rounded-full border-b-2 border-white mr-2"></div>
+          Adding...
+        </>
+      ) : (
+        <>
+          <ShoppingCart className="w-5 h-5 mr-2" />
+          Add to Cart
+        </>
+      )}
+    </button>
+  )}
+</div>
                 </div>
               </div>
             </div>

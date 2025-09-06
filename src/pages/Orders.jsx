@@ -217,7 +217,7 @@ console.log('Order Payload:', orderPayload);
       // Redirect after success
       setTimeout(() => {
         // Navigate to order confirmation page
-        window.location.href = `/order-confirmation/${result.data._id}`;
+        window.location.href = `/order`;
       }, 2000);
       
     } else {
