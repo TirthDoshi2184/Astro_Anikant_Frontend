@@ -424,20 +424,20 @@ const CartPage = () => {
       {/* Header */}
       <section className="py-12 bg-gradient-to-r from-[#9C0B13] to-red-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold mb-2 flex items-center">
-                <div className="relative mr-4">
-                  <ShoppingCart className="w-10 h-10 animate-pulse" />
-                  {totalItemsCount > 0 && (
-                    <div className="absolute -top-2 -right-2 bg-[#FEF7D7] text-[#9C0B13] rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold border-2 border-white">
-                      {totalItemsCount > 99 ? '99+' : totalItemsCount}
-                    </div>
-                  )}
-                </div>
-                Your Sacred Cart
-              </h1>
-              <p className="text-xl opacity-90">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 flex items-center">
+  <div className="relative mr-2 sm:mr-4">
+    <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 animate-pulse" />
+    {totalItemsCount > 0 && (
+      <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 bg-[#FEF7D7] text-[#9C0B13] rounded-full w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex items-center justify-center text-xs sm:text-sm font-bold border border-white sm:border-2">
+        {totalItemsCount > 99 ? '99+' : totalItemsCount}
+      </div>
+    )}
+  </div>
+  <span className="break-words">Your Sacred Cart</span>
+</h1>
+<p className="text-sm sm:text-lg lg:text-xl opacity-90">
                 {uniqueProductsCount > 0
                   ? `${uniqueProductsCount} ${uniqueProductsCount === 1 ? 'product' : 'products'} with ${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'} total`
                   : 'Your spiritual journey begins here'
@@ -445,20 +445,20 @@ const CartPage = () => {
               </p>
             </div>
             <button
-              className="flex items-center space-x-2 bg-[#FEF7D7] text-[#9C0B13] px-6 py-3 rounded-xl font-semibold hover:bg-white transition-all duration-300 transform hover:scale-105"
-              onClick={() => window.location.href = '/products'}
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Continue Shopping</span>
-            </button>
-          </div>
+  className="flex items-center space-x-1 sm:space-x-2 bg-[#FEF7D7] text-[#9C0B13] px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-xl font-semibold hover:bg-white transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
+  onClick={() => window.location.href = '/products'}
+>
+  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+  <span className="hidden sm:inline">Continue Shopping</span>
+  <span className="sm:hidden">Continue</span>
+</button>          </div>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid lg:grid-cols-3 gap-8">
+       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Cart Items Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-4 sm:space-y-6">
             {/* Cart Items List */}
             {cartItems.length > 0 && (
               <div id="cart-items" className={`transition-all duration-1000 ${isVisible['cart-items'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
@@ -473,10 +473,10 @@ const CartPage = () => {
                 <div className="space-y-4">
                   {cartItems.map((item) => (
                     <div key={item.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-[#9C0B13]/10">
-                      <div className="p-6">
-                        <div className="flex items-center space-x-6">
+                      <div className="p-3 sm:p-4 lg:p-6">
+  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">
                           <div className="relative group">
-                            <div className="w-24 h-24 bg-gray-200 rounded-xl overflow-hidden">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0"> 
                               {item.image ? (
                                 <img
                                   src={item.image}
@@ -500,20 +500,20 @@ const CartPage = () => {
                             )}
                           </div>
 
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-[#9C0B13] mb-1">{item.name}</h3>
-                            <p className="text-sm text-gray-600 mb-2">Category: {item.category}</p>
-                            {item.description && (
-                              <p className="text-sm text-gray-500 mb-2 line-clamp-2">{item.description}</p>
-                            )}
+                         <div className="flex-1 min-w-0">
+  <h3 className="text-base sm:text-lg font-bold text-[#9C0B13] mb-1 break-words">{item.name}</h3>
+  <p className="text-xs sm:text-sm text-gray-600 mb-2">Category: {item.category}</p>
+  {item.description && (
+    <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2 hidden sm:block">{item.description}</p>
+  )}
                             {item.energized && (
                               <span className="inline-block bg-[#FEF7D7] text-[#9C0B13] px-2 py-1 rounded-full text-xs font-semibold">
                                 ✨ Spiritually Energized
                               </span>
                             )}
 
-                            <div className="flex items-center space-x-2 mt-3">
-                              <span className="text-xl font-bold text-[#9C0B13]">₹{item.price?.toLocaleString()}</span>
+                           <div className="flex items-center space-x-2 mt-2 sm:mt-3 flex-wrap">
+  <span className="text-lg sm:text-xl font-bold text-[#9C0B13]">₹{item.price?.toLocaleString()}</span>
                               {item.originalPrice && item.originalPrice > item.price && (
                                 <>
                                   <span className="text-gray-500 line-through">₹{item.originalPrice?.toLocaleString()}</span>
@@ -525,24 +525,23 @@ const CartPage = () => {
                             </div>
                           </div>
 
-                          <div className="flex flex-col items-end space-y-4">
-                            <div className="flex items-center space-x-3 bg-[#FEF7D7] rounded-xl p-2">
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="w-8 h-8 bg-[#9C0B13] text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"
-                              >
-                                <Minus className="w-4 h-4" />
-                              </button>
-                              <span className="w-12 text-center font-bold text-[#9C0B13]">{item.quantity}</span>
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="w-8 h-8 bg-[#9C0B13] text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </button>
-                            </div>
-
-                            <div className="flex space-x-2">
+                         <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start space-x-4 sm:space-x-0 sm:space-y-4 w-full sm:w-auto">
+  <div className="flex items-center space-x-2 sm:space-x-3 bg-[#FEF7D7] rounded-xl p-2">
+    <button
+      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+      className="w-6 h-6 sm:w-8 sm:h-8 bg-[#9C0B13] text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"
+    >
+      <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
+    </button>
+    <span className="w-8 sm:w-12 text-center font-bold text-[#9C0B13] text-sm sm:text-base">{item.quantity}</span>
+    <button
+      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+      className="w-6 h-6 sm:w-8 sm:h-8 bg-[#9C0B13] text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"
+    >
+      <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+    </button>
+  </div>
+                            <div className="flex space-x-2 sm:space-x-2">
                               <button
                                 onClick={() => saveForLater(item.id)}
                                 className="p-2 text-gray-500 hover:text-[#9C0B13] transition-colors"
@@ -559,11 +558,11 @@ const CartPage = () => {
                               </button>
                             </div>
 
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-[#9C0B13]">
-                                ₹{(item.price * item.quantity)?.toLocaleString()}
-                              </p>
-                            </div>
+                           <div className="text-right sm:text-left">
+  <p className="text-base sm:text-lg font-bold text-[#9C0B13]">
+    ₹{(item.price * item.quantity)?.toLocaleString()}
+  </p>
+</div>
                           </div>
                         </div>
                       </div>
@@ -583,7 +582,7 @@ const CartPage = () => {
                     {savedItems.length}
                   </span>
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
                   {savedItems.map((item) => (
                     <div key={item.id} className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow">
                       <div className="flex items-center space-x-4">
@@ -624,9 +623,8 @@ const CartPage = () => {
 
           {/* Cart Summary Sidebar */}
           {cartItems.length > 0 && (
-            <div className="lg:col-span-1">
-              <div id="cart-summary" className={`sticky top-24 transition-all duration-1000 ${isVisible['cart-summary'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                {/* Cart Summary */}
+            <div className="xl:col-span-1">
+  <div id="cart-summary" className={`xl:sticky xl:top-24 transition-all duration-1000 ${isVisible['cart-summary'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                 <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 border border-[#9C0B13]/10">
                   <h3 className="text-2xl font-bold text-[#9C0B13] mb-6 flex items-center">
                     <Package className="w-6 h-6 mr-2" />
@@ -672,7 +670,7 @@ const CartPage = () => {
                       <Shield className="w-5 h-5 mr-2" />
                       Safe & Secure
                     </h4>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 gap-2 sm:gap-3">
                       <div className="bg-[#FEF7D7] p-3 rounded-lg text-center">
                         <Lock className="w-6 h-6 text-[#9C0B13] mx-auto mb-1" />
                         <div className="text-xs font-semibold text-[#9C0B13]">SSL Encrypted</div>
@@ -757,11 +755,11 @@ const CartPage = () => {
         {/* Empty Cart State */}
         {cartItems.length === 0 && !loading && (
           <div className="text-center py-20">
-            <div className="w-32 h-32 bg-[#FEF7D7] rounded-full mx-auto mb-8 flex items-center justify-center">
-              <ShoppingCart className="w-16 h-16 text-[#9C0B13] animate-bounce" />
-            </div>
-            <h2 className="text-3xl font-bold text-[#9C0B13] mb-4">Your Cart is Empty</h2>
-            <p className="text-xl text-gray-600 mb-8">Add some spiritual treasures to begin your sacred journey</p>
+           <div className="w-24 h-24 sm:w-32 sm:h-32 bg-[#FEF7D7] rounded-full mx-auto mb-6 sm:mb-8 flex items-center justify-center">
+  <ShoppingCart className="w-12 h-12 sm:w-16 sm:h-16 text-[#9C0B13] animate-bounce" />
+</div>
+<h2 className="text-2xl sm:text-3xl font-bold text-[#9C0B13] mb-4">Your Cart is Empty</h2>
+<p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 px-4">Add some spiritual treasures to begin your sacred journey</p>
             <button
               onClick={() => window.location.href = '/products'}
               className="bg-gradient-to-r from-[#9C0B13] to-red-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300 transform hover:scale-105"
@@ -775,16 +773,16 @@ const CartPage = () => {
         {cartItems.length > 0 && (
           <div id="offers" className={`mt-12 transition-all duration-1000 ${isVisible.offers ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="bg-gradient-to-r from-[#FEF7D7] to-white p-6 rounded-2xl shadow-lg border-2 border-[#9C0B13]/20">
-              <div className="grid md:grid-cols-3 gap-6 text-center">
-                <div className="flex items-center justify-center space-x-3">
-                  <div className="w-12 h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
-                    <Star className="w-6 h-6 text-[#FEF7D7] animate-spin" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-[#9C0B13]">Free Shipping</div>
-                    <div className="text-sm text-gray-600">Orders above ₹2,000</div>
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3">
+  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
+    <Star className="w-5 h-5 sm:w-6 sm:h-6 text-[#FEF7D7] animate-spin" />
+  </div>
+  <div>
+    <div className="font-bold text-[#9C0B13] text-sm sm:text-base">Free Shipping</div>
+    <div className="text-xs sm:text-sm text-gray-600">Orders above ₹2,000</div>
+  </div>
+</div>
 
                 <div className="flex items-center justify-center space-x-3">
                   <div className="w-12 h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
