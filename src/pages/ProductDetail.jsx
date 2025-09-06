@@ -32,6 +32,7 @@ const ProductDetailPage = () => {
   const [error, setError] = useState(null);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
+  const [isUpdatingQuantity, setIsUpdatingQuantity] = useState(false);
 
   const { id: productID } = useParams();
 
@@ -116,12 +117,62 @@ const ProductDetailPage = () => {
     }
   };
 
-  const handleQuantityChange = (type) => {
-    if (type === "increment" && quantity < product?.stock) {
-      setQuantity((prev) => prev + 1);
-    } else if (type === "decrement" && quantity > 1) {
-      setQuantity((prev) => prev - 1);
+  // New function to update quantity via API
+  const updateQuantityAPI = async (newQuantity) => {
+    setIsUpdatingQuantity(true);
+    try {
+      const response = await axios.put(
+        `http://localhost:1921/product/updatequantity/${productID}`,
+        {
+          quantity: newQuantity
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      console.log('Quantity updated successfully:', response.data);
+
+      // Update the local product state with the new quantity if the API returns updated product data
+      if (response.data.data) {
+        setProduct(prevProduct => ({
+          ...prevProduct,
+          stock: response.data.data.stock || prevProduct.stock
+        }));
+      }
+
+      // Show success message (optional)
+      // alert('Product quantity updated successfully!');
+
+    } catch (error) {
+      console.error('Error updating quantity:', error.response?.data || error);
+      alert('Failed to update product quantity. Please try again.');
+
+      // Revert the quantity change on error
+      setQuantity(prevQuantity => prevQuantity);
+    } finally {
+      setIsUpdatingQuantity(false);
     }
+  };
+
+  const handleQuantityChange = async (type) => {
+    let newQuantity = quantity;
+
+    if (type === "increment" && quantity < product?.stock) {
+      newQuantity = quantity + 1;
+    } else if (type === "decrement" && quantity > 1) {
+      newQuantity = quantity - 1;
+    } else {
+      return; // No change needed
+    }
+
+    // Update local state immediately for better UX
+    setQuantity(newQuantity);
+
+    // Update quantity via API
+    await updateQuantityAPI(newQuantity);
   };
 
   const toggleSection = (section) => {
@@ -215,40 +266,6 @@ const ProductDetailPage = () => {
       setIsAddingToCart(false);
     }
   };
-  // Buy Now functionality
-  // const handleBuyNow = async () => {
-  //   setIsBuyingNow(true);
-  //   try {
-  //     const orderData = {
-  //       order: {
-  //         user: "user123", // Replace with actual user ID from your auth system
-  //         products: [{
-  //           product: productID,
-  //           quantity: quantity,
-  //           price: getCurrentPrice()
-  //         }],
-  //         totalAmount: getCurrentPrice() * quantity,
-  //         shippingAddress: {}, // You might want to collect this from user
-  //         paymentMethod: "pending", // This could be set during payment
-  //         status: "pending",
-  //         orderDate: new Date().toISOString()
-  //       }
-  //     };
-
-  //     const response = await axios.post('https://astroanikantbackend-2.onrender.com/order/createorder', orderData);
-
-  //     if (response.data.message === "Order Placed Successfully") {
-  //       alert('Order placed successfully! Redirecting to payment...');
-  //       // Here you could redirect to payment page or show payment modal
-  //       // window.location.href = `/payment/${response.data.data._id}`;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error creating order:', error);
-  //     alert('Failed to create order. Please try again.');
-  //   } finally {
-  //     setIsBuyingNow(false);
-  //   }
-  // };
 
   const getWeightDisplay = () => {
     if (product?.weight?.value && product?.weight?.unit) {
@@ -385,16 +402,14 @@ const ProductDetailPage = () => {
                 <div className="absolute top-4 right-4 flex flex-col space-y-2">
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
-                    className={`p-2 rounded-full shadow-lg transition-all duration-300 ${
-                      isWishlisted
+                    className={`p-2 rounded-full shadow-lg transition-all duration-300 ${isWishlisted
                         ? "bg-red-800 text-white"
                         : "bg-white text-gray-600 hover:bg-red-50"
-                    }`}
+                      }`}
                   >
                     <Heart
-                      className={`w-5 h-5 ${
-                        isWishlisted ? "fill-current" : ""
-                      }`}
+                      className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""
+                        }`}
                     />
                   </button>
                   <button
@@ -420,11 +435,10 @@ const ProductDetailPage = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                      selectedImage === index
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${selectedImage === index
                         ? "border-red-800"
                         : "border-gray-200 hover:border-red-400"
-                    }`}
+                      }`}
                   >
                     <img
                       src={image}
@@ -476,11 +490,10 @@ const ProductDetailPage = () => {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`w-5 h-5 ${
-                            star <= Math.floor(product.averageRating || 0)
+                          className={`w-5 h-5 ${star <= Math.floor(product.averageRating || 0)
                               ? "text-yellow-400 fill-current"
                               : "text-gray-300"
-                          }`}
+                            }`}
                         />
                       ))}
                       <span className="ml-2 text-sm text-gray-600">
@@ -518,11 +531,10 @@ const ProductDetailPage = () => {
                   </div>
                   <div className="flex items-center space-x-2 mb-6">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        product.stock > 0
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${product.stock > 0
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
-                      }`}
+                        }`}
                     >
                       {product.stock > 0
                         ? `In Stock (${product.stock} available)`
@@ -543,16 +555,23 @@ const ProductDetailPage = () => {
                     <div className="flex items-center border border-gray-300 rounded-lg">
                       <button
                         onClick={() => handleQuantityChange("decrement")}
-                        className="p-2 hover:bg-red-50 transition-colors"
-                        disabled={quantity <= 1}
+                        className="p-2 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={quantity <= 1 || isUpdatingQuantity}
                       >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="px-4 py-2 font-medium">{quantity}</span>
+                      <div className="px-4 py-2 font-medium min-w-[60px] text-center relative">
+                        {quantity}
+                        {isUpdatingQuantity && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-800"></div>
+                          </div>
+                        )}
+                      </div>
                       <button
                         onClick={() => handleQuantityChange("increment")}
-                        className="p-2 hover:bg-red-50 transition-colors"
-                        disabled={quantity >= product.stock}
+                        className="p-2 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={quantity >= product.stock || isUpdatingQuantity}
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -564,11 +583,11 @@ const ProductDetailPage = () => {
                     <button
                       onClick={handleAddToCart}
                       className="bg-red-800 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      disabled={product.stock === 0 || isAddingToCart}
+                      disabled={product.stock === 0 || isAddingToCart || isUpdatingQuantity}
                     >
                       {isAddingToCart ? (
                         <>
-                          <div className="animate-spin rounded-full border-b-2 border-white mr-2"></div>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                           Adding...
                         </>
                       ) : (
@@ -578,23 +597,6 @@ const ProductDetailPage = () => {
                         </>
                       )}
                     </button>
-                    {/* <button 
-                      onClick={handleBuyNow}
-                      className="bg-yellow-200 text-red-800 py-3 px-6 rounded-xl font-semibold hover:bg-yellow-300 transform hover:scale-105 transition-all duration-300 shadow-lg border-2 border-red-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      disabled={product.stock === 0 || isBuyingNow}
-                    >
-                      {isBuyingNow ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-800 mr-2"></div>
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-5 h-5 mr-2" />
-                          Buy Now
-                        </>
-                      )}
-                    </button> */}
                   </div>
                 </div>
               </div>
@@ -637,11 +639,10 @@ const ProductDetailPage = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
-                      activeTab === tab.id
+                    className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                         ? "border-red-800 text-red-800"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`}
+                      }`}
                   >
                     <IconComponent className="w-4 h-4" />
                     <span>{tab.label}</span>
@@ -819,11 +820,10 @@ const ProductDetailPage = () => {
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
-                              className={`w-4 h-4 ${
-                                star <= review.rating
+                              className={`w-4 h-4 ${star <= review.rating
                                   ? "text-yellow-400 fill-current"
                                   : "text-gray-300"
-                              }`}
+                                }`}
                             />
                           ))}
                         </div>

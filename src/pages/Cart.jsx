@@ -28,69 +28,71 @@ const userId = useMemo(() => {
 useEffect(() => {
   console.log("Current localStorage user:", window.localStorage?.getItem("user"));
   console.log("Extracted userId:", userId);
+  
 }, [userId]);
 
-  // Optimize intersection observer with useCallback
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const updates = {};
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            updates[entry.target.id] = true;
-          }
-        });
-        if (Object.keys(updates).length > 0) {
-          setIsVisible(prev => ({ ...prev, ...updates }));
+// Optimize intersection observer with useCallback
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const updates = {};
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          updates[entry.target.id] = true;
         }
-      },
-      { threshold: 0.1 }
-    );
-
-    // Use setTimeout to defer observer setup after initial render
-    const timeoutId = setTimeout(() => {
-      document.querySelectorAll('[id]').forEach((el) => observer.observe(el));
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      observer.disconnect();
-    };
-  }, [cartItems.length]); // Only re-run when cart items change
+      });
+      if (Object.keys(updates).length > 0) {
+        setIsVisible(prev => ({ ...prev, ...updates }));
+      }
+    },
+    { threshold: 0.1 }
+  );
+  
+  // Use setTimeout to defer observer setup after initial render
+  const timeoutId = setTimeout(() => {
+    document.querySelectorAll('[id]').forEach((el) => observer.observe(el));
+  }, 100);
+  
+  return () => {
+    clearTimeout(timeoutId);
+    observer.disconnect();
+  };
+}, [cartItems.length]); // Only re-run when cart items change
 const fetchCartData = useCallback(async () => {
-    if (!userId) {
-        setError('Please log in to view your cart');
-        setLoading(false);
-        return;
-    }
-
-    try {
-        setLoading(true);
-        setError(null);
+  if (!userId) {
+    setError('Please log in to view your cart');
+    setLoading(false);
+    return;
+  }
+  
+  try {
+    setLoading(true);
+    setError(null);
         
-        const controller = new AbortController();
+    const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
         
         const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getcart/${userId}`, {
-            signal: controller.signal,
-            headers: {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache',
-            }
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+          }
         });
         
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-            if (response.status === 404) {
-                setCartItems([]);
-                return;
-            }
-            throw new Error(`HTTP error! status: ${response.status}`);
+          if (response.status === 404) {
+            setCartItems([]);
+            return;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
         console.log("Cart API Response:", data);
+        
         
         // Updated to match your backend response structure
         if (data && data.data && data.data.items && Array.isArray(data.data.items)) {
