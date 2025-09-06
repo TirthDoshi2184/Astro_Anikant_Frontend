@@ -256,7 +256,7 @@ const isUserLoggedIn = () => {
       <CustomToast 
         type="success"
         title="Added to Sacred Cart! ✨"
-        message={`${product.name} has been blessed and added to your collection`}
+        message={`${product.name} added to your collection`}
         icon={ShoppingCart}
       />,
       {

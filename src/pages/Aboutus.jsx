@@ -22,25 +22,25 @@ const AboutUs = () => {
 
   const teamMembers = [
     {
-      name: "Guru Rajesh Sharma",
-      role: "Founder & Chief Astrologer",
-      experience: "25+ Years",
+      name: "Dr Hukumchand Jain",
+      role: "Jyotisacharya avam vastu vidd",
+      experience: "40+ Years",
       specialization: "Vedic Astrology, Gemology",
       certifications: ["Certified Gemologist", "Vedic Astrology Master", "Vastu Expert"],
       image: "/api/placeholder/300/300"
     },
     {
-      name: "Dr. Priya Mehta",
-      role: "Senior Astrologer",
-      experience: "18+ Years",
+      name: "Pro. Naleen.k.Shastri",
+      role: "Jain darshan vidhvan/ Shahityakara ",
+      experience: "38+ Years",
       specialization: "Numerology, Crystal Healing",
       certifications: ["PhD in Astrology", "Crystal Healing Practitioner", "Reiki Master"],
       image: "/api/placeholder/300/300"
     },
     {
-      name: "Pandit Amit Joshi",
-      role: "Spiritual Advisor",
-      experience: "20+ Years",
+      name: "Ravi Jain Guruji",
+      role: "Hast rekha evam kundali milan visheshagya",
+      experience: "32+ Years",
       specialization: "Yantra Consecration, Puja Rituals",
       certifications: ["Sanskrit Scholar", "Temple Priest", "Yantra Expert"],
       image: "/api/placeholder/300/300"
@@ -82,7 +82,7 @@ const AboutUs = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center">
             <h1 className="text-5xl md:text-7xl font-bold text-[#9C0B13] mb-6 animate-pulse">
-              About AstroMystic
+              About Astro Anekant
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
               Bridging Ancient Wisdom with Modern Lives Through Authentic Spiritual Products
@@ -105,8 +105,8 @@ const AboutUs = () => {
               <div className="bg-white p-8 rounded-2xl shadow-xl border-l-4 border-[#9C0B13] hover:shadow-2xl transition-shadow duration-300">
                 <h3 className="text-2xl font-semibold text-[#9C0B13] mb-4">Founded in Spiritual Heritage</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Established in 1998, AstroMystic began as a small spiritual center in the heart of Gujarat. Our founder, 
-                  Guru Rajesh Sharma, started this journey with a vision to make authentic spiritual products accessible to seekers worldwide.
+                  Established in 1986, Astro Anekant began as a small spiritual center in the heart of Rajasthan. Our founder, 
+                  Pratisthacharya Pandit Surendra Kumar Jain, started this journey with a vision to make authentic spiritual products accessible to seekers worldwide.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
                   What started as a humble collection of sacred gems and yantras has grown into a trusted spiritual marketplace, 
@@ -135,7 +135,7 @@ const AboutUs = () => {
                 </p>
                 <div className="flex items-center space-x-4">
                   <div className="text-center">
-                    <div className="text-3xl font-bold">25+</div>
+                    <div className="text-3xl font-bold">35+</div>
                     <div className="text-sm opacity-90">Years of Service</div>
                   </div>
                   <div className="text-center">
@@ -143,7 +143,7 @@ const AboutUs = () => {
                     <div className="text-sm opacity-90">Happy Customers</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold">1000+</div>
+                    <div className="text-3xl font-bold">500+</div>
                     <div className="text-sm opacity-90">Products</div>
                   </div>
                 </div>
