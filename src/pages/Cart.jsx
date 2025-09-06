@@ -651,7 +651,7 @@ if (!userId && !loading) {
                   {/* Checkout Button */}
                   <button 
                    onClick={() => {
-  window.location.href = `/orders?userId=${userId}`;
+  window.location.href = `/orders/${userId}`;
 }}
                     className="w-full bg-gradient-to-r from-[#9C0B13] to-red-600 text-white py-4 rounded-xl font-bold text-lg hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
                   >

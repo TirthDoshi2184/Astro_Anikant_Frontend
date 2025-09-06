@@ -159,7 +159,7 @@ const AstrologyNavbar = () => {
   // Logout handler
   const handleLogout = () => {
     localStorage.removeItem('authToken');
-    localStorage.removeItem('userId');
+    localStorage.removeItem('user');
     setIsAuthenticated(false);
     setUser(null);
     setCartCount(0);

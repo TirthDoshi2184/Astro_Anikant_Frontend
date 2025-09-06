@@ -528,24 +528,23 @@ const fetchProducts = async (categoryFilter = null) => {
                   </div>
 
                   {/* Add to Cart Button */}
-                  <button 
-                    className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                      product.stock > 0 && product.isActive
-                        ? 'bg-red-900 text-white hover:bg-red-800'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                    disabled={product.stock === 0 || !product.isActive}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (product.stock > 0 && product.isActive) {
-                        console.log(`Added ${product.name} to cart`);
-                      }
-                    }}
-                  >
-                    <ShoppingCart size={18} />
-                    {product.stock > 0 && product.isActive ? 'Add to Cart' : 'Out of Stock'}
-                  </button>
-                </div>
+                 <button 
+      className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+        product.stock > 0 && product.isActive
+          ? 'bg-red-900 text-white hover:bg-red-800'
+          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+      }`}
+      disabled={product.stock === 0 || !product.isActive}
+      onClick={() => {
+        if (product.stock > 0 && product.isActive) {
+          navigate(`/productdetail/${product._id}`);
+        }
+      }}
+    >
+      <Eye size={18} />
+      {product.stock > 0 && product.isActive ? 'View Product' : 'Out of Stock'}
+    </button>
+  </div>
               </div>
             ))}
           </div>

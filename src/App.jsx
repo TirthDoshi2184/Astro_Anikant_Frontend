@@ -67,7 +67,7 @@ function App() {
         <Route path="/products" element={<Product />} />
         <Route path="/about" element={<Aboutus />} />
         <Route path="/order" element={<Previous_Order_Page/>}/>
-        <Route path="/orders/:id" element={<Orders />} />
+        <Route path="/orders/:userId" element={<Orders />} />
         <Route path="/donation" element={<Donation />} />
         <Route path="/booking" element={<Book_Visit />} />
         <Route path="/profile" element={<View_Profile />} />

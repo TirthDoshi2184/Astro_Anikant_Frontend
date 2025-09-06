@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat } from "react-icons/fa";
 import { GiPrayerBeads } from "react-icons/gi";
 // import { useNavigate } from 'react-router-dom';
-// import axios from 'axios';
+import axios from 'axios';
 
 const HomePage = () => {
 
@@ -33,56 +33,47 @@ const HomePage = () => {
     console.log('Form submitted:', formData);
     alert('Thank you! Your product inquiry has been submitted. Our team will contact you soon.');
   };
-  const navigate = useNavigate();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isVisible, setIsVisible] = useState({});
-  // const [categories, setCategories] = useState([]);
-  // const [bestSellers, setBestSellers] = useState([]);
-  // const [loading, setLoading] = useState(true);
+const navigate = useNavigate();
+const [currentSlide, setCurrentSlide] = useState(0);
+const [productSlide, setProductSlide] = useState(0);
+const [isVisible, setIsVisible] = useState({});
+const [Categories, setCategories] = useState([]);
+const [bestsellers, setBestSellers] = useState([]);
+const [loading, setLoading] = useState(true);
+  // API Functions
+useEffect(() => {
+  fetchData();
+}, []);
 
-  // API Functions (Currently commented for development)
-  /*
-  useEffect(() => {
-    fetchData();
-  }, []);
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    
+    // Fetch best sellers (featured products)
+    const bestSellersResponse = await axios.get('http://localhost:1921/product/bestsellers');
+    setBestSellers(bestSellersResponse.data.data || []);
+    
+    setLoading(false);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    setLoading(false);
+  }
+};
+const getProductsPerSlide = () => {
+  if (window.innerWidth < 768) return 1; // Mobile: 1 per slide
+  if (window.innerWidth < 1024) return 2; // Tablet: 2 per slide
+  return 4; // Desktop: 4 per slide
+};
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch categories
-      const categoriesResponse = await axios.get('/api/categories');
-      setCategories(categoriesResponse.data);
-      
-      // Fetch best sellers
-      const bestSellersResponse = await axios.get('/api/products/bestsellers');
-      setBestSellers(bestSellersResponse.data);
-      
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
-    }
-  };
+const nextProductSlide = () => {
+  const productsPerSlide = getProductsPerSlide();
+  setProductSlide((prev) => (prev + 1) % Math.ceil(bestsellers.length / productsPerSlide));
+};
 
-  const handleAddToCart = async (productId) => {
-    try {
-      const response = await axios.post('/api/cart/add', {
-        productId: productId,
-        quantity: 1
-      });
-      
-      if (response.data.success) {
-        // Show success notification
-        alert('Product added to cart successfully!');
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      alert('Failed to add product to cart');
-    }
-  };
-  */
-
+const prevProductSlide = () => {
+  const productsPerSlide = getProductsPerSlide();
+  setProductSlide((prev) => (prev - 1 + Math.ceil(bestsellers.length / productsPerSlide)) % Math.ceil(bestsellers.length / productsPerSlide));
+};
   // Navigation functions (SPA routing without page reload)
   const handleNavigation = (path) => {
     // For React Router: navigate(path);
@@ -103,7 +94,7 @@ const HomePage = () => {
   }
 
   const handleProductClick = (productId) => {
-    navigate(`/products/${productId}`);
+    navigate(`/productdetail/${productId}`);
     // handleNavigation(`/products/${productId}`);
   };
 
@@ -154,7 +145,7 @@ const HomePage = () => {
       description: "Experience the power of ancient symbols and sacred geometry for prosperity and protection"
     },
     {
-      title: "Mystical Bracelet & Spiritual Tools",
+      title: "Mystical Bracelets & Spiritual Tools",
       subtitle: "Meditation & Manifestation",
       description: "Enhance your spiritual journey with authentic prayer beads and meditation accessories"
     }
@@ -201,48 +192,48 @@ const categories = [
 ];
 
 
-  const bestSellers = [
-    {
-      id: 1,
-      name: "Ruby Gemstone Ring",
-      price: "₹12,500",
-      originalPrice: "₹15,000",
-      rating: 4.9,
-      reviews: 234,
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=300&fit=crop",
-      badge: "Bestseller"
-    },
-    {
-      id: 2,
-      name: "Sri Yantra - Gold Plated",
-      price: "₹8,999",
-      originalPrice: "₹11,999",
-      rating: 4.8,
-      reviews: 189,
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop",
-      badge: "Premium"
-    },
-    {
-      id: 3,
-      name: "Rudraksha Mala 108 Beads",
-      price: "₹3,500",
-      originalPrice: "₹4,200",
-      rating: 4.9,
-      reviews: 456,
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop",
-      badge: "Authentic"
-    },
-    {
-      id: 4,
-      name: "Crystal Pyramid Set",
-      price: "₹6,750",
-      originalPrice: "₹8,500",
-      rating: 4.7,
-      reviews: 167,
-      image: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=300&h=300&fit=crop",
-      badge: "New"
-    }
-  ];
+  // const bestSellers = [
+  //   {
+  //     id: 1,
+  //     name: "Ruby Gemstone Ring",
+  //     price: "₹12,500",
+  //     originalPrice: "₹15,000",
+  //     rating: 4.9,
+  //     reviews: 234,
+  //     image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=300&fit=crop",
+  //     badge: "Bestseller"
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Sri Yantra - Gold Plated",
+  //     price: "₹8,999",
+  //     originalPrice: "₹11,999",
+  //     rating: 4.8,
+  //     reviews: 189,
+  //     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop",
+  //     badge: "Premium"
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Rudraksha Mala 108 Beads",
+  //     price: "₹3,500",
+  //     originalPrice: "₹4,200",
+  //     rating: 4.9,
+  //     reviews: 456,
+  //     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop",
+  //     badge: "Authentic"
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Crystal Pyramid Set",
+  //     price: "₹6,750",
+  //     originalPrice: "₹8,500",
+  //     rating: 4.7,
+  //     reviews: 167,
+  //     image: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=300&h=300&fit=crop",
+  //     badge: "New"
+  //   }
+  // ];
 
   const whyChooseUs = [
     {
@@ -634,72 +625,126 @@ const categories = [
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-[#9C0B13] to-red-400 mx-auto mt-6"></div>
           </div>
+<div className="relative">
+  {/* Navigation Buttons */}
+  <button 
+    onClick={prevProductSlide}
+    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-[#9C0B13] text-[#FEF7D7] rounded-full flex items-center justify-center hover:bg-red-700 transition-all duration-300 shadow-lg -ml-6"
+   disabled={loading || bestsellers.length <= getProductsPerSlide()}
+  >
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {bestSellers.map((product, index) => (
-              <div
-                key={product.id}
-                className={`group bg-white rounded-3xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition-all duration-500 overflow-hidden cursor-pointer ${
-                  isVisible.bestsellers ? `animate-fade-in-up delay-${index * 150}` : ''
-                }`}
-                onClick={() => handleProductClick(product.id)}
-              >
-                {/* Product Image */}
-                <div className="relative overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-[#9C0B13] text-[#FEF7D7] text-sm font-bold rounded-full">
-                      {product.badge}
-                    </span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  <button 
+    onClick={nextProductSlide}
+    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-[#9C0B13] text-[#FEF7D7] rounded-full flex items-center justify-center hover:bg-red-700 transition-all duration-300 shadow-lg -mr-6"
+    disabled={loading || bestsellers.length <= 4}
+  >
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+
+  {/* Slider Container */}
+  <div className="overflow-hidden">
+    <div 
+  className="flex transition-transform duration-500 ease-in-out"
+  style={{ 
+    transform: `translateX(-${productSlide * (100 / getProductsPerSlide())}%)` 
+  }}
+>
+      {loading ? (
+        // Loading skeleton
+        [...Array(4)].map((_, index) => (
+          <div key={index} className="w-full md:w-1/2 lg:w-1/4 flex-shrink-0 px-4">
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+              <div className="w-full h-64 bg-gray-200 animate-pulse"></div>
+              <div className="p-6">
+                <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse mb-3 w-2/3"></div>
+                <div className="h-8 bg-gray-200 rounded animate-pulse w-1/3"></div>
+              </div>
+            </div>
+          </div>
+        ))
+      ) : (
+        bestsellers.map((product, index) => (
+          <div key={product._id} className="w-full md:w-1/2 lg:w-1/4 flex-shrink-0 px-2 md:px-4">
+            <div
+              className={`group bg-white rounded-3xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition-all duration-500 overflow-hidden cursor-pointer h-full ${
+                isVisible.bestsellers ? `animate-fade-in-up delay-${index * 150}` : ''
+              }`}
+              onClick={() => handleProductClick(product._id)}
+            >
+              {/* Product Image */}
+              <div className="relative overflow-hidden">
+                <img
+                  src={product.images?.[0]?.url || "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=300&fit=crop"}
+                  alt={product.images?.[0]?.alt || product.name}
+                  className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1 bg-[#9C0B13] text-[#FEF7D7] text-sm font-bold rounded-full">
+                    {product.isFeatured ? "Featured" : "Authentic"}
+                  </span>
                 </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
 
-                {/* Product Info */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-[#9C0B13] mb-2 group-hover:text-red-700 transition-colors duration-300">
-                    {product.name}
-                  </h3>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center mb-3">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-current" />
-                      ))}
-                    </div>
-                    <span className="text-gray-600 text-sm ml-2">
-                      {product.rating} ({product.reviews} reviews)
+              {/* Product Info */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-[#9C0B13] mb-2 group-hover:text-red-700 transition-colors duration-300">
+                  {product.name}
+                </h3>
+                
+                {/* Rating */}
+                <div className="flex items-center mb-3">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.averageRating) ? 'fill-current' : ''}`} />
+                    ))}
+                  </div>
+                  <span className="text-gray-600 text-sm ml-2">
+                    {product.averageRating.toFixed(1)} ({product.reviewCount} reviews)
+                  </span>
+                </div>
+                
+                {/* Price */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <span className="text-2xl font-bold text-[#9C0B13]">
+                      ₹{product.discountedPrice || product.price}
                     </span>
+                    {product.discountedPrice && (
+                      <span className="text-gray-400 line-through ml-2">₹{product.price}</span>
+                    )}
                   </div>
-                  
-                  {/* Price */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <span className="text-2xl font-bold text-[#9C0B13]">{product.price}</span>
-                      <span className="text-gray-400 line-through ml-2">{product.originalPrice}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Add to Cart Button */}
-                  <button 
-                    className="w-full py-3 bg-gradient-to-r from-[#9C0B13] to-red-700 text-[#FEF7D7] rounded-xl font-bold hover:from-red-700 hover:to-[#9C0B13] transform hover:scale-105 transition-all duration-300 shadow-lg"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent card click when clicking button
-                      handleAddToCart(product.id, product.name);
-                    }}
-                  >
-                    Add to Cart
-                  </button>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
+        ))
+      )}
+    </div>
+  </div>
 
+  {/* Slide Indicators */}
+  {!loading && bestsellers.length > 4 && (
+    <div className="flex justify-center mt-8 space-x-2">
+      {[...Array(Math.ceil(bestsellers.length / getProductsPerSlide()))].map((_, index) => (
+        <button
+          key={index}
+          onClick={() => setProductSlide(index)}
+          className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            productSlide === index ? 'bg-[#9C0B13] scale-125' : 'bg-gray-300'
+          }`}
+        />
+      ))}
+    </div>
+  )}
+</div>
           <div className="text-center mt-12">
             <button 
               className="px-8 py-4 bg-gradient-to-r from-[#9C0B13] to-red-700 text-[#FEF7D7] rounded-full font-bold text-lg hover:from-red-700 hover:to-[#9C0B13] transform hover:scale-105 transition-all duration-300 shadow-xl"

@@ -9,12 +9,14 @@ export default function AstrologyLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-  });
+  email: "",
+  password: "",
+  confirmPassword: "",
+  firstName: "",
+  lastName: "",
+  phone: "",
+  gender: "",
+});
 
   const handleInputChange = (e) => {
     setFormData({
@@ -106,22 +108,20 @@ export default function AstrologyLogin() {
 
     try {
       // Updated to match controller fields
-      const response = await fetch("https://astroanikantbackend-2.onrender.com/user/useradd", {
+      const response = await fetch("http://localhost:1921/user/useradd", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email.trim().toLowerCase(),
-          phone: formData.phone,
-          password: formData.password,
-          role: "customer",
-          isActive: true,
-          // product: '',
-          // address: '', // directly use array as per controller
-          // gender: ''
-        }),
+  name: `${formData.firstName} ${formData.lastName}`,
+  email: formData.email.trim().toLowerCase(),
+  phone: formData.phone,
+  password: formData.password, 
+  role: "customer",
+  isActive: true,
+  gender: formData.gender,
+}),
       });
 
       let data;
@@ -141,13 +141,14 @@ export default function AstrologyLogin() {
         setSuccess("Account created successfully! You can now sign in.");
         setIsLogin(true);
         setFormData({
-          email: formData.email,
-          password: "",
-          confirmPassword: "",
-          firstName: "",
-          lastName: "",
-          phone: "",
-        });
+  email: formData.email,
+  password: "",
+  confirmPassword: "",
+  firstName: "",
+  lastName: "",
+  phone: "",
+  gender: "",
+});
       } else {
         setError(data.message || "Registration failed. Please try again.");
       }
@@ -169,14 +170,16 @@ export default function AstrologyLogin() {
     if (isLogin) {
       handleLogin();
     } else {
-      if (
-        !formData.firstName ||
-        !formData.lastName ||
-        !formData.confirmPassword
-      ) {
-        setError("Please fill in all required fields.");
-        return;
-      }
+     if (
+  !formData.firstName ||
+  !formData.lastName ||
+  !formData.phone ||
+  !formData.gender ||
+  !formData.confirmPassword
+) {
+  setError("Please fill in all required fields.");
+  return;
+}
       handleSignup();
     }
   };
@@ -319,6 +322,29 @@ export default function AstrologyLogin() {
                 />
               </div>
             )}
+            {!isLogin && (
+  <div>
+    <label className="block text-sm font-medium mb-2" style={{ color: '#660B05' }}>
+      Gender
+    </label>
+    <select
+      name="gender"
+      value={formData.gender}
+      onChange={handleInputChange}
+      className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
+      style={{ 
+        borderColor: '#660B05',
+        backgroundColor: 'rgba(255, 240, 196, 0.5)',
+        focusRingColor: '#660B05'
+      }}
+      required={!isLogin}
+    >
+      <option value="">Select Gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </div>
+)}
             
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: '#660B05' }}>

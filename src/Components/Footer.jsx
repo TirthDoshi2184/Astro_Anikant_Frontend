@@ -24,7 +24,9 @@ import {
   TrendingUpIcon,
   GraduationCap,
   Activity,
-  GemIcon
+  GemIcon,
+  Pill,
+  Infinity
 } from 'lucide-react';
 import { SiFacebook, SiInstagram, SiWhatsapp, SiYoutube } from 'react-icons/si';
 import { BsTwitterX } from 'react-icons/bs';
@@ -61,7 +63,7 @@ const productCategories = [
   { 
     id: 1, 
     name: "Sarv Karya Siddhi", 
-    icon: FaAward, // success / siddhi / accomplishment
+      icon: Infinity, // success / siddhi / accomplishment, // success / siddhi / accomplishment
     count: "150+ Remedies", 
     color: "from-red-500 to-pink-600", 
     path: "/products?category=sarv-karya-siddhi" 
@@ -85,7 +87,7 @@ const productCategories = [
   { 
     id: 4, 
     name: "Sarv Rog Nivaran", 
-    icon: FaHeartbeat, // health, disease cure
+    icon: Pill, // health, disease cure
     count: "60+ Treatments", 
     color: "from-emerald-500 to-teal-600", 
     path: "/products?category=sarv-rog-nivaran" 
