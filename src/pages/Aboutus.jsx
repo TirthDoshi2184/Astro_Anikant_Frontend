@@ -23,24 +23,24 @@ const AboutUs = () => {
   const teamMembers = [
     {
       name: "Dr Hukumchand Jain",
-      role: "Jyotisacharya avam vastu vidd",
-      experience: "40+ Years",
+      role: "Jyotishacharya and Vastu Expert",
+      experience: "40+ Years Exp",
       specialization: "Vedic Astrology, Gemology",
       certifications: ["Certified Gemologist", "Vedic Astrology Master", "Vastu Expert"],
       image: "/api/placeholder/300/300"
     },
     {
       name: "Pro. Naleen.k.Shastri",
-      role: "Jain darshan vidhvan/ Shahityakara ",
-      experience: "38+ Years",
+      role: "Philoshopher and Litterateur",
+      experience: "38+ Years Exp",
       specialization: "Numerology, Crystal Healing",
       certifications: ["PhD in Astrology", "Crystal Healing Practitioner", "Reiki Master"],
       image: "/api/placeholder/300/300"
     },
     {
       name: "Ravi Jain Guruji",
-      role: "Hast rekha evam kundali milan visheshagya",
-      experience: "32+ Years",
+      role: "Palmistry and kundli milan Expert",
+      experience: "32+ Years Exp",
       specialization: "Yantra Consecration, Puja Rituals",
       certifications: ["Sanskrit Scholar", "Temple Priest", "Yantra Expert"],
       image: "/api/placeholder/300/300"
