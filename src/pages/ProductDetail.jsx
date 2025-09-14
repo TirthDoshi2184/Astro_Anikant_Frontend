@@ -17,7 +17,35 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+const CustomToast = ({ type, title, message, icon: Icon }) => (
+  <div className="flex items-center space-x-4 p-2">
+    <div className="relative">
+      <div className={`p-3 rounded-full ${type === 'success' ? 'bg-gradient-to-br from-green-400 to-green-600' : 
+        type === 'update' ? 'bg-gradient-to-br from-yellow-400 to-orange-500' : 
+        'bg-gradient-to-br from-red-400 to-red-600'} shadow-lg`}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+      <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-md">
+        <div className={`w-2 h-2 rounded-full ${type === 'success' ? 'bg-green-500' : 
+          type === 'update' ? 'bg-yellow-500' : 'bg-red-500'} animate-pulse`}></div>
+      </div>
+    </div>
+    <div className="flex-1">
+      <h4 className="font-bold text-gray-800 text-lg mb-1">{title}</h4>
+      <p className="text-gray-600 text-sm leading-relaxed">{message}</p>
+    </div>
+    <div className="flex flex-col items-center space-y-1">
+      <div className={`w-8 h-1 rounded-full ${type === 'success' ? 'bg-green-400' : 
+        type === 'update' ? 'bg-yellow-400' : 'bg-red-400'}`}></div>
+      <div className={`w-6 h-1 rounded-full ${type === 'success' ? 'bg-green-300' : 
+        type === 'update' ? 'bg-yellow-300' : 'bg-red-300'}`}></div>
+      <div className={`w-4 h-1 rounded-full ${type === 'success' ? 'bg-green-200' : 
+        type === 'update' ? 'bg-yellow-200' : 'bg-red-200'}`}></div>
+    </div>
+  </div>
+);
 const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -34,7 +62,11 @@ const ProductDetailPage = () => {
   const [isBuyingNow, setIsBuyingNow] = useState(false);
 
   const { id: productID } = useParams();
-
+const isUserLoggedIn = () => {
+  const authToken = localStorage.getItem("authToken");
+  const user = localStorage.getItem("user");
+  return authToken && user;
+};
   // Static data that might not come from API
   const relatedProducts = [
     {
@@ -199,20 +231,73 @@ const ProductDetailPage = () => {
       );
 
       if (response.status === 200) {
-        // Check if it's an update or new creation
-        const message = response.data.message.includes("updated")
-          ? `Quantity updated! Total items: ${response.data.data.quantity}`
-          : "Product added to cart successfully!";
-        alert(message);
-
-        // Reset quantity to 1 after adding to cart
-        setQuantity(1);
+  // Check if it's an update or new creation
+  if (response.data.message.includes("updated")) {
+    toast.success(
+      <CustomToast 
+        type="update"
+        title="Quantity Updated! 🔄"
+        icon={Plus}
+      />,
+      {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "mystical-toast mystical-update",
+        bodyClassName: "mystical-body",
+        closeButton: false
       }
-    } catch (error) {
-      console.error("Error adding to cart:", error.response?.data || error);
-      alert("Failed to add product to cart. Please try again.");
-    } finally {
-      setIsAddingToCart(false);
+    );
+  } else {
+    toast.success(
+      <CustomToast 
+        type="success"
+        title="Added to Sacred Cart! ✨"
+        message={`${product.name} added to your collection`}
+        icon={ShoppingCart}
+      />,
+      {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "mystical-toast mystical-success",
+        bodyClassName: "mystical-body",
+        closeButton: false
+      }
+    );
+  }
+
+  // Reset quantity to 1 after adding to cart
+  setQuantity(1);
+}
+} catch (error) {
+  console.error("Error adding to cart:", error.response?.data || error);
+  toast.error(
+    <CustomToast 
+      type="error"
+      title="Sacred Ritual Interrupted! ⚡"
+      message="The cosmic energies are misaligned. Please try again in a moment."
+      icon={Zap}
+    />,
+    {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      className: "mystical-toast mystical-error",
+      bodyClassName: "mystical-body",
+      closeButton: false
+    }
+  );
+} finally {      setIsAddingToCart(false);
     }
   };
   // Buy Now functionality
@@ -560,42 +645,37 @@ const ProductDetailPage = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="">
-                    <button
-                      onClick={handleAddToCart}
-                      className="bg-red-800 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      disabled={product.stock === 0 || isAddingToCart}
-                    >
-                      {isAddingToCart ? (
-                        <>
-                          <div className="animate-spin rounded-full border-b-2 border-white mr-2"></div>
-                          Adding...
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingCart className="w-5 h-5 mr-2" />
-                          Add to Cart
-                        </>
-                      )}
-                    </button>
-                    {/* <button 
-                      onClick={handleBuyNow}
-                      className="bg-yellow-200 text-red-800 py-3 px-6 rounded-xl font-semibold hover:bg-yellow-300 transform hover:scale-105 transition-all duration-300 shadow-lg border-2 border-red-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      disabled={product.stock === 0 || isBuyingNow}
-                    >
-                      {isBuyingNow ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-800 mr-2"></div>
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-5 h-5 mr-2" />
-                          Buy Now
-                        </>
-                      )}
-                    </button> */}
-                  </div>
+                <div className="">
+  {!isUserLoggedIn() ? (
+    // Show login button if user is not logged in
+    <button
+      onClick={() => window.location.href = "/login"} // or use your routing method
+      className="bg-red-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-700 transform hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center w-full"
+    >
+      <MessageCircle className="w-5 h-5 mr-2" />
+      Login to Add to Cart
+    </button>
+  ) : (
+    // Show normal add to cart button if user is logged in
+    <button
+      onClick={handleAddToCart}
+      className="bg-red-800 text-white py-3 px-6 rounded-xl font-semibold hover:bg-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+      disabled={product.stock === 0 || isAddingToCart}
+    >
+      {isAddingToCart ? (
+        <>
+          <div className="animate-spin rounded-full border-b-2 border-white mr-2"></div>
+          Adding...
+        </>
+      ) : (
+        <>
+          <ShoppingCart className="w-5 h-5 mr-2" />
+          Add to Cart
+        </>
+      )}
+    </button>
+  )}
+</div>
                 </div>
               </div>
             </div>
@@ -870,6 +950,21 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
+      <ToastContainer
+        position="top-center"
+        autoClose={4000}
+        limit={3}
+        hideProgressBar={true}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastClassName="mystical-toast"
+      />
+
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -884,6 +979,93 @@ const ProductDetailPage = () => {
 
         .animate-fadeIn {
           animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes mysticalGlow {
+          0% { box-shadow: 0 0 20px rgba(156, 11, 19, 0.3); }
+          50% { box-shadow: 0 0 40px rgba(156, 11, 19, 0.5), 0 0 60px rgba(254, 247, 215, 0.3); }
+          100% { box-shadow: 0 0 20px rgba(156, 11, 19, 0.3); }
+        }
+
+        @keyframes slideInFromTop {
+          0% {
+            transform: translateY(-100px) scale(0.8);
+            opacity: 0;
+          }
+          50% {
+            transform: translateY(10px) scale(1.05);
+          }
+          100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+          }
+        }
+
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+
+        :global(.mystical-toast) {
+          background: linear-gradient(135deg, #FEF7D7 0%, #FFF8E1 50%, #FEF7D7 100%) !important;
+          border: 2px solid #9C0B13 !important;
+          border-radius: 20px !important;
+          box-shadow: 0 15px 35px rgba(156, 11, 19, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+          backdrop-filter: blur(10px) !important;
+          animation: slideInFromTop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+          position: relative !important;
+          overflow: visible !important;
+          min-height: 80px !important;
+          width: 400px !important;
+          margin: 10px auto !important;
+        }
+
+        :global(.mystical-toast::before) {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          background: linear-gradient(45deg, #9C0B13, #FEF7D7, #9C0B13, #FEF7D7);
+          background-size: 400% 400%;
+          border-radius: 22px;
+          z-index: -1;
+          animation: shimmer 3s ease-in-out infinite;
+        }
+
+        :global(.mystical-success) {
+          animation: slideInFromTop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), mysticalGlow 2s ease-in-out infinite 1s !important;
+        }
+
+        :global(.mystical-update) {
+          animation: slideInFromTop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), mysticalGlow 2s ease-in-out infinite 1s !important;
+          border-color: #F59E0B !important;
+        }
+
+        :global(.mystical-update::before) {
+          background: linear-gradient(45deg, #F59E0B, #FEF7D7, #F59E0B, #FEF7D7);
+          background-size: 400% 400%;
+        }
+
+        :global(.mystical-error) {
+          animation: slideInFromTop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), mysticalGlow 2s ease-in-out infinite 1s !important;
+          background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 50%, #FEF2F2 100%) !important;
+        }
+
+        :global(.mystical-body) {
+          padding: 0 !important;
+          margin: 0 !important;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        }
+
+        :global(.Toastify__toast-container) {
+          z-index: 9999 !important;
+        }
+
+        :global(.mystical-toast:hover) {
+          transform: translateY(-5px) scale(1.02) !important;
+          box-shadow: 0 20px 45px rgba(156, 11, 19, 0.3), 0 10px 20px rgba(0, 0, 0, 0.15) !important;
         }
       `}</style>
     </div>

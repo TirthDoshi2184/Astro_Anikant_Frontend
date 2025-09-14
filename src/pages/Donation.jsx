@@ -15,10 +15,10 @@ const Donation = () => {
 
   const predefinedAmounts = [
     { value: '501', label: '₹501', description: 'Sacred Beginning' },
-    { value: '1001', label: '₹1,001', description: 'Spiritual Blessing' },
-    { value: '2501', label: '₹2,501', description: 'Divine Grace' },
-    { value: '5001', label: '₹5,001', description: 'Sacred Abundance' },
-    { value: '11001', label: '₹11,001', description: 'Auspicious Offering' },
+    { value: '1111', label: '₹1,111', description: 'Spiritual Blessing' },
+    { value: '2121', label: '₹2,121', description: 'Divine Grace' },
+    { value: '5151', label: '₹5,151', description: 'Sacred Abundance' },
+    { value: '11111', label: '₹11,111', description: 'Auspicious Offering' },
     { value: 'custom', label: 'Custom', description: 'Your Sacred Choice' }
   ];
 
@@ -98,8 +98,13 @@ const Donation = () => {
     Anekant Astrology and Vastu Research Center
   </p>
   <p className="text-sm md:text-base text-gray-600 italic mt-1">
-    "An institute dedicated to Astrology, Vastu, Yantra, and Gemstone Science"
+    "An institute dedicated to Astrology, Vastu, Yantra, and Gemstone Science."
+    <br />
   </p>
+<p className="text-base md:text-2xl font-bold  text-[#9C0B13]">
+
+  [Anekant Seva Sansthan]
+</p>
 </div>
 <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
   Support Our Spiritual Mission & Help Us Spread Ancient Wisdom
@@ -121,21 +126,21 @@ const Donation = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Users className="w-8 h-8 text-[#FEF7D7]" />
               </div>
-              <h3 className="text-2xl font-bold text-[#9C0B13] mb-2">50,000+</h3>
+              <h3 className="text-2xl font-bold text-[#9C0B13] mb-2">20,000+</h3>
               <p className="text-gray-600">Lives Touched Through Spiritual Guidance</p>
             </div>
             <div className="p-6">
               <div className="w-16 h-16 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Gift className="w-8 h-8 text-[#FEF7D7]" />
               </div>
-              <h3 className="text-2xl font-bold text-[#9C0B13] mb-2">1,000+</h3>
+              <h3 className="text-2xl font-bold text-[#9C0B13] mb-2">5,000+</h3>
               <p className="text-gray-600">Free Spiritual Products Distributed</p>
             </div>
             <div className="p-6">
               <div className="w-16 h-16 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Sparkles className="w-8 h-8 text-[#FEF7D7]" />
               </div>
-              <h3 className="text-2xl font-bold text-[#9C0B13] mb-2">25+</h3>
+              <h3 className="text-2xl font-bold text-[#9C0B13] mb-2">35+</h3>
               <p className="text-gray-600">Years of Spiritual Service & Dedication</p>
             </div>
           </div>
@@ -191,7 +196,6 @@ const Donation = () => {
                   </div>
                 )}
               </div>
-
               {/* Personal Information */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>

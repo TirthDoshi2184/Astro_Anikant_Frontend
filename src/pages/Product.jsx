@@ -443,7 +443,6 @@ const fetchProducts = async (categoryFilter = null) => {
                       <Heart size={16} className="text-red-600" />
                     </button>
                     <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
-                      <Eye size={16} className="text-red-600" />
                     </button>
                   </div>
 
@@ -541,7 +540,6 @@ const fetchProducts = async (categoryFilter = null) => {
         }
       }}
     >
-      <Eye size={18} />
       {product.stock > 0 && product.isActive ? 'View Product' : 'Out of Stock'}
     </button>
   </div>
