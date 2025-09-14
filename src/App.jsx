@@ -29,6 +29,7 @@ import Previous_Order_Page from "./pages/Previous_Order_Page";
 import { AdminProductRequest } from "./Components/Admin/AdminProductRequest";
 import { ForgotUserEmail } from "./pages/ForgotUserEmail";
 import EmailResetPassword from "./pages/EmailResetPassword";
+import { Payment } from "./pages/Payment";
 
 function App() {
   const location = useLocation();
@@ -50,7 +51,8 @@ function App() {
     "/adminvisits/:id",
     "/adminproductrequest",
     "/login",
-    "/forgotuseremail"
+    "/forgotuseremail",
+    "/paymentdemo"
   ];
 
   // Check if current path matches any of the patterns
@@ -76,6 +78,8 @@ function App() {
         <Route path="/booking" element={<Book_Visit />} />
         <Route path="/profile" element={<View_Profile />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/paymentdemo" element={<Payment />} />
+
         <Route path="/forgotuseremail" element={<ForgotUserEmail/>}/>
         <Route path="/emailresetpassword/:token" element={<EmailResetPassword/>}/>
 
