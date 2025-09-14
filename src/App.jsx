@@ -27,6 +27,8 @@ import { AdminVisits } from "./Components/Admin/AdminVisits";
 import { AdminSingleVisit } from "./Components/Admin/AdminSingleVisit";
 import Previous_Order_Page from "./pages/Previous_Order_Page";
 import { AdminProductRequest } from "./Components/Admin/AdminProductRequest";
+import { ForgotUserEmail } from "./pages/ForgotUserEmail";
+import EmailResetPassword from "./pages/EmailResetPassword";
 
 function App() {
   const location = useLocation();
@@ -46,7 +48,9 @@ function App() {
     "/adminorders/:id",
     "/adminvisits",
     "/adminvisits/:id",
-    "/adminproductrequest"
+    "/adminproductrequest",
+    "/login",
+    "/forgotuseremail"
   ];
 
   // Check if current path matches any of the patterns
@@ -72,6 +76,9 @@ function App() {
         <Route path="/booking" element={<Book_Visit />} />
         <Route path="/profile" element={<View_Profile />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/forgotuseremail" element={<ForgotUserEmail/>}/>
+        <Route path="/emailresetpassword/:token" element={<EmailResetPassword/>}/>
+
         <Route path="/productdetail/:id" element={<ProductDetailPage />} />
         
         {/* Admin Routes */}

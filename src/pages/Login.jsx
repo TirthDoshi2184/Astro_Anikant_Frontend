@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Star, Moon, Sun, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function AstrologyLogin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -430,13 +430,13 @@ export default function AstrologyLogin() {
                   />
                   <span className="ml-2" style={{ color: '#8B0E08' }}>Remember me</span>
                 </label>
-                <button
-                  type="button"
+                <Link
+                  to={"/forgotuseremail"}
                   className="font-medium hover:opacity-70"
                   style={{ color: '#660B05' }}
                 >
                   Forgot password?
-                </button>
+                </Link>
               </div>
             )}
 
