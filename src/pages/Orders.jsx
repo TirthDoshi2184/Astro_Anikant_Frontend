@@ -155,122 +155,152 @@ const OrderCheckoutPage = () => {
     return true;
   };
   const handleSubmitOrder = async () => {
+    alert("dshib")
     if (!validateForm()) return;
     if (!cartData) {
-      setError("Cart data not available");
+      setError('Cart data not available');
       return;
     }
 
     try {
       setSubmitting(true);
-      setError("");
-      setSuccess("");
+      setError('');
 
-      // 1. Create Order in your backend (save order first)
+      // Create order payload matching your backend structure
       const orderPayload = {
-        cart: cartData._id,
+        cart: cartData._id, // Use the cart ID from the fetched cart data // This should be the cart ID string
         typeOfPayment: paymentMethod,
+        // You might want to add more fields here if your backend expects them
+        // shippingAddress: {
+        //   firstName: formData.firstName,
+        //   lastName: formData.lastName,
+        //   address: formData.address,
+        //   city: formData.city,
+        //   state: formData.state,
+        //   pincode: formData.pincode
+        // }
       };
 
-      const orderRes = await fetch(
-        "https://astroanikantbackend-2.onrender.com/order/createorder",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderPayload),
+      console.log('Cart Data:', cartData);
+      console.log('Order Payload:', orderPayload);
+
+      console.log('Submitting order:', orderPayload);
+
+      const response = await fetch('https://astroanikantbackend-2.onrender.com/order/createorder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderPayload)
+      });
+
+      const result = await response.json();
+      console.log('Order response:', result);
+
+      if (response.ok && result.data) {
+        setSuccess('Order placed successfully! Redirecting to confirmation...');
+
+        // Clear form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          address: '',
+          city: '',
+          state: '',
+          pincode: '',
+          deliveryInstructions: '',
+          orderNotes: '',
+          deliveryPreference: 'standard'
+        });
+
+        // Redirect after success
+        setTimeout(() => {
+          // Navigate to order confirmation page
+          window.location.href = `/order`;
+        }, 2000);
+
+
+        const [OrderDetails, setOrderDetails] = useState({})
+
+        try {
+          const order = await axios.post("http://localhost:1921/payment/createorder", {
+            amount: 500,
+            currency: "INR",
+            receipt: "receipt_order_123",
+          });
+
+          setOrderDetails(order.data);
+          displayRazorpay(order.data);
+        } catch (error) {
+          console.error("Order creation failed:", error);
         }
-      );
 
-      const orderResult = await orderRes.json();
+        const loadScript = (src) => {
+          return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = src;
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+          });
+        };
+        const displayRazorpay = async (orderData) => {
+          const res = await loadScript(
+            "https://checkout.razorpay.com/v1/checkout.js"
+          );
 
-      if (!orderRes.ok || !orderResult.data) {
-        setError(orderResult.message || "Failed to create order. Try again.");
-        return;
-      }
+          if (!res) {
+            alert("Razorpay SDK failed to load. Are you online?");
+            return;
+          }
 
-      // 2. Create Razorpay Order via backend
-      const paymentOrder = await axios.post(
-        "https://astroanikantbackend-2.onrender.com/payment/createorder",
-        {
-          amount: calculateTotal() * 100, // Razorpay expects amount in paise
-          currency: "INR",
-          receipt: `receipt_${Date.now()}`,
-        }
-      );
-
-      // 3. Load Razorpay SDK
-      const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-      if (!res) {
-        setError("Razorpay SDK failed to load. Are you online?");
-        return;
-      }
-
-      // 4. Razorpay Options
-      const options = {
-        key: "rzp_test_m60EaJoASbqtGR", // replace with LIVE key in prod
-        amount: paymentOrder.data.amount,
-        currency: paymentOrder.data.currency,
-        name: "Astro Anekant",
-        description: "Order Payment",
-        order_id: paymentOrder.data.id, // Razorpay order id
-        handler: async function (response) {
-          try {
-            // 5. Verify Payment on Backend
-            const verifyRes = await axios.post(
-              "https://astroanikantbackend-2.onrender.com/payment/verify",
-              {
+          const options = {
+            key: "rzp_test_m60EaJoASbqtGR",
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: "Astro Anekant",
+            description: "Test Transaction",
+            order_id: orderData.id,
+            handler: async function (response) {
+              const res = await axios.post("/verify-payment", {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                orderId: orderResult.data._id, // link payment with order
+              });
+
+              if (res.data.status === "success") {
+                alert("Payment verified successfully!");
+              } else {
+                alert("Payment verification failed.");
               }
-            );
+            },
+            prefill: {
+              name: "Astro Anekant",
+              email: "astro@gmail.com",
+              contact: "09010291209",
+            },
+            theme: {
+              color: "#61dafb",
+            },
+          };
 
-            if (verifyRes.data.status === "success") {
-              setSuccess("Order placed & payment verified successfully!");
-              setTimeout(() => {
-                window.location.href = "/order";
-              }, 2000);
-            } else {
-              setError("Payment verification failed.");
-            }
-          } catch (err) {
-            console.error("Payment verification error:", err);
-            setError("Error verifying payment.");
-          }
-        },
-        prefill: {
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          contact: formData.phone,
-        },
-        theme: { color: "#B91C1C" },
-      };
+          const paymentObject = new window.Razorpay(options);
+          paymentObject.open();
+        };
 
-      // 6. Open Razorpay Payment Popup
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
+      } else {
+        setError(result.message || 'Failed to place order. Please try again.');
+      }
 
     } catch (err) {
-      console.error("Order submission error:", err);
-      setError("Something went wrong. Please try again.");
+      console.error('Order submission error:', err);
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setSubmitting(false);
     }
   };
-
-
-  // Helper to load Razorpay script
-  const loadScript = (src) => {
-    return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
 
   const calculateSubtotal = () => {
     if (!cartData || !cartData.items || !Array.isArray(cartData.items)) return 0;
@@ -669,12 +699,8 @@ const OrderCheckoutPage = () => {
 
               <button
                 onClick={handleSubmitOrder}
+
                 disabled={submitting}
-                style={{
-                  'hover': {
-                    "cursor": "pointer"
-                  }
-                }}
                 className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${submitting
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
