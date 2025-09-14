@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { CreditCard, Truck, MapPin, User, Phone, Mail, Package, Shield, Gift, AlertCircle, CheckCircle } from 'lucide-react';
 
 const OrderCheckoutPage = () => {
-  
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [cartData, setCartData] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [formData, setFormData] = useState({
     firstName: '',
@@ -26,9 +26,9 @@ const OrderCheckoutPage = () => {
 
   // Get cart_id from URL params or use demo ID
   const getCartIdFromUrl = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('userId') || 'demo-user-id';
-};
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('userId') || 'demo-user-id';
+  };
 
   const cartId = getCartIdFromUrl();
 
@@ -37,88 +37,88 @@ const OrderCheckoutPage = () => {
     fetchCartDetails(cartId);
   }, [cartId]);
 
-useEffect(() => {
-  fetchCartDetails(cartId);
-}, [cartId]);
+  useEffect(() => {
+    fetchCartDetails(cartId);
+  }, [cartId]);
 
-const fetchCartDetails = async (cartId) => {
-  try {
-    setLoading(true);
-    setError('');
-    
-    // First try to get user ID from localStorage
-    const user = localStorage.getItem("user");
-    let userId = null;
-    
-    if (user) {
-      try {
-        const parsedUser = JSON.parse(user);
-        userId = parsedUser.userId || parsedUser.id || parsedUser._id;
-      } catch (e) {
-        console.error("Error parsing user from localStorage", e);
+  const fetchCartDetails = async (cartId) => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // First try to get user ID from localStorage
+      const user = localStorage.getItem("user");
+      let userId = null;
+
+      if (user) {
+        try {
+          const parsedUser = JSON.parse(user);
+          userId = parsedUser.userId || parsedUser.id || parsedUser._id;
+        } catch (e) {
+          console.error("Error parsing user from localStorage", e);
+        }
       }
-    }
-    
-    if (!userId) {
-      setError('Please log in to continue with checkout');
-      return;
-    }
-    
-    // Use the same endpoint as cart page - get user's cart, not single cart
-    const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getcart/${userId}`);
-    const result = await response.json();
-    
-    console.log('API Response:', result);
-    
-    if (response.ok && result.data) {
-      setCartData(result.data);
-      
-      // Pre-fill form with user data if available
-      if (result.data.user) {
-        const user = result.data.user;
-        setFormData(prev => ({
-          ...prev,
-          firstName: user.name ? user.name.split(' ')[0] : '',
-          lastName: user.name ? user.name.split(' ').slice(1).join(' ') : '',
-          email: user.email || '',
-          phone: user.phone || '',
-          address: user.address?.street || user.address?.societyName || '',
-          city: user.address?.city || '',
-          state: user.address?.state || '',
-          pincode: user.address?.pincode || ''
-        }));
+
+      if (!userId) {
+        setError('Please log in to continue with checkout');
+        return;
       }
-    } else {
-      setError(result.message || 'Cart not found or has expired');
+
+      // Use the same endpoint as cart page - get user's cart, not single cart
+      const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getcart/${userId}`);
+      const result = await response.json();
+
+      console.log('API Response:', result);
+
+      if (response.ok && result.data) {
+        setCartData(result.data);
+
+        // Pre-fill form with user data if available
+        if (result.data.user) {
+          const user = result.data.user;
+          setFormData(prev => ({
+            ...prev,
+            firstName: user.name ? user.name.split(' ')[0] : '',
+            lastName: user.name ? user.name.split(' ').slice(1).join(' ') : '',
+            email: user.email || '',
+            phone: user.phone || '',
+            address: user.address?.street || user.address?.societyName || '',
+            city: user.address?.city || '',
+            state: user.address?.state || '',
+            pincode: user.address?.pincode || ''
+          }));
+        }
+      } else {
+        setError(result.message || 'Cart not found or has expired');
+        setCartData(null);
+      }
+
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+      setError('Network error. Please check your connection and try again.');
       setCartData(null);
+    } finally {
+      setLoading(false);
     }
-    
-  } catch (err) {
-    console.error('Error fetching cart:', err);
-    setError('Network error. Please check your connection and try again.');
-    setCartData(null);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-if (!cartData || !cartData.items || !Array.isArray(cartData.items) || cartData.items.length === 0) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
-      <div className="text-center">
-        <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Cart is Empty</h2>
-        <p className="text-gray-600 mb-4">Your cart doesn't have any items or has expired.</p>
-        <button 
-          onClick={() => window.location.href = '/products'} 
-          className="bg-red-800 text-white px-6 py-3 rounded-lg hover:bg-red-900 transition-colors"
-        >
-          Continue Shopping
-        </button>
+  if (!cartData || !cartData.items || !Array.isArray(cartData.items) || cartData.items.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Cart is Empty</h2>
+          <p className="text-gray-600 mb-4">Your cart doesn't have any items or has expired.</p>
+          <button
+            onClick={() => window.location.href = '/products'}
+            className="bg-red-800 text-white px-6 py-3 rounded-lg hover:bg-red-900 transition-colors"
+          >
+            Continue Shopping
+          </button>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -154,92 +154,133 @@ if (!cartData || !cartData.items || !Array.isArray(cartData.items) || cartData.i
 
     return true;
   };
-const handleSubmitOrder = async () => {
-  if (!validateForm()) return;
-  if (!cartData) {
-    setError('Cart data not available');
-    return;
-  }
-
-  try {
-    setSubmitting(true);
-    setError('');
-
-    // Create order payload matching your backend structure
-    const orderPayload = {
-      cart: cartData._id, // Use the cart ID from the fetched cart data // This should be the cart ID string
-      typeOfPayment: paymentMethod,
-      // You might want to add more fields here if your backend expects them
-      // shippingAddress: {
-      //   firstName: formData.firstName,
-      //   lastName: formData.lastName,
-      //   address: formData.address,
-      //   city: formData.city,
-      //   state: formData.state,
-      //   pincode: formData.pincode
-      // }
-    };
-
-    console.log('Cart Data:', cartData);
-console.log('Order Payload:', orderPayload);
-
-    console.log('Submitting order:', orderPayload);
-
-    const response = await fetch('https://astroanikantbackend-2.onrender.com/order/createorder', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(orderPayload)
-    });
-
-    const result = await response.json();
-    console.log('Order response:', result);
-
-    if (response.ok && result.data) {
-      setSuccess('Order placed successfully! Redirecting to confirmation...');
-      
-      // Clear form
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        address: '',
-        city: '',
-        state: '',
-        pincode: '',
-        deliveryInstructions: '',
-        orderNotes: '',
-        deliveryPreference: 'standard'
-      });
-
-      // Redirect after success
-      setTimeout(() => {
-        // Navigate to order confirmation page
-        window.location.href = `/order`;
-      }, 2000);
-      
-    } else {
-      setError(result.message || 'Failed to place order. Please try again.');
+  const handleSubmitOrder = async () => {
+    if (!validateForm()) return;
+    if (!cartData) {
+      setError("Cart data not available");
+      return;
     }
-  } catch (err) {
-    console.error('Order submission error:', err);
-    setError('Network error. Please check your connection and try again.');
-  } finally {
-    setSubmitting(false);
-  }
-};
+
+    try {
+      setSubmitting(true);
+      setError("");
+      setSuccess("");
+
+      // 1. Create Order in your backend (save order first)
+      const orderPayload = {
+        cart: cartData._id,
+        typeOfPayment: paymentMethod,
+      };
+
+      const orderRes = await fetch(
+        "https://astroanikantbackend-2.onrender.com/order/createorder",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderPayload),
+        }
+      );
+
+      const orderResult = await orderRes.json();
+
+      if (!orderRes.ok || !orderResult.data) {
+        setError(orderResult.message || "Failed to create order. Try again.");
+        return;
+      }
+
+      // 2. Create Razorpay Order via backend
+      const paymentOrder = await axios.post(
+        "https://astroanikantbackend-2.onrender.com/payment/createorder",
+        {
+          amount: calculateTotal() * 100, // Razorpay expects amount in paise
+          currency: "INR",
+          receipt: `receipt_${Date.now()}`,
+        }
+      );
+
+      // 3. Load Razorpay SDK
+      const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      if (!res) {
+        setError("Razorpay SDK failed to load. Are you online?");
+        return;
+      }
+
+      // 4. Razorpay Options
+      const options = {
+        key: "rzp_test_m60EaJoASbqtGR", // replace with LIVE key in prod
+        amount: paymentOrder.data.amount,
+        currency: paymentOrder.data.currency,
+        name: "Astro Anekant",
+        description: "Order Payment",
+        order_id: paymentOrder.data.id, // Razorpay order id
+        handler: async function (response) {
+          try {
+            // 5. Verify Payment on Backend
+            const verifyRes = await axios.post(
+              "https://astroanikantbackend-2.onrender.com/payment/verify",
+              {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                orderId: orderResult.data._id, // link payment with order
+              }
+            );
+
+            if (verifyRes.data.status === "success") {
+              setSuccess("Order placed & payment verified successfully!");
+              setTimeout(() => {
+                window.location.href = "/order";
+              }, 2000);
+            } else {
+              setError("Payment verification failed.");
+            }
+          } catch (err) {
+            console.error("Payment verification error:", err);
+            setError("Error verifying payment.");
+          }
+        },
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: { color: "#B91C1C" },
+      };
+
+      // 6. Open Razorpay Payment Popup
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+
+    } catch (err) {
+      console.error("Order submission error:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+
+  // Helper to load Razorpay script
+  const loadScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
 
   const calculateSubtotal = () => {
-  if (!cartData || !cartData.items || !Array.isArray(cartData.items)) return 0;
-  
-  return cartData.items.reduce((total, item) => {
-    const price = item.product?.discountedPrice || item.product?.price || 0;
-    const quantity = item.quantity || 1;
-    return total + (price * quantity);
-  }, 0);
-};
+    if (!cartData || !cartData.items || !Array.isArray(cartData.items)) return 0;
+
+    return cartData.items.reduce((total, item) => {
+      const price = item.product?.discountedPrice || item.product?.price || 0;
+      const quantity = item.quantity || 1;
+      return total + (price * quantity);
+    }, 0);
+  };
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
@@ -265,8 +306,8 @@ console.log('Order Payload:', orderPayload);
           <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Cart Not Found</h2>
           <p className="text-gray-600 mb-4">The cart you're looking for doesn't exist or has expired.</p>
-          <button 
-            onClick={() => window.location.href = '/cart'} 
+          <button
+            onClick={() => window.location.href = '/cart'}
             className="bg-red-800 text-white px-6 py-3 rounded-lg hover:bg-red-900 transition-colors"
           >
             Go to Cart
@@ -310,7 +351,7 @@ console.log('Order Payload:', orderPayload);
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Forms */}
           <div className="lg:col-span-2 space-y-8">
-            
+
             {/* Billing Information */}
             <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-all duration-300 border border-red-100">
               <div className="flex items-center mb-6">
@@ -319,7 +360,7 @@ console.log('Order Payload:', orderPayload);
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800">Billing Information</h2>
               </div>
-              
+
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="group">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">First Name *</label>
@@ -403,7 +444,7 @@ console.log('Order Payload:', orderPayload);
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="group">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">City *</label>
@@ -476,11 +517,10 @@ console.log('Order Payload:', orderPayload);
                   <div
                     key={method.id}
                     onClick={() => setPaymentMethod(method.id)}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-105 ${
-                      paymentMethod === method.id
-                        ? 'border-red-800 bg-red-50 shadow-lg'
-                        : 'border-gray-200 hover:border-red-400 hover:bg-red-50'
-                    }`}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-105 ${paymentMethod === method.id
+                      ? 'border-red-800 bg-red-50 shadow-lg'
+                      : 'border-gray-200 hover:border-red-400 hover:bg-red-50'
+                      }`}
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">{method.icon}</div>
@@ -515,7 +555,7 @@ console.log('Order Payload:', orderPayload);
 
                 <div className="group">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Delivery Preferences</label>
-                  <select 
+                  <select
                     name="deliveryPreference"
                     value={formData.deliveryPreference}
                     onChange={handleInputChange}
@@ -535,13 +575,13 @@ console.log('Order Payload:', orderPayload);
                 <Shield className="w-6 h-6 text-red-800 mr-3" />
                 <h3 className="text-lg font-bold text-gray-800">Terms & Conditions</h3>
               </div>
-              
+
               <div className="space-y-3">
                 <label className="flex items-start cursor-pointer group">
                   <input type="checkbox" className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" required />
                   <span className="text-sm text-gray-700">I agree to the <a href="#" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
                 </label>
-                
+
                 <label className="flex items-start cursor-pointer group">
                   <input type="checkbox" className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" required />
                   <span className="text-sm text-gray-700">I accept the <a href="#" className="text-red-800 hover:underline font-semibold">Privacy Policy</a> and consent to data processing</span>
@@ -554,53 +594,53 @@ console.log('Order Payload:', orderPayload);
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl p-8 sticky top-8 border border-red-100">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Order Review</h2>
-              
-            <div className="space-y-4 mb-6">
-  {cartData.items && Array.isArray(cartData.items) ? cartData.items.map((item, index) => (
-    <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300">
-      <img 
-        src={item.product?.images?.[0]?.url || item.product?.images?.[0] || item.product?.image || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop'} 
-        alt={item.product?.name || 'Product'} 
-        className="w-16 h-16 rounded-lg object-cover shadow-md" 
-        onError={(e) => {
-          e.target.src = 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop';
-        }}
-      />
-      <div className="flex-1">
-        <p className="font-semibold text-gray-800 text-sm">{item.product?.name || 'Unknown Product'}</p>
-        <p className="text-xs text-gray-600">Qty: {item.quantity || 1}</p>
-        {item.product?.weight && (
-          <p className="text-xs text-gray-500">
-            {typeof item.product.weight === 'object' 
-              ? `${item.product.weight.value}${item.product.weight.unit}` 
-              : `${item.product.weight}g`}
-          </p>
-        )}
-        {item.product?.category && (
-          <p className="text-xs text-gray-500">Category: {item.product.category}</p>
-        )}
-        <p className="text-xs text-gray-400">Status: {cartData.status}</p>
-      </div>
-      <div className="text-right">
-        {item.product?.price && item.product?.discountedPrice && item.product.discountedPrice < item.product.price && (
-          <p className="text-xs text-gray-400 line-through">₹{item.product.price}</p>
-        )}
-        <p className="font-bold text-red-800">
-          ₹{item.product?.discountedPrice || item.product?.price || 0}
-        </p>
-        {item.quantity > 1 && (
-          <p className="text-xs text-gray-600">
-            ₹{(item.product?.discountedPrice || item.product?.price || 0) * item.quantity} total
-          </p>
-        )}
-      </div>
-    </div>
-  )) : (
-    <div className="text-center py-4 text-gray-500">
-      No items found in cart
-    </div>
-  )}
-</div>
+
+              <div className="space-y-4 mb-6">
+                {cartData.items && Array.isArray(cartData.items) ? cartData.items.map((item, index) => (
+                  <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300">
+                    <img
+                      src={item.product?.images?.[0]?.url || item.product?.images?.[0] || item.product?.image || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop'}
+                      alt={item.product?.name || 'Product'}
+                      className="w-16 h-16 rounded-lg object-cover shadow-md"
+                      onError={(e) => {
+                        e.target.src = 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop';
+                      }}
+                    />
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-800 text-sm">{item.product?.name || 'Unknown Product'}</p>
+                      <p className="text-xs text-gray-600">Qty: {item.quantity || 1}</p>
+                      {item.product?.weight && (
+                        <p className="text-xs text-gray-500">
+                          {typeof item.product.weight === 'object'
+                            ? `${item.product.weight.value}${item.product.weight.unit}`
+                            : `${item.product.weight}g`}
+                        </p>
+                      )}
+                      {item.product?.category && (
+                        <p className="text-xs text-gray-500">Category: {item.product.category}</p>
+                      )}
+                      <p className="text-xs text-gray-400">Status: {cartData.status}</p>
+                    </div>
+                    <div className="text-right">
+                      {item.product?.price && item.product?.discountedPrice && item.product.discountedPrice < item.product.price && (
+                        <p className="text-xs text-gray-400 line-through">₹{item.product.price}</p>
+                      )}
+                      <p className="font-bold text-red-800">
+                        ₹{item.product?.discountedPrice || item.product?.price || 0}
+                      </p>
+                      {item.quantity > 1 && (
+                        <p className="text-xs text-gray-600">
+                          ₹{(item.product?.discountedPrice || item.product?.price || 0) * item.quantity} total
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-4 text-gray-500">
+                    No items found in cart
+                  </div>
+                )}
+              </div>
 
               {subtotal >= 2000 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
@@ -627,14 +667,18 @@ console.log('Order Payload:', orderPayload);
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={handleSubmitOrder}
                 disabled={submitting}
-                className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${
-                  submitting 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
-                }`}
+                style={{
+                  'hover': {
+                    "cursor": "pointer"
+                  }
+                }}
+                className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${submitting
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
+                  }`}
               >
                 {submitting ? (
                   <div className="flex items-center justify-center">
