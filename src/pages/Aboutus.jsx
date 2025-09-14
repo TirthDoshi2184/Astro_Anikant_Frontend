@@ -25,15 +25,15 @@ const AboutUs = () => {
       name: "Dr Hukumchand Jain",
       role: "Jyotishacharya and Vastu Expert",
       experience: "40+ Years Exp",
-      specialization: "Vedic Astrology, Gemology",
-      certifications: ["Certified Gemologist", "Vedic Astrology Master", "Vastu Expert"],
+      specialization: "Gemology, Vedic Astrology",
+      certifications: ["PhD in Astrology", "Certified Gemologist", "Vastu Consultant"],
       image: "/api/placeholder/300/300"
     },
     {
       name: "Pro. Naleen.k.Shastri",
       role: "Philoshopher and Litterateur",
       experience: "38+ Years Exp",
-      specialization: "Numerology, Crystal Healing",
+      specialization: "Astro-Psychology, Meditation",
       certifications: ["PhD in Astrology", "Crystal Healing Practitioner", "Reiki Master"],
       image: "/api/placeholder/300/300"
     },
@@ -41,8 +41,8 @@ const AboutUs = () => {
       name: "Ravi Jain Guruji",
       role: "Palmistry and kundli milan Expert",
       experience: "32+ Years Exp",
-      specialization: "Yantra Consecration, Puja Rituals",
-      certifications: ["Sanskrit Scholar", "Temple Priest", "Yantra Expert"],
+      specialization: "Palmistry, Kundli Matching",
+      certifications: ["Certified Palmistry Expert", "Kundli Matching Specialist"],
       image: "/api/placeholder/300/300"
     }
   ];
