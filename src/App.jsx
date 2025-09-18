@@ -30,6 +30,7 @@ import { AdminProductRequest } from "./Components/Admin/AdminProductRequest";
 import { ForgotUserEmail } from "./pages/ForgotUserEmail";
 import EmailResetPassword from "./pages/EmailResetPassword";
 import { Payment } from "./pages/Payment";
+import WishlistPage from "./pages/WishlistPage";
 
 function App() {
   const location = useLocation();
@@ -84,6 +85,8 @@ function App() {
         <Route path="/emailresetpassword/:token" element={<EmailResetPassword/>}/>
 
         <Route path="/productdetail/:id" element={<ProductDetailPage />} />
+        <Route path="/wishlist/" element={<WishlistPage />} />
+
         
         {/* Admin Routes */}
         <Route path="/adminpanel" element={<AdminSidePanel />} />

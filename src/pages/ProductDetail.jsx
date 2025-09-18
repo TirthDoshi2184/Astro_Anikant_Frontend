@@ -16,7 +16,7 @@ import {
   Minus,
 } from "lucide-react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const CustomToast = ({ type, title, message, icon: Icon }) => (
@@ -468,8 +468,8 @@ const isUserLoggedIn = () => {
                   className="w-full h-96 object-cover rounded-xl group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute top-4 right-4 flex flex-col space-y-2">
-                  <button
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                  <Link
+                    to={`/wishlisted/${productID}`}
                     className={`p-2 rounded-full shadow-lg transition-all duration-300 ${
                       isWishlisted
                         ? "bg-red-800 text-white"
@@ -481,7 +481,7 @@ const isUserLoggedIn = () => {
                         isWishlisted ? "fill-current" : ""
                       }`}
                     />
-                  </button>
+                  </Link>
                   <button
                     onClick={handleShare}
                     className="p-2 bg-white rounded-full shadow-lg text-gray-600 hover:bg-red-50 transition-all duration-300"
