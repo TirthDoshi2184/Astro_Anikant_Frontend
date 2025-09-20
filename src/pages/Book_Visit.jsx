@@ -76,23 +76,30 @@ const BookVisitPage = () => {
       setLoading(false);
       return;
     }
+    if (!acceptedTerms) {
+      setError('You must accept the terms and conditions');
+      setLoading(false);
+      return;
+    }
 
     try {
       const visitData = {
         name: formData.name,
-        phone: parseInt(formData.phone),
+        phone: formData.phone, // keep as string unless backend requires int
         email: formData.email,
         birthdate: formData.birthdate,
         message: formData.message,
       };
 
+      // Create booking
       const result = await createVisit(visitData);
 
       if (result.message === "Visit Added Successfully") {
         setBookingDetails(result.data);
         setShowConfirmation(true);
 
-        // Refresh the visits list
+        // After successful booking, initiate Razorpay payment
+        await initiateRazorpayPayment(500); // Pass amount here (₹11 for your UI, adjust as needed)
       } else {
         setError('Failed to book visit. Please try again.');
       }
@@ -102,6 +109,70 @@ const BookVisitPage = () => {
       setLoading(false);
     }
   };
+  // Load Razorpay checkout script
+  const loadScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  // Create Razorpay order and open checkout
+  const initiateRazorpayPayment = async (amount) => {
+    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    if (!res) {
+      alert("Razorpay SDK failed to load. Please check your connection.");
+      return;
+    }
+
+    try {
+      // Create Razorpay order from your backend
+      const response = await fetch("http://localhost:1921/payment/createorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: amount * 100, // amount in paise
+          currency: "INR",
+          receipt: `receipt_order_${Date.now()}`,
+        }),
+      });
+      const order = await response.json();
+
+      if (!order.id) {
+        alert("Failed to create payment order. Please try again.");
+        return;
+      }
+
+      const options = {
+        key: "rzp_test_m60EaJoASbqtGR", // Replace with your Razorpay key (live for production)
+        amount: order.amount,
+        currency: order.currency,
+        name: "Astro Anekant",
+        description: "Consultation Booking Payment",
+        order_id: order.id,
+        handler: async function (response) {
+          // Call backend to verify payment here (optional)
+          alert("Payment successful!");
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: { color: "#9C0B13" },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (err) {
+      alert("Payment initiation failed. Please try again.");
+      console.error(err);
+    }
+  };
+
 
 
   const FloatingElement = ({ children, delay = 0 }) => (
@@ -253,56 +324,56 @@ const BookVisitPage = () => {
                     </div>
                   </div>
                 </div>
-{/* Terms & Conditions */}
-<div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-2xl shadow-lg">
-  <h3 className="text-2xl font-bold text-[#9C0B13] mb-4 flex items-center">
-    <AlertCircle className="mr-3 text-yellow-500" />
-    Terms & Conditions
-  </h3>
-  <div className="space-y-3">
-    <div className="flex items-start">
-      <input
-        type="checkbox"
-        id="terms"
-        checked={acceptedTerms}
-        onChange={(e) => setAcceptedTerms(e.target.checked)}
-        className="mt-1 mr-3 h-4 w-4 text-[#9C0B13] focus:ring-[#9C0B13] border-2 border-[#9C0B13] rounded"
-        required
-      />
-      <label htmlFor="terms" className="text-gray-700 text-sm leading-relaxed">
-        <span className="text-red-500">*</span> I agree to the{' '}
-        <button
-          type="button"
-          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
-          onClick={() => {
-            window.open('/terms', '_blank');
-          }}
-        >
-          Terms & Conditions
-        </button>
-        {' '}and{' '}
-        <button
-          type="button"
-          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
-          onClick={() => {
-            window.open('/privacy', '_blank');
-          }}
-        >
-          Privacy Policy
-        </button>
-      </label>
-    </div>
-  </div>
-</div>
+                {/* Terms & Conditions */}
+                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-2xl shadow-lg">
+                  <h3 className="text-2xl font-bold text-[#9C0B13] mb-4 flex items-center">
+                    <AlertCircle className="mr-3 text-yellow-500" />
+                    Terms & Conditions
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start">
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        className="mt-1 mr-3 h-4 w-4 text-[#9C0B13] focus:ring-[#9C0B13] border-2 border-[#9C0B13] rounded"
+                        required
+                      />
+                      <label htmlFor="terms" className="text-gray-700 text-sm leading-relaxed">
+                        <span className="text-red-500">*</span> I agree to the{' '}
+                        <button
+                          type="button"
+                          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
+                          onClick={() => {
+                            window.open('/terms', '_blank');
+                          }}
+                        >
+                          Terms & Conditions
+                        </button>
+                        {' '}and{' '}
+                        <button
+                          type="button"
+                          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
+                          onClick={() => {
+                            window.open('/privacy', '_blank');
+                          }}
+                        >
+                          Privacy Policy
+                        </button>
+                      </label>
+                    </div>
+                  </div>
+                </div>
                 {/* Submit Button */}
                 <div className="text-center">
-                 <button
-  onClick={handleSubmit}
-  disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message || !acceptedTerms}
-  className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
->
-  {loading ? 'Booking...' : 'Confirm Booking - ₹11'}
-</button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message || !acceptedTerms}
+                    className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Booking...' : 'Confirm Booking - ₹11'}
+                  </button>
                 </div>
               </div>
             ) : (
