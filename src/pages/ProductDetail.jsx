@@ -232,11 +232,19 @@ const isUserLoggedIn = () => {
 
       if (response.status === 200) {
   // Check if it's an update or new creation
-  if (response.data.message.includes("updated")) {
+  // Check if the same product is being updated (quantity increased), or a new product is added
+  if (
+    response.data.message &&
+    response.data.message.toLowerCase().includes("updated") &&
+    response.data.data &&
+    response.data.data.product === productID
+  ) {
+    // Same product, quantity updated
     toast.success(
       <CustomToast 
         type="update"
-        title="Quantity Updated! 🔄"
+        title="Cart Updated! 🔄"
+        message={`Quantity updated for ${product.name}`}
         icon={Plus}
       />,
       {
@@ -252,6 +260,7 @@ const isUserLoggedIn = () => {
       }
     );
   } else {
+    // New product added to cart
     toast.success(
       <CustomToast 
         type="success"
