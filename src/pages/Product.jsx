@@ -204,31 +204,7 @@ const fetchProducts = async (categoryFilter = null) => {
 </div>
       <div className="container mx-auto px-6 py-8">
         {/* Category Description */}
-        <div className="bg-gradient-to-r from-red-900 to-red-800 text-white rounded-xl p-8 mb-8">
-          <h2 className="text-3xl font-bold mb-4">Spiritual Collections</h2>
-          <p className="text-lg mb-6 opacity-90">
-            Our carefully curated collection of spiritual products harnesses ancient wisdom to bring positive energy into your life.
-          </p>
-<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-  <div className="bg-white/10 rounded-lg p-4">
-    <h4 className="font-semibold mb-2">Perfect Selection</h4>
-    <p className="text-sm opacity-80">Choose based on your zodiac and spiritual goals</p>
-  </div>
-  <div className="bg-white/10 rounded-lg p-4">
-  <h4 className="font-semibold mb-2">Free Delivery</h4>
-  <p className="text-sm opacity-80">Free shipping on all orders nationwide</p>
-</div>
-  <div className="bg-white/10 rounded-lg p-4">
-    <h4 className="font-semibold mb-2">Powerful Energy</h4>
-    <p className="text-sm opacity-80">Amplify your aura and manifest positive vibrations</p>
-  </div>
-  <div className="bg-white/10 rounded-lg p-4">
-    <h4 className="font-semibold mb-2">100% Authentic</h4>
-    <p className="text-sm opacity-80">Certified genuine with authenticity guarantee</p>
-  </div>
-
-</div>      
-        </div>
+        
 
         {/* Filter Toggle & Sort Options */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white rounded-lg p-4 shadow-md">
@@ -606,6 +582,8 @@ const fetchProducts = async (categoryFilter = null) => {
       </div>
     </div>
 
+    
+
     {/* Mobile Layout */}
     <div className="md:hidden space-y-4">
       {/* Items per page - Mobile */}
@@ -642,8 +620,34 @@ const fetchProducts = async (categoryFilter = null) => {
     </div>
   </div>
 )}
+<div className="bg-gradient-to-r from-red-900 to-red-800 text-white rounded-xl p-8 mb-8">
+          <h2 className="text-3xl font-bold mb-4">Spiritual Collections</h2>
+          <p className="text-lg mb-6 opacity-90">
+            Our carefully curated collection of spiritual products harnesses ancient wisdom to bring positive energy into your life.
+          </p>
+<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <div className="bg-white/10 rounded-lg p-4">
+    <h4 className="font-semibold mb-2">Perfect Selection</h4>
+    <p className="text-sm opacity-80">Choose based on your zodiac and spiritual goals</p>
+  </div>
+  <div className="bg-white/10 rounded-lg p-4">
+  <h4 className="font-semibold mb-2">Free Delivery</h4>
+  <p className="text-sm opacity-80">Free shipping on all orders nationwide</p>
+</div>
+  <div className="bg-white/10 rounded-lg p-4">
+    <h4 className="font-semibold mb-2">Powerful Energy</h4>
+    <p className="text-sm opacity-80">Amplify your aura and manifest positive vibrations</p>
+  </div>
+  <div className="bg-white/10 rounded-lg p-4">
+    <h4 className="font-semibold mb-2">100% Authentic</h4>
+    <p className="text-sm opacity-80">Certified genuine with authenticity guarantee</p>
+  </div>
+
+</div>      
+        </div>
       </div>
     </div>
+    
   );
 };
 <style jsx>{`

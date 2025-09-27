@@ -50,7 +50,7 @@ const fetchData = async () => {
     setLoading(true);
     
     // Fetch best sellers (featured products)
-    const bestSellersResponse = await axios.get('http://localhost:1921/product/bestsellers');
+    const bestSellersResponse = await axios.get('https://astroanikantbackend-2.onrender.com/product/bestsellers');
     setBestSellers(bestSellersResponse.data.data || []);
     
     setLoading(false);

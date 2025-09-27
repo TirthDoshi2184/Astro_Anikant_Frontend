@@ -66,10 +66,10 @@ const AboutUs = () => {
   ];
 
   const awards = [
-    { title: "Best Spiritual Store 2024", organization: "Spiritual Wellness Awards" },
-    { title: "Excellence in Gemology", organization: "Indian Gem & Jewelry Council" },
-    { title: "Customer Choice Award", organization: "E-commerce Excellence Awards" },
-    { title: "Authentic Spiritual Products", organization: "Hindu Heritage Foundation" }
+    { title: "Certificate of Appreciation ", organization: "By Kathmandu,Nepal Digambar Jain Society" },
+    { title: "Excellence in Gemology and Vastu", organization: "Honored by All Communities in Uttar Pradesh" },
+    { title: "Featured in the leading newspapers ", organization: "*Rajasthan Patrika* and *Dainik Bhaskar*" },
+    { title: "Awards for remarkable contribution", organization: "Edited and compiled more than 20 books in Hindi, Sanskrit, and Prakrit languages" }
   ];
 
   return (
@@ -301,16 +301,14 @@ const AboutUs = () => {
 
           <div className="mt-16 text-center">
             <div className="bg-white p-8 rounded-2xl shadow-xl border-2 border-[#9C0B13]/20 max-w-4xl mx-auto">
-              <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Featured in Leading Publications</h3>
+              <h3 className="text-2xl font-bold text-[#9C0B13] mb-6">Featured in Leading Publications</h3>
               <p className="text-gray-700 leading-relaxed mb-6">
-                Our expertise and authentic products have been recognized by major spiritual and lifestyle publications 
-                including Spiritual Times, Astrology Today, and Divine Living Magazine.
+                Our expertise and authentic products have been recognized by major spiritual and lifestyle publications.
               </p>
-              <div className="flex justify-center space-x-8 opacity-60">
-                <div className="text-sm font-semibold">Spiritual Times</div>
-                <div className="text-sm font-semibold">Astrology Today</div>
-                <div className="text-sm font-semibold">Divine Living</div>
-                <div className="text-sm font-semibold">Sacred Gems Quarterly</div>
+              <div className="flex justify-center space-x-10 opacity-60">
+                <div className="text-sm font-bold">VASTU</div>
+                <div className="text-sm font-bold">RATNA VIGYAN</div>
+                <div className="text-sm font-bold">KUNDALI</div>
               </div>
             </div>
           </div>
@@ -325,10 +323,12 @@ const AboutUs = () => {
             Let our authentic products and expert guidance help you unlock your spiritual potential and transform your life
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#FEF7D7] text-[#9C0B13] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-colors duration-300 transform hover:scale-105">
+            <button className="bg-[#FEF7D7] text-[#9C0B13] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-colors duration-300 transform hover:scale-105"
+              onClick={() => window.location.href = '/products'}>
               Explore Products
             </button>
-            <button className="border-2 border-[#FEF7D7] text-[#FEF7D7] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#FEF7D7] hover:text-[#9C0B13] transition-all duration-300 transform hover:scale-105">
+            <button className="border-2 border-[#FEF7D7] text-[#FEF7D7] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#FEF7D7] hover:text-[#9C0B13] transition-all duration-300 transform hover:scale-105"
+              onClick={() => window.location.href = '/booking'}>
               Book Consultation 
             </button>
           </div>

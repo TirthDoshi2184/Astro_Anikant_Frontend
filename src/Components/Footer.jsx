@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   MapPin, 
   Phone, 
@@ -35,11 +36,12 @@ import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat } from "react-icons/
 import { GiLotus, GiPrayerBeads } from "react-icons/gi"; // for Rudraksha (spiritual)
 
 
+
 const Footer = () => {
+  const navigate = useNavigate();
   // Navigation function for SPA routing
   const handleNavigation = (path) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new CustomEvent('navigate', { detail: path }));
+    navigate(path);
   };
 
   const companyInfo = {
@@ -52,11 +54,13 @@ const Footer = () => {
   const quickLinks = [
     { name: "Privacy Policy", path: "/privacy-policy" },
     { name: "Terms & Conditions", path: "/terms-conditions" },
-    { name: "Shipping Info", path: "/shipping-info" },
-    { name: "Returns Policy", path: "/returns-policy" },
-    { name: "Book a Consultation", path: "/book-visit" },
+    // { name: "Shipping Info", path: "/shipping-info" },
+    { name: "Book a Consultation", path: "/booking" },
     { name: "Donation", path: "/donation" }
   ];
+
+  // On click, handleNavigation is already used in the button below to redirect to the given path.
+  // No further changes needed here, as the button's onClick calls handleNavigation(link.path).
 
 
 const productCategories = [
@@ -221,20 +225,6 @@ const socialLinks = [
                 </div>
               </div>
 
-              {/* Support Hours */}
-              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                <div className="flex items-start space-x-3">
-                  <Clock className="w-4 h-4 text-orange-600 mt-1" />
-                  <div>
-                    <h4 className="font-semibold text-amber-900 text-sm mb-2">Support Hours</h4>
-                    <div className="space-y-1 text-xs text-amber-800">
-                      <p>{supportHours.weekdays}</p>
-                      <p>{supportHours.saturday}</p>
-                      <p>{supportHours.sunday}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               {/* Social Media */}
               <div>
@@ -245,7 +235,7 @@ const socialLinks = [
     key={name}
     href={url}
     target="_blank"
-    rel="noreferrer"
+    rel="noreferrer"  
     className="inline-flex items-center gap-2 p-2"
   >
     <Icon className="h-6 w-6" style={{ color }} />

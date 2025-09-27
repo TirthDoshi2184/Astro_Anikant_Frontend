@@ -606,7 +606,7 @@ const OrderCheckoutPage = () => {
               <div className="space-y-3">
                 <label className="flex items-start cursor-pointer group">
                   <input type="checkbox" className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" required />
-                  <span className="text-sm text-gray-700">I agree to the <a href="#" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
+                  <span className="text-sm text-gray-700">I agree to the <a href="/terms-condition" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
                 </label>
 
                 <label className="flex items-start cursor-pointer group">
