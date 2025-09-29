@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react';
 import { CreditCard, Truck, MapPin, User, Phone, Mail, Package, Shield, Gift, AlertCircle, CheckCircle } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const OrderCheckoutPage = () => {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [cartData, setCartData] = useState(null);
@@ -100,9 +102,10 @@ const OrderCheckoutPage = () => {
       setLoading(false);
     }
   };
-
+  
 
   const paymentProcess = async () => {
+    
     try {
       const loadScript = (src) => {
         return new Promise((resolve) => {
@@ -139,6 +142,8 @@ const OrderCheckoutPage = () => {
 
               if (res.data.status === "success") {
                 alert("✅ Payment verified successfully!");
+                navigate("/")
+
               } else {
                 alert("❌ Payment verification failed.");
               }
@@ -158,6 +163,7 @@ const OrderCheckoutPage = () => {
 
         const paymentObject = new window.Razorpay(options);
         paymentObject.open();
+
       };
 
       // 👇 THIS was missing in your code
@@ -170,6 +176,7 @@ const OrderCheckoutPage = () => {
           });
 
           displayRazorpay(order.data);
+          navigate("/")
         } catch (error) {
           console.error("Order creation failed:", error);
         }
