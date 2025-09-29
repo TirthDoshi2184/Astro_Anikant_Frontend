@@ -122,12 +122,7 @@ export const AdminSidePanel = () => {
               </div>
 
               {/* Add User Button */}
-              <Link to="/admin/add-user">
-                <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-xl shadow-lg hover:shadow-red-900/40 transition-all duration-300 transform hover:scale-105">
-                  <UserPlus className="w-5 h-5" />
-                  <span>Add User</span>
-                </button>
-              </Link>
+             
             </div>
           </div>
         </div>
@@ -199,7 +194,7 @@ export const AdminSidePanel = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link to={"#"}>
+                      <Link to={`/adminusers/${user?._id}`}>
                         <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                           <Eye className="w-4 h-4" />
                           <span className="font-medium">View</span>

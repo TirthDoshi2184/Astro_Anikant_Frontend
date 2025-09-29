@@ -173,12 +173,7 @@ export const AdminProductsView = () => {
               </div>
 
               {/* Add User Button */}
-              <Link to="/admin/add-user">
-                <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-xl shadow-lg hover:shadow-red-900/40 transition-all duration-300 transform hover:scale-105">
-                  <ShoppingBag className="w-5 h-5" />
-                  <span>Add Product</span>
-                </button>
-              </Link>
+              
             </div>
           </div>
         </div>

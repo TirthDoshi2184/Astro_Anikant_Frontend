@@ -277,9 +277,7 @@ const IntegratedAdminProductDetail = () => {
               >
                 ← Back
               </button>
-              <button className="bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-900 transition-colors">
-                Edit Product
-              </button>
+            
             </div>
           </div>
         </div>
