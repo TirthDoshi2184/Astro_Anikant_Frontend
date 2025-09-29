@@ -66,10 +66,10 @@ const AboutUs = () => {
   ];
 
   const awards = [
-    { title: "Best Spiritual Store 2024", organization: "Spiritual Wellness Awards" },
-    { title: "Excellence in Gemology", organization: "Indian Gem & Jewelry Council" },
-    { title: "Customer Choice Award", organization: "E-commerce Excellence Awards" },
-    { title: "Authentic Spiritual Products", organization: "Hindu Heritage Foundation" }
+    { title: "Certificate of Appreciation ", organization: "By Kathmandu,Nepal Digambar Jain Society" },
+    { title: "Excellence in Gemology and Vastu", organization: "Honored by All Communities in Uttar Pradesh" },
+    { title: "Featured in the leading newspapers ", organization: "*Rajasthan Patrika* and *Dainik Bhaskar*" },
+    { title: "Awards for remarkable contribution", organization: "Edited and compiled more than 20 books in Hindi, Sanskrit, and Prakrit languages" }
   ];
 
   return (
@@ -163,92 +163,101 @@ const AboutUs = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="group">
-                <div className="bg-gradient-to-br from-[#FEF7D7] to-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-2">
-                  <div className="relative mb-6">
-                    <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-[#9C0B13] to-red-600 p-1">
-                      <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                        <Users className="w-16 h-16 text-[#9C0B13]" />
-                      </div>
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#9C0B13] rounded-full flex items-center justify-center">
-                      <Star className="w-4 h-4 text-[#FEF7D7] animate-pulse" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-[#9C0B13] text-center mb-2">{member.name}</h3>
-                  <p className="text-gray-600 text-center mb-3">{member.role}</p>
-                  <div className="text-center mb-4">
-                    <span className="bg-[#9C0B13] text-[#FEF7D7] px-3 py-1 rounded-full text-sm font-semibold">
-                      {member.experience}
-                    </span>
-                  </div>
-                  <p className="text-gray-700 text-center mb-4 text-sm">{member.specialization}</p>
-                  <div className="space-y-2">
-                    {member.certifications.map((cert, idx) => (
-                      <div key={idx} className="bg-white p-2 rounded-lg shadow-sm text-center text-xs text-gray-600">
-                        ✓ {cert}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+  {teamMembers.map((member, index) => (
+    <div key={index} className="group h-full">
+      <div className="bg-gradient-to-br from-[#FEF7D7] to-white p-6 lg:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-2 h-full flex flex-col">
+        <div className="relative mb-4 lg:mb-6">
+          <div className="w-24 h-24 lg:w-32 lg:h-32 mx-auto rounded-full bg-gradient-to-br from-[#9C0B13] to-red-600 p-1">
+            <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+              <Users className="w-12 h-12 lg:w-16 lg:h-16 text-[#9C0B13]" />
+            </div>
           </div>
+          <div className="absolute -top-1 -right-1 lg:-top-2 lg:-right-2 w-6 h-6 lg:w-8 lg:h-8 bg-[#9C0B13] rounded-full flex items-center justify-center">
+            <Star className="w-3 h-3 lg:w-4 lg:h-4 text-[#FEF7D7] animate-pulse" />
+          </div>
+        </div>
+        
+        <h3 className="text-lg lg:text-xl font-bold text-[#9C0B13] text-center mb-2">{member.name}</h3>
+        <p className="text-sm lg:text-base text-gray-600 text-center mb-3">{member.role}</p>
+        
+        <div className="text-center mb-4">
+          <span className="bg-[#9C0B13] text-[#FEF7D7] px-3 py-1 rounded-full text-sm font-semibold">
+            {member.experience}
+          </span>
+        </div>
+        
+        <p className="text-gray-700 text-center mb-4 text-sm flex-grow">{member.specialization}</p>
+        
+        <div className="space-y-2 mt-auto">
+          {member.certifications.slice(0, 3).map((cert, idx) => (
+            <div key={idx} className="bg-white p-2 rounded-lg shadow-sm text-center text-xs text-gray-600">
+              ✓ {cert}
+            </div>
+          ))}
+          {member.certifications.length > 3 && (
+            <div className="text-center text-xs text-gray-500">
+              +{member.certifications.length - 3} more certifications
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
         </div>
       </section>
 
       {/* Our Process Section */}
-      <section id="process" className={`py-20 bg-gradient-to-br from-[#FEF7D7] to-white transition-all duration-1000 ${isVisible.process ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-[#9C0B13] mb-4">Our Sacred Process</h2>
-            <p className="text-xl text-gray-600">How we ensure authenticity and spiritual potency in every product</p>
+<section id="process" className={`py-20 bg-gradient-to-br from-[#FEF7D7] to-white transition-all duration-1000 ${isVisible.process ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl font-bold text-[#9C0B13] mb-4">Our Sacred Process</h2>
+      <p className="text-xl text-gray-600">How we ensure authenticity and spiritual potency in every product</p>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="text-center group h-full">
+        <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 h-full flex flex-col">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-6 flex items-center justify-center group-hover:animate-pulse">
+            <Shield className="w-10 h-10 text-[#FEF7D7]" />
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105">
-                <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-6 flex items-center justify-center group-hover:animate-pulse">
-                  <Shield className="w-10 h-10 text-[#FEF7D7]" />
-                </div>
-                <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Authentic Sourcing</h3>
-                <p className="text-gray-700 leading-relaxed">
-                  Direct sourcing from sacred mines and trusted artisans. Each gem and product is hand-selected 
-                  based on astrological properties and natural formation.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center group">
-              <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105">
-                <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-6 flex items-center justify-center group-hover:animate-pulse">
-                  <Award className="w-10 h-10 text-[#FEF7D7]" />
-                </div>
-                <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Quality Assurance</h3>
-                <p className="text-gray-700 leading-relaxed">
-                  Rigorous testing and certification process. Each product undergoes gemological testing 
-                  and spiritual evaluation before reaching our customers.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center group">
-              <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105">
-                <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-6 flex items-center justify-center group-hover:animate-pulse">
-                  <Sparkles className="w-10 h-10 text-[#FEF7D7]" />
-                </div>
-                <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Spiritual Energizing</h3>
-                <p className="text-gray-700 leading-relaxed">
-                  Sacred cleansing rituals and Vedic mantras are performed to enhance the spiritual energy 
-                  of each product before delivery.
-                </p>
-              </div>
-            </div>
-          </div>
+          <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Authentic Sourcing</h3>
+          <p className="text-gray-700 leading-relaxed flex-grow">
+            Direct sourcing from sacred mines and trusted artisans. Each gem and product is hand-selected 
+            based on astrological properties and natural formation.
+          </p>
         </div>
-      </section>
+      </div>
+
+      <div className="text-center group h-full">
+        <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 h-full flex flex-col">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-6 flex items-center justify-center group-hover:animate-pulse">
+            <Award className="w-10 h-10 text-[#FEF7D7]" />
+          </div>
+          <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Quality Assurance</h3>
+          <p className="text-gray-700 leading-relaxed flex-grow">
+            Rigorous testing and certification process. Each product undergoes gemological testing 
+            and spiritual evaluation before reaching our customers.
+          </p>
+        </div>
+      </div>
+
+      <div className="text-center group h-full">
+        <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 h-full flex flex-col">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-6 flex items-center justify-center group-hover:animate-pulse">
+            <Sparkles className="w-10 h-10 text-[#FEF7D7]" />
+          </div>
+          <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Spiritual Energizing</h3>
+          <p className="text-gray-700 leading-relaxed flex-grow">
+            Sacred cleansing rituals and Vedic mantras are performed to enhance the spiritual energy 
+            of each product before delivery.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Values & Commitments */}
       <section id="values" className={`py-20 bg-white transition-all duration-1000 ${isVisible.values ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
@@ -275,47 +284,46 @@ const AboutUs = () => {
       </section>
 
       {/* Awards & Recognition */}
-      <section id="awards" className={`py-20 bg-gradient-to-br from-[#FEF7D7] to-white transition-all duration-1000 ${isVisible.awards ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-[#9C0B13] mb-4">Awards & Recognition</h2>
-            <p className="text-xl text-gray-600">Honored for our commitment to spiritual excellence and authentic service</p>
-          </div>
+      {/* Awards & Recognition */}
+<section id="awards" className={`py-20 bg-gradient-to-br from-[#FEF7D7] to-white transition-all duration-1000 ${isVisible.awards ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl font-bold text-[#9C0B13] mb-4">Awards & Recognition</h2>
+      <p className="text-xl text-gray-600">Honored for our commitment to spiritual excellence and authentic service</p>
+    </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {awards.map((award, index) => (
-              <div key={index} className="group">
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform group-hover:scale-105 text-center border border-[#9C0B13]/10">
-                  <Trophy className="w-12 h-12 text-[#9C0B13] mx-auto mb-4 group-hover:animate-bounce" />
-                  <h3 className="font-bold text-[#9C0B13] mb-2 text-lg">{award.title}</h3>
-                  <p className="text-gray-600 text-sm">{award.organization}</p>
-                  <div className="mt-4 flex justify-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-16 text-center">
-            <div className="bg-white p-8 rounded-2xl shadow-xl border-2 border-[#9C0B13]/20 max-w-4xl mx-auto">
-              <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Featured in Leading Publications</h3>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Our expertise and authentic products have been recognized by major spiritual and lifestyle publications 
-                including Spiritual Times, Astrology Today, and Divine Living Magazine.
-              </p>
-              <div className="flex justify-center space-x-8 opacity-60">
-                <div className="text-sm font-semibold">Spiritual Times</div>
-                <div className="text-sm font-semibold">Astrology Today</div>
-                <div className="text-sm font-semibold">Divine Living</div>
-                <div className="text-sm font-semibold">Sacred Gems Quarterly</div>
-              </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {awards.map((award, index) => (
+        <div key={index} className="group h-full">
+          <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform group-hover:scale-105 text-center border border-[#9C0B13]/10 h-full flex flex-col">
+            <Trophy className="w-12 h-12 text-[#9C0B13] mx-auto mb-4 group-hover:animate-bounce" />
+            <h3 className="font-bold text-[#9C0B13] mb-2 text-lg">{award.title}</h3>
+            <p className="text-gray-600 text-sm mb-4 flex-grow">{award.organization}</p>
+            <div className="mt-auto flex justify-center">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+              ))}
             </div>
           </div>
         </div>
-      </section>
+      ))}
+    </div>
+
+    <div className="mt-16 text-center">
+      <div className="bg-white p-8 rounded-2xl shadow-xl border-2 border-[#9C0B13]/20 max-w-4xl mx-auto">
+        <h3 className="text-2xl font-bold text-[#9C0B13] mb-6">Featured in Leading Publications</h3>
+        <p className="text-gray-700 leading-relaxed mb-6">
+          Our expertise and authentic products have been recognized by major spiritual and lifestyle publications.
+        </p>
+        <div className="flex justify-center space-x-10 opacity-60">
+          <div className="text-sm font-bold">VASTU</div>
+          <div className="text-sm font-bold">RATNA VIGYAN</div>
+          <div className="text-sm font-bold">KUNDALI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-r from-[#9C0B13] to-red-600 text-white">
@@ -325,10 +333,12 @@ const AboutUs = () => {
             Let our authentic products and expert guidance help you unlock your spiritual potential and transform your life
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#FEF7D7] text-[#9C0B13] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-colors duration-300 transform hover:scale-105">
+            <button className="bg-[#FEF7D7] text-[#9C0B13] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-colors duration-300 transform hover:scale-105"
+              onClick={() => window.location.href = '/products'}>
               Explore Products
             </button>
-            <button className="border-2 border-[#FEF7D7] text-[#FEF7D7] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#FEF7D7] hover:text-[#9C0B13] transition-all duration-300 transform hover:scale-105">
+            <button className="border-2 border-[#FEF7D7] text-[#FEF7D7] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#FEF7D7] hover:text-[#9C0B13] transition-all duration-300 transform hover:scale-105"
+              onClick={() => window.location.href = '/booking'}>
               Book Consultation 
             </button>
           </div>

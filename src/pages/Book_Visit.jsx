@@ -130,7 +130,7 @@ const BookVisitPage = () => {
 
     try {
       // Create Razorpay order from your backend
-      const response = await fetch("http://localhost:1921/payment/createorder", {
+      const response = await fetch("https://astroanikantbackend-2.onrender.com/payment/createorder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -346,7 +346,7 @@ const BookVisitPage = () => {
                           type="button"
                           className="text-[#9C0B13] underline hover:text-red-800 font-medium"
                           onClick={() => {
-                            window.open('/terms', '_blank');
+                            window.open('/terms-conditions', '_blank');
                           }}
                         >
                           Terms & Conditions
@@ -356,7 +356,7 @@ const BookVisitPage = () => {
                           type="button"
                           className="text-[#9C0B13] underline hover:text-red-800 font-medium"
                           onClick={() => {
-                            window.open('/privacy', '_blank');
+                            window.open('/privacy-policy', '_blank');
                           }}
                         >
                           Privacy Policy

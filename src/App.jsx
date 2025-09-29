@@ -31,6 +31,8 @@ import { ForgotUserEmail } from "./pages/ForgotUserEmail";
 import EmailResetPassword from "./pages/EmailResetPassword";
 import { Payment } from "./pages/Payment";
 import WishlistPage from "./pages/WishlistPage";
+import PrivacyPolicyPage from "./pages/Privacy_Policy";
+import TermsConditionsPage from "./pages/Terms_and_Condition";
 
 function App() {
   const location = useLocation();
@@ -86,6 +88,8 @@ function App() {
 
         <Route path="/productdetail/:id" element={<ProductDetailPage />} />
         <Route path="/wishlist/" element={<WishlistPage />} />
+        <Route path='/privacy-policy' element={<PrivacyPolicyPage/>} />
+        <Route path='/terms-conditions' element={<TermsConditionsPage/>} />
 
         
         {/* Admin Routes */}

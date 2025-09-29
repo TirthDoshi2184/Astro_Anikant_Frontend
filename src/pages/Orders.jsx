@@ -221,6 +221,93 @@ const OrderCheckoutPage = () => {
     return true;
   };
 
+<<<<<<< HEAD
+=======
+  // Create Razorpay order
+  const createRazorpayOrder = async (amount) => {
+    try {
+      const response = await fetch("https://astroanikantbackend-2.onrender.com/payment/createorder", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: amount * 100, // Razorpay expects amount in paise
+          currency: "INR",
+          receipt: `receipt_order_${Date.now()}`,
+        })
+      });
+
+      const order = await response.json();
+      console.log('Razorpay Order Created:', order);
+      return order;
+    } catch (error) {
+      console.error("Order creation failed:", error);
+      throw error;
+    }
+  };
+
+  // Display Razorpay payment modal
+  const displayRazorpay = async (orderData, orderInfo) => {
+  const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+  console.log("Razorpay script loaded:", res);
+  if (!res) {
+    setError("Razorpay SDK failed to load. Please check your internet connection.");
+    setSubmitting(false);
+    return;
+  }
+
+  if (!orderData || !orderData.id) {
+    setError("Invalid Razorpay order data.");
+    setSubmitting(false);
+    return;
+  }
+
+  const options = {
+    key: "rzp_test_m60EaJoASbqtGR",
+    amount: orderData.amount,
+    currency: orderData.currency,
+    name: "Astro Anekant",
+    description: "Spiritual Products Purchase",
+    image: "/logo.png",
+    order_id: orderData.id,
+    handler: async function (response) {
+      // Your payment verification code
+    },
+    prefill: {
+      name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      contact: formData.phone,
+    },
+    notes: {
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      pincode: formData.pincode,
+    },
+    theme: { color: "#9C0B13" },
+    modal: {
+      ondismiss: function () {
+        setSubmitting(false);
+        setError("Payment was cancelled. Please try again.");
+      },
+    },
+  };
+
+  try {
+    const paymentObject = new window.Razorpay(options);
+    console.log("Opening Razorpay modal");
+    paymentObject.open();
+  } catch (err) {
+    console.error("Razorpay open error:", err);
+    setError("Payment initialization failed. Please try again.");
+    setSubmitting(false);
+  }
+};
+
+
+
+>>>>>>> dd753a49418f6da4ca99efd625660274972c8f66
   const handleSubmitOrder = async () => {
     if (!validateForm()) return;
     if (!cartData) {
@@ -607,7 +694,7 @@ const OrderCheckoutPage = () => {
               <div className="space-y-3">
                 <label className="flex items-start cursor-pointer group">
                   <input type="checkbox" className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" required />
-                  <span className="text-sm text-gray-700">I agree to the <a href="#" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
+                  <span className="text-sm text-gray-700">I agree to the <a href="/terms-condition  " className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
                 </label>
 
                 <label className="flex items-start cursor-pointer group">
