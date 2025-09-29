@@ -177,12 +177,7 @@ export const AdminUsersView = () => {
                 </div>
 
                 {/* Add User Button */}
-                <Link to="/admin/add-user">
-                  <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 rounded-xl shadow-lg hover:shadow-amber-500/40 transition-all duration-300 transform hover:scale-105">
-                    <UserPlus className="w-5 h-5" />
-                    <span className="font-semibold">Add User</span>
-                  </button>
-                </Link>
+                
               </div>
             </div>
           </div>

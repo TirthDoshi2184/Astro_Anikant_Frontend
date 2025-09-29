@@ -231,7 +231,7 @@ export const AdminOrders = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-amber-200">
+                        {/* <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-amber-200">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-red-700 text-sm font-medium">Completed</p>
@@ -243,7 +243,7 @@ export const AdminOrders = () => {
                                     <CheckCircle className="w-5 h-5 text-green-600" />
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                         <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-amber-200">
                             <div className="flex items-center justify-between">
                                 <div>
