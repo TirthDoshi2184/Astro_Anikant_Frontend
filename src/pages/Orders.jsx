@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { CreditCard, Truck, MapPin, User, Phone, Mail, Package, Shield, Gift, AlertCircle, CheckCircle } from 'lucide-react';
+import axios from 'axios';
 
 const OrderCheckoutPage = () => {
   const [loading, setLoading] = useState(true);
@@ -33,16 +34,6 @@ const OrderCheckoutPage = () => {
 
   const cartId = getCartIdFromUrl();
 
-  // Load Razorpay script
-  const loadScript = (src) => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
 
   // Fetch cart details on component mount
   useEffect(() => {
@@ -110,6 +101,90 @@ const OrderCheckoutPage = () => {
     }
   };
 
+
+  const paymentProcess = async () => {
+    try {
+      const loadScript = (src) => {
+        return new Promise((resolve) => {
+          const script = document.createElement("script");
+          script.src = src;
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        });
+      };
+
+      const displayRazorpay = async (orderData) => {
+        const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+
+        if (!res) {
+          alert("Razorpay SDK failed to load. Are you online?");
+          return;
+        }
+
+        const options = {
+          key: "rzp_test_m60EaJoASbqtGR", // replace with LIVE key in production
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "Astro Anekant",
+          description: "Test Transaction",
+          order_id: orderData.id,
+          handler: async function (response) {
+            try {
+              const res = await axios.post("http://localhost:1921/payment/verify-payment", {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+
+              if (res.data.status === "success") {
+                alert("✅ Payment verified successfully!");
+              } else {
+                alert("❌ Payment verification failed.");
+              }
+            } catch (error) {
+              console.error("Verification error:", error);
+            }
+          },
+          prefill: {
+            name: "Astro Anekant",
+            email: "astro@gmail.com",
+            contact: "09010291209",
+          },
+          theme: {
+            color: "#61dafb",
+          },
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
+      };
+
+      // 👇 THIS was missing in your code
+      const handleCreateOrder = async () => {
+        try {
+          const order = await axios.post("http://localhost:1921/payment/createorder", {
+            amount: 500,
+            currency: "INR",
+            receipt: "receipt_order_123",
+          });
+
+          displayRazorpay(order.data);
+        } catch (error) {
+          console.error("Order creation failed:", error);
+        }
+      };
+
+      // 👇 Call it here
+      await handleCreateOrder();
+
+    } catch (error) {
+      console.error("Payment process error:", error);
+    }
+  };
+
+
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -146,100 +221,16 @@ const OrderCheckoutPage = () => {
     return true;
   };
 
-  // Create Razorpay order
-  const createRazorpayOrder = async (amount) => {
-    try {
-      const response = await fetch("http://localhost:1921/payment/createorder", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: amount * 100, // Razorpay expects amount in paise
-          currency: "INR",
-          receipt: `receipt_order_${Date.now()}`,
-        })
-      });
-
-      const order = await response.json();
-      console.log('Razorpay Order Created:', order);
-      return order;
-    } catch (error) {
-      console.error("Order creation failed:", error);
-      throw error;
-    }
-  };
-
-  // Display Razorpay payment modal
-  const displayRazorpay = async (orderData, orderInfo) => {
-  const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-  console.log("Razorpay script loaded:", res);
-  if (!res) {
-    setError("Razorpay SDK failed to load. Please check your internet connection.");
-    setSubmitting(false);
-    return;
-  }
-
-  if (!orderData || !orderData.id) {
-    setError("Invalid Razorpay order data.");
-    setSubmitting(false);
-    return;
-  }
-
-  const options = {
-    key: "rzp_test_m60EaJoASbqtGR",
-    amount: orderData.amount,
-    currency: orderData.currency,
-    name: "Astro Anekant",
-    description: "Spiritual Products Purchase",
-    image: "/logo.png",
-    order_id: orderData.id,
-    handler: async function (response) {
-      // Your payment verification code
-    },
-    prefill: {
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      contact: formData.phone,
-    },
-    notes: {
-      address: formData.address,
-      city: formData.city,
-      state: formData.state,
-      pincode: formData.pincode,
-    },
-    theme: { color: "#9C0B13" },
-    modal: {
-      ondismiss: function () {
-        setSubmitting(false);
-        setError("Payment was cancelled. Please try again.");
-      },
-    },
-  };
-
-  try {
-    const paymentObject = new window.Razorpay(options);
-    console.log("Opening Razorpay modal");
-    paymentObject.open();
-  } catch (err) {
-    console.error("Razorpay open error:", err);
-    setError("Payment initialization failed. Please try again.");
-    setSubmitting(false);
-  }
-};
-
-
-
   const handleSubmitOrder = async () => {
     if (!validateForm()) return;
     if (!cartData) {
-      setError('Cart data not available');
+      setError("Cart data not available");
       return;
     }
 
     try {
       setSubmitting(true);
-      setError('');
+      setError("");
 
       const total = calculateTotal();
 
@@ -261,34 +252,44 @@ const OrderCheckoutPage = () => {
         orderNotes: formData.orderNotes,
         deliveryPreference: formData.deliveryPreference,
         amount: total,
-        status: 'pending',
+        status: "pending",
       };
 
       const orderResponse = await fetch(
-        'https://astroanikantbackend-2.onrender.com/order/createorder',
+        "https://astroanikantbackend-2.onrender.com/order/createorder",
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(orderPayload),
         }
       );
 
       const orderResult = await orderResponse.json();
       if (!orderResponse.ok || !orderResult.data) {
-        throw new Error(orderResult.message || 'Failed to create order');
+        throw new Error(orderResult.message || "Failed to create order");
       }
 
-      // STEP 2: Create Razorpay order (pass amount)
-      const razorpayOrder = await createRazorpayOrder(total);
+      // STEP 2: Create Razorpay order (backend should return this)
+      const razorpayOrderResponse = await fetch(
+        "http://localhost:1921/payment/createorder",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: total, currency: "INR" }),
+        }
+      );
 
-      // STEP 3: Open Razorpay modal with payment details
+      const razorpayOrder = await razorpayOrderResponse.json();
+
+      // STEP 3: Open Razorpay modal
       await displayRazorpay(razorpayOrder, orderResult.data);
 
     } catch (err) {
-      setError(err.message || 'Failed to process order. Please try again.');
+      setError(err.message || "Failed to process order. Please try again.");
       setSubmitting(false);
     }
   };
+
 
 
   const calculateSubtotal = () => {
@@ -695,11 +696,11 @@ const OrderCheckoutPage = () => {
               </div>
 
               <button
-                onClick={handleSubmitOrder}
+                onClick={paymentProcess}
                 disabled={submitting}
                 className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${submitting
                   ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
+                  : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105 cursor-pointer'
                   }`}
               >
                 {submitting ? (
@@ -711,9 +712,6 @@ const OrderCheckoutPage = () => {
                   `Place Order ₹${total} ✨`
                 )}
               </button>
-
-
-
               <div className="mt-4 text-center">
                 <p className="text-xs text-gray-500">Secure checkout powered by SSL encryption</p>
                 <p className="text-xs text-gray-500 mt-1">Cart ID: {cartId}</p>
