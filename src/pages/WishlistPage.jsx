@@ -110,7 +110,7 @@ const WishlistPage = () => {
       
       // Fetch ALL wishlist items from the API
       const response = await axios.get(
-        "http://localhost:1921/wishlist/getallwishlist",
+        "https://astroanikantbackend-2.onrender.com/wishlist/getallwishlist",
         {
           headers: {
             ...(authToken && { Authorization: `Bearer ${authToken}` }),

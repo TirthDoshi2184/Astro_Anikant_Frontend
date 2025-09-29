@@ -1,130 +1,155 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Grid, List, Star, Heart, ShoppingCart, ChevronDown, ChevronLeft, ChevronRight, Eye, Sparkles, Zap, Shield, DollarSign, TrendingUp, X } from 'lucide-react';
+import { Search, Filter, Star, ShoppingCart, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import axios from 'axios';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ProductPage = () => {
-  const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('popularity');
   const [priceRange, setPriceRange] = useState([0, 50000]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedBenefits, setSelectedBenefits] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const navigate = useNavigate();
 
-  const categories = [
-    { name: 'Gems', icon: '💎', count: 245 },
-    { name: 'Pyramids', icon: '🔺', count: 87 },
-    { name: 'Malas', icon: '📿', count: 156 },
-    { name: 'Yantras', icon: '🕉️', count: 98 },
-    { name: 'Crystals', icon: '💠', count: 203 },
-    { name: 'Rudraksha', icon: '🔮', count: 134 }
-  ];
+  // Dynamic categories, benefits, and stone types from API data
+  // Scroll to top when component loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
-  const benefits = [
-    { name: 'Wealth', icon: '💰', color: 'from-yellow-400 to-orange-500' },
-    { name: 'Health', icon: '🌿', color: 'from-green-400 to-emerald-500' },
-    { name: 'Protection', icon: '🛡️', color: 'from-blue-400 to-indigo-500' },
-    { name: 'Love', icon: '💖', color: 'from-pink-400 to-rose-500' },
-    { name: 'Success', icon: '🏆', color: 'from-purple-400 to-violet-500' },
-    { name: 'Spirituality', icon: '🕉️', color: 'from-indigo-400 to-purple-500' },
-    { name: 'Peace', icon: '☮️', color: 'from-teal-400 to-cyan-500' },
-    { name: 'Confidence', icon: '⚡', color: 'from-orange-400 to-red-500' }
-  ];
-
-  const brands = [
-    { name: 'Vedic Collection', rating: 4.8, products: 89 },
-    { name: 'Crystal Palace', rating: 4.9, products: 156 },
-    { name: 'Sacred Gems', rating: 4.7, products: 203 },
-    { name: 'Divine Energy', rating: 4.6, products: 134 },
-    { name: 'Mystic Treasures', rating: 4.8, products: 98 }
-  ];
-
-  // API Integration (commented for future use)
-  
-useEffect(() => {
+  // Fetch products from API
+  useEffect(() => {
     fetchProducts();
-    
-    // Listen for URL changes to refetch products
-    const handleUrlChange = () => {
-        fetchProducts();
-    };
-    
-    window.addEventListener('popstate', handleUrlChange);
-    
-    return () => {
-        window.removeEventListener('popstate', handleUrlChange);
-    };
-}, []);
-const fetchProducts = async (categoryFilter = null) => {
+  }, []);
+
+  const fetchProducts = async (categoryFilter = null) => {
     setIsLoading(true);
     try {
-        // Get category from URL params
-        const urlParams = new URLSearchParams(window.location.search);
-        const categoryFromUrl = urlParams.get('category');
-        
-        // Use the category filter parameter or URL parameter
-        const categoryToFetch = categoryFilter || categoryFromUrl;
-        
-        let url = 'https://astroanikantbackend-2.onrender.com/product/getallproducts';
-        if (categoryToFetch) {
-            url += `?category=${categoryToFetch}`;
-        }
-        
-        const response = await axios.get(url);
-        console.log('Fetched products:', response.data.data);
-        
-        setProducts(response.data.data);
+      // Get category from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryFromUrl = urlParams.get('category');
+      
+      // Use the category filter parameter or URL parameter
+      const categoryToFetch = categoryFilter || categoryFromUrl;
+      
+      let url = 'https://astroanikantbackend-2.onrender.com/product/getallproducts';
+      if (categoryToFetch) {
+        url += `?category=${categoryToFetch}`;
+      }
+      
+      const response = await axios.get(url);
+      console.log('Fetched products:', response.data.data);
+      
+      const products = response.data.data || [];
+      setAllProducts(products);
+      setFilteredProducts(products);
+      
+      // Extract unique categories, benefits, and stone types from the data
+      
     } catch (error) {
-        console.error('Error fetching products:', error);
-        
-        // Check if it's a 404 (no products found for category)
-        if (error.response && error.response.status === 404) {
-            setProducts([]); // Set empty array to show "no products" message
-        } else {
-            // For other errors, you might want to show all products or handle differently
-            setProducts([]);
-        }
+      console.error('Error fetching products:', error);
+      
+      // Check if it's a 404 (no products found for category)
+      if (error.response && error.response.status === 404) {
+        setAllProducts([]);
+        setFilteredProducts([]);
+      } else {
+        setAllProducts([]);
+        setFilteredProducts([]);
+      }
     } finally {
-        setIsLoading(false);
-    }
-};
-  const handleSearch = async () => {
-    setIsLoading(true);
-    // Simulate search
-    setTimeout(() => {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
-  const toggleCategory = (category) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
+  
+  // Filter and sort products
+  useEffect(() => {
+    let filtered = [...allProducts];
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(product =>
+        (product.name && product.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (product.stoneType && product.stoneType.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+
+    // Category filter
+   
+    // Sort products
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return (a.discountedPrice || a.price || 0) - (b.discountedPrice || b.price || 0);
+        case 'price-high':
+          return (b.discountedPrice || b.price || 0) - (a.discountedPrice || a.price || 0);
+        case 'rating':
+          return (b.averageRating || 0) - (a.averageRating || 0);
+        case 'newest':
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        case 'popularity':
+        default:
+          return (b.salesCount || 0) - (a.salesCount || 0);
+      }
+    });
+
+    setFilteredProducts(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [allProducts, searchQuery, priceRange, sortBy]);
+
+  const handleSearch = () => {
+    setCurrentPage(1);
   };
 
-  const toggleBenefit = (benefit) => {
-    setSelectedBenefits(prev => 
-      prev.includes(benefit) 
-        ? prev.filter(b => b !== benefit)
-        : [...prev, benefit]
-    );
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
+
+ 
+const clearAllFilters = () => {
+  setPriceRange([0, 50000]);
+  setSearchQuery('');
+  setCurrentPage(1);
+};
 
   const clearCategoryFilter = () => {
     navigate('/products');
     fetchProducts(); // Fetch all products
-};
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  const goToPage = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
-      {/* Hero Section - Clean and Professional */}
+      {/* Hero Section */}
       <div className="bg-gradient-to-r from-red-900 to-red-800 text-white py-16">
         <div className="container mx-auto px-6">
           <div className="text-center">
@@ -139,226 +164,107 @@ const fetchProducts = async (categoryFilter = null) => {
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
                 placeholder="Search gems, pyramids, malas..."
                 className="w-full px-6 py-4 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-300"
               />
-              <button className="absolute right-2 top-2 bg-red-900 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition-colors">
+              <button 
+                onClick={handleSearch}
+                className="absolute right-2 top-2 bg-red-900 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition-colors"
+              >
                 <Search size={20} />
               </button>
             </div>
           </div>
         </div>
       </div>
-      {/* Free Delivery Banner */}
-{/* Enhanced Free Delivery Banner */}
-{/* Enhanced Free Delivery Banner - Theme Matched */}
-<div className="relative bg-gradient-to-r from-red-800 via-red-700 to-orange-700 text-white overflow-hidden">
-  {/* Animated background elements */}
-  <div className="absolute inset-0 opacity-25">
-    <div className="absolute top-2 left-10 animate-pulse">✨</div>
-    <div className="absolute top-4 right-20 animate-bounce">🕉️</div>
-    <div className="absolute bottom-3 left-32 animate-pulse">💎</div>
-    <div className="absolute bottom-2 right-40 animate-bounce">⭐</div>
-    <div className="absolute top-3 left-1/2 animate-pulse">🌟</div>
-  </div>
-  
-  {/* Main content */}
-  <div className="relative text-center py-4">
-    <div className="flex items-center justify-center gap-3">
-      {/* Truck icon with glow effect */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-yellow-300 rounded-full blur-sm opacity-40 animate-pulse"></div>
-        <div className="relative bg-white/20 rounded-full p-2">
-          <span className="text-xl">🚚</span>
-        </div>
-      </div>
-      
-      {/* Main text */}
-      <div className="flex flex-col sm:flex-row items-center gap-2">
-        <span className="text-lg font-bold tracking-wide">
-          🌟 DIVINE BLESSING 🌟
-        </span>
-        <span className="hidden sm:inline text-white/80">•</span>
-        <span className="text-base font-semibold">
-          FREE SACRED DELIVERY ON ALL ORDERS
-        </span>
-      </div>
-      
-      {/* Sacred symbol */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-yellow-300 rounded-full blur-sm opacity-40 animate-pulse"></div>
-        <div className="relative text-xl animate-spin-slow">
-          🔮
-        </div>
-      </div>
-    </div>
-    
-    {/* Subtitle */}
-    <div className="mt-1 text-sm opacity-90 font-medium">
-      Bringing spiritual energy to your doorstep with love & care ✨
-    </div>
-  </div>
-  
-  {/* Decorative border */}
-  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400"></div>
-</div>
-      <div className="container mx-auto px-6 py-8">
-        {/* Category Description */}
-        
 
-        {/* Filter Toggle & Sort Options */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white rounded-lg p-4 shadow-md">
-          <div className="flex items-center gap-4 mb-4 sm:mb-0">
-            <button 
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-2 bg-red-900 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors"
-            >
-              <Filter size={20} />
-              <span>Filters</span>
-              {(selectedCategories.length > 0 || selectedBenefits.length > 0) && (
-                <span className="bg-orange-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
-                  {selectedCategories.length + selectedBenefits.length}
-                </span>
-              )}
-              
-            </button>
+      {/* Free Delivery Banner */}
+      <div className="relative bg-gradient-to-r from-red-800 via-red-700 to-orange-700 text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-25">
+          <div className="absolute top-2 left-10 animate-pulse">✨</div>
+          <div className="absolute top-4 right-20 animate-bounce">🕉️</div>
+          <div className="absolute bottom-3 left-32 animate-pulse">💎</div>
+          <div className="absolute bottom-2 right-40 animate-bounce">⭐</div>
+          <div className="absolute top-3 left-1/2 animate-pulse">🌟</div>
+        </div>
+        
+        <div className="relative text-center py-4">
+          <div className="flex items-center justify-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-yellow-300 rounded-full blur-sm opacity-40 animate-pulse"></div>
+              <div className="relative bg-white/20 rounded-full p-2">
+                <span className="text-xl">🚚</span>
+              </div>
+            </div>
             
-            <select 
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <option value="popularity">Most Popular</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
-              <option value="newest">Newest First</option>
-            </select>
-  
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <span className="text-lg font-bold tracking-wide">
+                🌟 DIVINE BLESSING 🌟
+              </span>
+              <span className="hidden sm:inline text-white/80">•</span>
+              <span className="text-base font-semibold">
+                FREE SACRED DELIVERY ON ALL ORDERS
+              </span>
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 bg-yellow-300 rounded-full blur-sm opacity-40 animate-pulse"></div>
+              <div className="relative text-xl" style={{animation: 'spin 3s linear infinite'}}>
+                🔮
+              </div>
+            </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <span className="text-gray-600">View:</span>
-            <button 
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-red-900 text-white' : 'bg-gray-200'}`}
-            >
-              <Grid size={20} />
-            </button>
-            <button 
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-red-900 text-white' : 'bg-gray-200'}`}
-            >
-              <List size={20} />
-            </button>
-  
+          <div className="mt-1 text-sm opacity-90 font-medium">
+            Bringing spiritual energy to your doorstep with love & care ✨
           </div>
         </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400"></div>
+      </div>
 
-        {/* Collapsible Filter Sidebar */}
-        {isFilterOpen && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-800">Filter Products</h3>
-              <button 
-                onClick={() => setIsFilterOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {/* Price Range */}
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">Price Range</h4>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="50000" 
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="w-full mb-2"
-                />
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>₹{priceRange[0]}</span>
-                  <span>₹{priceRange[1]}</span>
-                </div>
-              </div>
-
-              {/* Categories */}
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">Categories</h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {categories.map(category => (
-                    <label key={category.name} className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        checked={selectedCategories.includes(category.name)}
-                        onChange={() => toggleCategory(category.name)}
-                        className="text-red-900"
-                      />
-                      <span className="text-sm">{category.icon} {category.name} ({category.count})</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Benefits */}
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">Benefits</h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {benefits.slice(0, 6).map(benefit => (
-                    <label key={benefit.name} className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        checked={selectedBenefits.includes(benefit.name)}
-                        onChange={() => toggleBenefit(benefit.name)}
-                        className="text-red-900"
-                      />
-                      <span className="text-sm">{benefit.icon} {benefit.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Brands */}
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">Stone Types</h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {[...new Set(products.map(p => p.stoneType))].slice(0, 5).map(stoneType => (
-                    <label key={stoneType} className="flex items-center space-x-2">
-                      <input type="checkbox" className="text-red-900" />
-                      <span className="text-sm">{stoneType}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-                              {/* // Add this after your filter buttons */}
-{window.location.search.includes('category') && (
-    <button 
-        onClick={clearCategoryFilter}
-        className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800"
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white rounded-lg p-4 shadow-md">
+  <div className="flex items-center gap-4 mb-4 sm:mb-0">
+    <select 
+      value={sortBy}
+      onChange={(e) => setSortBy(e.target.value)}
+      className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
     >
+      <option value="popularity">Most Popular</option>
+      <option value="price-low">Price: Low to High</option>
+      <option value="price-high">Price: High to Low</option>
+      <option value="rating">Highest Rated</option>
+      <option value="newest">Newest First</option>
+    </select>
+
+    {/* Clear Data Button */}
+    <button 
+      onClick={clearAllFilters}
+      className="bg-red-900 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors"
+    >
+      Clear Data
+    </button>
+
+    {/* Clear Category Filter Button */}
+    {new URLSearchParams(window.location.search).get('category') && (
+      <button 
+        onClick={clearCategoryFilter}
+        className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800 bg-red-50 px-3 py-2 rounded-lg"
+      >
         <X size={16} />
         Clear Category Filter
-    </button>
-)}
-
-            <div className="flex justify-end mt-6">
-              <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2">
-                Clear All
-              </button>
-              <button 
-                onClick={() => setIsFilterOpen(false)}
-                className="bg-red-900 text-white px-6 py-2 rounded-lg hover:bg-red-800"
-              >
-                Apply Filters
-              </button>
-            </div>
-          </div>
-        )}
+      </button>
+    )}
+  </div>
+  
+  <div className="text-gray-600">
+    {!isLoading && (
+      <>Showing {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products</>
+    )}
+  </div>
+</div>
 
         {/* Loading State */}
         {isLoading && (
@@ -373,290 +279,330 @@ const fetchProducts = async (categoryFilter = null) => {
           </div>
         )}
 
-        {!isLoading && (
-          <div className={`grid gap-6 mb-8 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
-            {products.map(product => (
-              <div
-                key={product._id}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
-                onClick={() => navigate(`/productdetail/${product._id}`)}
-              >
-                {/* Product Image */}
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={product.images && product.images.length > 0 
-                      ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
-                      : 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400'
-                    } 
-                    alt={product.images && product.images.length > 0 
-                      ? product.images.find(img => img.isPrimary)?.alt || product.name
-                      : product.name
-                    }
-                    className="w-full h-48 sm:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400';
-                    }}
-                  />
-                  
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-1">
-                    {product.isFeatured && (
-                      <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">FEATURED</span>
-                    )}
-                    {product.salesCount > 50 && (
-                      <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">BESTSELLER</span>
-                    )}
-                    {product.discountedPrice && (
-                      <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
-                        {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
-                      </span>
-                    )}
-                  </div>
+        {/* Products Grid */}
+        {/* Products Grid */}
+      {/* Products Grid */}
+{!isLoading && (
+  <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-8">
+    {currentProducts.map(product => (
+      <div
+        key={product._id}
+        className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer flex flex-col h-full"
+        onClick={() => navigate(`/productdetail/${product._id}`)}
+      >
+        {/* Product Image */}
+        <div className="relative overflow-hidden">
+          <img 
+            src={product.images && product.images.length > 0 
+              ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+              : 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400'
+            } 
+            alt={product.name}
+            className="w-full h-40 sm:h-48 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              const fallbackImages = {
+                'Yantras': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
+                'Rudraksha': 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400',
+                'Gems': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400',
+                'default': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400'
+              };
+              e.target.src = fallbackImages[product.category] || fallbackImages.default;
+            }}
+          />
+          
+          {/* Badges - Mobile Optimized */}
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
+            {product.isFeatured && (
+              <span className="bg-green-500 text-white px-1.5 py-0.5 rounded text-xs font-semibold">FEATURED</span>
+            )}
+            {product.discountedPrice && product.price && product.discountedPrice < product.price && (
+              <span className="bg-red-600 text-white px-1.5 py-0.5 rounded text-xs font-semibold">
+                {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
+              </span>
+            )}
+          </div>
 
-                  {/* Action Buttons */}
-                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
-                      <Heart size={16} className="text-red-600" />
-                    </button>
-                    <button className="p-2 bg-white rounded-full shadow-md hover:bg-red-50">
-                    </button>
-                  </div>
+          {/* Stock Status - Mobile Optimized */}
+          <div className="absolute bottom-2 left-2">
+            <span className={`px-1.5 py-0.5 rounded text-xs font-semibold ${
+              product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }`}>
+              {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+            </span>
+          </div>
+        </div>
+        
+        {/* Product Info - Mobile Optimized */}
+        <div className="p-3 lg:p-4 flex flex-col flex-grow">
+          {/* Product Name */}
+          <h3 className="text-sm lg:text-lg font-semibold text-gray-800 mb-2 line-clamp-2 leading-tight">
+            {product.name}
+          </h3>
+          
+          {/* Description - Hidden on mobile to save space */}
+          <p className="hidden lg:block text-sm text-gray-600 mb-3 line-clamp-2">
+            {product.shortDescription || product.description}
+          </p>
+          
+          {/* Rating - Simplified for mobile */}
+          <div className="flex items-center gap-1 mb-2 lg:mb-3">
+            <div className="flex text-yellow-400">
+              {[...Array(5)].map((_, i) => (
+                <Star 
+                  key={i} 
+                  size={12} 
+                  className={i < Math.floor(product.averageRating || 0) ? "fill-current" : "fill-none stroke-current"} 
+                />
+              ))}
+            </div>
+            <span className="text-xs lg:text-sm text-gray-600">
+              {(product.averageRating || 0).toFixed(1)}
+            </span>
+          </div>
 
-                  {/* Stock Status */}
-                  <div className="absolute bottom-3 left-3">
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                      product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Product Info */}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                    {product.shortDescription || product.description}
-                  </p>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          size={14} 
-                          fill={i < Math.floor(product.averageRating || 0) ? "currentColor" : "none"} 
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      {product.averageRating || 0} ({product.reviewCount || 0})
-                    </span>
-                  </div>
+          {/* Benefits - Show only 2 on mobile, 3 on desktop */}
+          {product.astrologicalBenefits && product.astrologicalBenefits.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2 lg:mb-3">
+              {product.astrologicalBenefits.slice(0, 2).map((benefit, index) => (
+                <span key={index} className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
+                  {benefit}
+                </span>
+              ))}
+              {product.astrologicalBenefits.length > 2 && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
+                  +{product.astrologicalBenefits.length - 2}
+                </span>
+              )}
+            </div>
+          )}
 
-                  {/* Astrological Benefits */}
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {product.astrologicalBenefits && product.astrologicalBenefits.slice(0, 2).map((benefit, index) => (
-                      <span key={index} className="text-xs bg-amber-100 text-red-800 px-2 py-1 rounded">
-                        {benefit}
-                      </span>
-                    ))}
-                    {product.astrologicalBenefits && product.astrologicalBenefits.length > 2 && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        +{product.astrologicalBenefits.length - 2} more
-                      </span>
-                    )}
-                  </div>
+          {/* Stone Type - Hidden on mobile */}
+          {product.stoneType && (
+            <div className="hidden lg:block mb-3">
+              <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
+                {product.stoneType}
+              </span>
+            </div>
+          )}
 
-                  {/* Stone Type */}
-                  {product.stoneType && (
-                    <div className="mb-3">
-                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
-                        {product.stoneType}
-                      </span>
-                    </div>
-                  )}
+          {/* Spacer */}
+          <div className="flex-grow"></div>
 
-                  {/* Weight */}
-                  {product.weight && product.weight.value && (
-                    <div className="text-xs text-gray-500 mb-3">
-                      Weight: {product.weight.value} {product.weight.unit}
-                    </div>
-                  )}
-
-                  {/* Price */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <span className="text-xl font-bold text-red-900">
-                        ₹{(product.discountedPrice || product.price).toLocaleString()}
-                      </span>
-                      {product.discountedPrice && (
-                        <span className="text-sm text-gray-500 line-through ml-2">
-                          ₹{product.price.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Add to Cart Button */}
-                 <button 
-      className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-        product.stock > 0 && product.isActive
-          ? 'bg-red-900 text-white hover:bg-red-800'
-          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-      }`}
-      disabled={product.stock === 0 || !product.isActive}
-      onClick={() => {
-        if (product.stock > 0 && product.isActive) {
-          navigate(`/productdetail/${product._id}`);
-        }
-      }}
-    >
-      {product.stock > 0 && product.isActive ? 'View Product' : 'Out of Stock'}
-    </button>
-  </div>
+          {/* Price - Mobile Optimized */}
+          <div className="mb-3">
+            {product.price && (
+              <div className="flex flex-col lg:flex-row lg:items-center lg:gap-2">
+                <span className="text-lg lg:text-xl font-bold text-red-900">
+                  ₹{(product.discountedPrice || product.price).toLocaleString()}
+                </span>
+                {product.discountedPrice && product.discountedPrice < product.price && (
+                  <span className="text-xs lg:text-sm text-gray-500 line-through">
+                    ₹{product.price.toLocaleString()}
+                  </span>
+                )}
               </div>
-            ))}
+            )}
+          </div>
+
+          {/* Button - Mobile Optimized */}
+          <button 
+            className={`w-full py-2.5 lg:py-3 text-sm lg:text-base rounded-lg font-semibold transition-colors flex items-center justify-center gap-1 mt-auto ${
+              product.stock > 0 && product.isActive
+                ? 'bg-red-900 text-white hover:bg-red-800'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+            disabled={product.stock === 0 || !product.isActive}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (product.stock > 0 && product.isActive) {
+                navigate(`/productdetail/${product._id}`);
+              }
+            }}
+          >
+            {product.stock > 0 && product.isActive ? 'View Product' : 'Out of Stock'}
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+        {/* No Products Found */}
+        {!isLoading && currentProducts.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-500 text-lg mb-4">
+              {new URLSearchParams(window.location.search).get('category') 
+                ? `No products found for category: ${new URLSearchParams(window.location.search).get('category')}`
+                : searchQuery 
+                  ? `No products found for "${searchQuery}"`
+                  : 'No products found'
+              }
+            </div>
+            <div className="text-gray-400 mb-6">
+              {searchQuery 
+                ? 'Try adjusting your filters or search terms'
+                : 'Check back later for new products'
+              }
+            </div>
+            <button 
+              onClick={clearAllFilters}
+              className="bg-red-900 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition-colors"
+            >
+              Clear All Filters
+            </button>
           </div>
         )}
 
-        {!isLoading && products.length === 0 && (
-    <div className="text-center py-12">
-        <div className="text-gray-500 text-lg mb-4">
-            {new URLSearchParams(window.location.search).get('category') 
-                ? `No products found for category: ${new URLSearchParams(window.location.search).get('category')}`
-                : 'No products found'
-            }
-        </div>
-        <div className="text-gray-400 mb-6">Try browsing other categories or check back later</div>
-        {new URLSearchParams(window.location.search).get('category') && (
-            <button 
-                onClick={() => {
-                    window.history.pushState({}, '', '/products');
-                    fetchProducts();
-                }}
-                className="bg-red-900 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition-colors"
-            >
-                View All Products
-            </button>
+        {/* Pagination */}
+        {!isLoading && filteredProducts.length > 0 && totalPages > 1 && (
+          <div className="bg-white rounded-lg p-4 shadow-md">
+            {/* Desktop Layout */}
+            <div className="hidden md:flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <span className="text-gray-700">Items per page:</span>
+                <select 
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(parseInt(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value={12}>12</option>
+                  <option value={24}>24</option>
+                  <option value={48}>48</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className="p-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                
+                {/* Page numbers */}
+                {[...Array(Math.min(5, totalPages))].map((_, index) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = index + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = index + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + index;
+                  } else {
+                    pageNum = currentPage - 2 + index;
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => goToPage(pageNum)}
+                      className={`px-4 py-2 rounded ${
+                        currentPage === pageNum
+                          ? 'bg-red-900 text-white'
+                          : 'border border-gray-300 hover:bg-gray-100'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                
+                <button 
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+
+              <div className="text-sm text-gray-600">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
+              </div>
+            </div>
+
+            {/* Mobile Layout */}
+            <div className="md:hidden space-y-4">
+              {/* Items per page - Mobile */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Items per page:</span>
+                <select 
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(parseInt(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value={12}>12</option>
+                  <option value={24}>24</option>
+                  <option value={48}>48</option>
+                </select>
+              </div>
+
+              {/* Page navigation - Mobile */}
+              <div className="flex items-center justify-center gap-2">
+                <button 
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className="p-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                
+                <span className="px-3 py-2 bg-red-900 text-white rounded text-sm">
+                  {currentPage}
+                </span>
+                <span className="text-sm text-gray-500">of {totalPages}</span>
+                
+                <button 
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+
+              {/* Results info - Mobile */}
+              <div className="text-center text-sm text-gray-600">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
+              </div>
+            </div>
+          </div>
         )}
-    </div>
-)}
 
-        {/* Responsive Pagination */}
-{!isLoading && products.length > 0 && (
-  <div className="bg-white rounded-lg p-4 shadow-md">
-    {/* Desktop Layout */}
-    <div className="hidden md:flex justify-between items-center">
-      <div className="flex items-center gap-4">
-        <span className="text-gray-700">Items per page:</span>
-        <select 
-          value={itemsPerPage}
-          onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
-          className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-        >
-          <option value={12}>12</option>
-          <option value={24}>24</option>
-          <option value={48}>48</option>
-        </select>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
-          <ChevronLeft size={20} />
-        </button>
-        <span className="px-4 py-2 bg-red-900 text-white rounded">1</span>
-        <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">2</button>
-        <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">3</button>
-        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
-          <ChevronRight size={20} />
-        </button>
-      </div>
-
-      <div className="text-sm text-gray-600">
-        Showing 1-{Math.min(itemsPerPage, products.length)} of {products.length} products
-      </div>
-    </div>
-
-    
-
-    {/* Mobile Layout */}
-    <div className="md:hidden space-y-4">
-      {/* Items per page - Mobile */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-700">Items per page:</span>
-        <select 
-          value={itemsPerPage}
-          onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
-          className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-        >
-          <option value={12}>12</option>
-          <option value={24}>24</option>
-          <option value={48}>48</option>
-        </select>
-      </div>
-
-      {/* Page navigation - Mobile */}
-      <div className="flex items-center justify-center gap-2">
-        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
-          <ChevronLeft size={18} />
-        </button>
-        <span className="px-3 py-2 bg-red-900 text-white rounded text-sm">1</span>
-        <button className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100 text-sm">2</button>
-        <button className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100 text-sm">3</button>
-        <button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
-          <ChevronRight size={18} />
-        </button>
-      </div>
-
-      {/* Results info - Mobile */}
-      <div className="text-center text-sm text-gray-600">
-        Showing 1-{Math.min(itemsPerPage, products.length)} of {products.length} products
-      </div>
-    </div>
-  </div>
-)}
-<div className="bg-gradient-to-r from-red-900 to-red-800 text-white rounded-xl p-8 mb-8">
+        {/* Spiritual Collections Info */}
+        <div className="bg-gradient-to-r from-red-900 to-red-800 text-white rounded-xl p-8 mt-8">
           <h2 className="text-3xl font-bold mb-4">Spiritual Collections</h2>
           <p className="text-lg mb-6 opacity-90">
             Our carefully curated collection of spiritual products harnesses ancient wisdom to bring positive energy into your life.
           </p>
-<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-  <div className="bg-white/10 rounded-lg p-4">
-    <h4 className="font-semibold mb-2">Perfect Selection</h4>
-    <p className="text-sm opacity-80">Choose based on your zodiac and spiritual goals</p>
-  </div>
-  <div className="bg-white/10 rounded-lg p-4">
-  <h4 className="font-semibold mb-2">Free Delivery</h4>
-  <p className="text-sm opacity-80">Free shipping on all orders nationwide</p>
-</div>
-  <div className="bg-white/10 rounded-lg p-4">
-    <h4 className="font-semibold mb-2">Powerful Energy</h4>
-    <p className="text-sm opacity-80">Amplify your aura and manifest positive vibrations</p>
-  </div>
-  <div className="bg-white/10 rounded-lg p-4">
-    <h4 className="font-semibold mb-2">100% Authentic</h4>
-    <p className="text-sm opacity-80">Certified genuine with authenticity guarantee</p>
-  </div>
-
-</div>      
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white/10 rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Perfect Selection</h4>
+              <p className="text-sm opacity-80">Choose based on your zodiac and spiritual goals</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Free Delivery</h4>
+              <p className="text-sm opacity-80">Free shipping on all orders nationwide</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Powerful Energy</h4>
+              <p className="text-sm opacity-80">Amplify your aura and manifest positive vibrations</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <h4 className="font-semibold mb-2">100% Authentic</h4>
+              <p className="text-sm opacity-80">Certified genuine with authenticity guarantee</p>
+            </div>
+          </div>      
         </div>
       </div>
     </div>
-    
   );
 };
-<style jsx>{`
-  @keyframes spin-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  .animate-spin-slow {
-    animation: spin-slow 3s linear infinite;
-  }
-`}</style>
+
 export default ProductPage;

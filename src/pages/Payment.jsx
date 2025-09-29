@@ -7,7 +7,7 @@ export const Payment = () => {
     const [OrderDetails, setOrderDetails] = useState({})
     const handleCreateOrder = async () => {
         try {
-            const order = await axios.post("http://localhost:1921/payment/createorder", {
+            const order = await axios.post("https://astroanikantbackend-2.onrender.com/payment/createorder", {
                 amount: 500,
                 currency: "INR",
                 receipt: "receipt_order_123",

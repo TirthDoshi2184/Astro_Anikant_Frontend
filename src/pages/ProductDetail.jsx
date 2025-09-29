@@ -53,6 +53,8 @@ const ProductDetailPage = () => {
   const [expandedSection, setExpandedSection] = useState("");
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+const [isLoadingRelated, setIsLoadingRelated] = useState(false);
 
   // State for API data
   const [product, setProduct] = useState(null);
@@ -68,32 +70,6 @@ const isUserLoggedIn = () => {
   return authToken && user;
 };
   // Static data that might not come from API
-  const relatedProducts = [
-    {
-      id: 2,
-      name: "Ruby Pendant",
-      price: 8999,
-      image: "/api/placeholder/200/200",
-    },
-    {
-      id: 3,
-      name: "Sun Yantra",
-      price: 2499,
-      image: "/api/placeholder/200/200",
-    },
-    {
-      id: 4,
-      name: "Red Jasper Mala",
-      price: 1999,
-      image: "/api/placeholder/200/200",
-    },
-    {
-      id: 5,
-      name: "Copper Pyramid",
-      price: 3499,
-      image: "/api/placeholder/200/200",
-    },
-  ];
 
   const reviews = [
     {
@@ -114,12 +90,19 @@ const isUserLoggedIn = () => {
       helpful: 8,
     },
   ];
+useEffect(() => {
+  if (productID) {
+    fetchProduct(productID);
+  }
+}, [productID]);
 
-  useEffect(() => {
-    if (productID) {
-      fetchProduct(productID);
-    }
-  }, [productID]);
+// Update useEffect to use productId instead of waiting for category
+useEffect(() => {
+  if (productID) {
+    fetchRelatedProducts(productID);
+  }
+}, [productID]);
+
 
   useEffect(() => {
     if (product?.images?.length > 0) {
@@ -129,6 +112,23 @@ const isUserLoggedIn = () => {
       return () => clearInterval(interval);
     }
   }, [product?.images?.length]);
+
+  const fetchRelatedProducts = async (currentProductId) => {
+  setIsLoadingRelated(true);
+  try {
+    const response = await axios.get(
+      `https://astroanikantbackend-2.onrender.com/product/related-by-product/${currentProductId}?limit=4`
+    );
+    setRelatedProducts(response.data.data || []);
+  } catch (error) {
+    console.error("Error fetching related products:", error);
+    setRelatedProducts([]);
+  } finally {
+    setIsLoadingRelated(false);
+  }
+};
+
+
 
   const fetchProduct = async (productID) => {
     setIsLoading(true);
@@ -929,34 +929,52 @@ const isUserLoggedIn = () => {
           </div>
         </div>
 
-        {/* Related Products */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-            You Might Also Like
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {relatedProducts.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">
-                    {item.name}
-                  </h3>
-                  <p className="text-red-800 font-semibold">
-                    ₹{item.price.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            ))}
+     {/* Related Products */}
+<div className="mt-16">
+  <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+    You Might Also Like
+  </h2>
+  
+  {isLoadingRelated ? (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
+          <div className="w-full h-48 bg-gray-300"></div>
+          <div className="p-4">
+            <div className="h-4 bg-gray-300 rounded mb-2"></div>
+            <div className="h-4 bg-gray-300 rounded w-2/3"></div>
           </div>
         </div>
+      ))}
+    </div>
+  ) : relatedProducts.length > 0 ? (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {relatedProducts.map((item) => (
+        <Link 
+          key={item._id} 
+          to={`/productdetail/${item._id}`}
+          className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        >
+          <img
+            src={item.images?.[0]?.url || "/api/placeholder/200/200"}
+            alt={item.name}
+            className="w-full h-48 object-cover"
+          />
+          <div className="p-4">
+            <h3 className="font-medium text-gray-900 mb-2">
+              {item.name}
+            </h3>
+            <p className="text-red-800 font-semibold">
+              ₹{(item.discountedPrice || item.price).toLocaleString()}
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  ) : (
+    <p className="text-center text-gray-500">No related products found</p>
+  )}
+</div>
       </div>
 
       <ToastContainer

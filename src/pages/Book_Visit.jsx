@@ -130,7 +130,7 @@ const BookVisitPage = () => {
 
     try {
       // Create Razorpay order from your backend
-      const response = await fetch("http://localhost:1921/payment/createorder", {
+      const response = await fetch("https://astroanikantbackend-2.onrender.com/payment/createorder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

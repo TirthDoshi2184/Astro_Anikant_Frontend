@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye, TrendingUp, BookOpen, HeartPulse, Stars, Infinity, Pill, Droplets, Package, User, Phone, Mail, Send } from 'lucide-react';
+import { Star, Gem, Crown, Shield, Heart, Zap, CheckCircle, Sparkles, Eye, TrendingUp, BookOpen, HeartPulse, Stars, Infinity, Pill, Droplets, Package, User, Phone, Mail, Send, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 // Sample data (replace with API data in production)
 import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat } from "react-icons/fa";
@@ -7,7 +7,9 @@ import { GiPrayerBeads } from "react-icons/gi";
 // import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 const HomePage = () => {
+  const [showEnergizationPopup, setShowEnergizationPopup] = useState(true);
 
   const [formData, setFormData] = useState({
     productName: '',
@@ -44,6 +46,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
   fetchData();
 }, []);
+
 
 const fetchData = async () => {
   try {
@@ -258,8 +261,148 @@ const categories = [
     }
   ];
 
+  useEffect(() => {
+  // Auto-hide popup after 8 seconds
+  const timer = setTimeout(() => {
+    setShowEnergizationPopup(false);
+  }, 5000);
+
+  return () => clearTimeout(timer);
+}, []);
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FEF7D7] to-white">
+
+    {/* Energization Popup */}
+{showEnergizationPopup && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
+    <div className="relative mx-4 max-w-md w-full">
+      <button
+        onClick={() => setShowEnergizationPopup(false)}
+        className="absolute -top-4 -right-4 z-10 w-12 h-12 bg-gradient-to-br from-[#FEF7D7] to-yellow-300 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300"
+      >
+        <svg className="w-6 h-6 text-[#9C0B13]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div className="relative bg-gradient-to-br from-[#9C0B13] to-red-900 rounded-3xl p-8 shadow-2xl border-4 border-[#FEF7D7]/30 animate-scale-in">
+        
+        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+          <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center animate-bounce shadow-xl">
+            <Sparkles className="w-8 h-8 text-white animate-pulse" />
+          </div>
+        </div>
+        
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-8 right-8 w-8 h-8 bg-[#FEF7D7]/30 rounded-full animate-spin-slow">
+            <div className="w-3 h-3 bg-yellow-400 rounded-full m-2.5 animate-pulse"></div>
+          </div>
+          <div className="absolute bottom-8 left-8 w-6 h-6 bg-yellow-300/40 rounded-full animate-bounce delay-1000">
+            <div className="w-2 h-2 bg-[#FEF7D7] rounded-full m-2 animate-pulse"></div>
+          </div>
+          <div className="absolute top-1/2 right-4 w-4 h-4 bg-amber-400/50 rounded-full animate-ping delay-500"></div>
+          <div className="absolute top-16 left-4 w-5 h-5 bg-[#FEF7D7]/40 rounded-full animate-bounce delay-700"></div>
+        </div>
+
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 200 200">
+            <defs>
+              <pattern id="sacred-energy" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                <circle cx="20" cy="20" r="2" fill="#FEF7D7" opacity="0.6"/>
+                <circle cx="20" cy="20" r="8" fill="none" stroke="#FEF7D7" strokeWidth="0.5" opacity="0.4"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#sacred-energy)" />
+          </svg>
+        </div>
+
+        <div className="relative z-10 text-center pt-6">
+          <div className="mb-6 flex justify-center">
+            <div className="relative">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#FEF7D7]/20 to-yellow-200/20 rounded-full flex items-center justify-center border-3 border-[#FEF7D7]/50 animate-pulse shadow-2xl">
+<Sun className="w-10 h-10 text-[#FEF7D7] animate-spin-slow" />
+              </div>
+              <div className="absolute inset-0 rounded-full border-2 border-[#FEF7D7]/30 animate-ping"></div>
+              <div className="absolute inset-0 rounded-full border border-yellow-300/20 animate-ping delay-500"></div>
+            </div>
+          </div>
+
+          <h2 className="text-3xl font-bold text-[#FEF7D7] mb-4 animate-glow">
+            🙏 Temple Blessed 🙏
+          </h2>
+          
+          <div className="mb-6">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-8 h-0.5 bg-gradient-to-r from-transparent to-yellow-400"></div>
+              <Sparkles className="w-5 h-5 text-yellow-300 mx-3 animate-spin-slow" />
+              <div className="w-8 h-0.5 bg-gradient-to-r from-yellow-400 to-transparent"></div>
+            </div>
+            <p className="text-[#FEF7D7]/90 font-semibold text-lg">
+              Temple Blessed Products
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-r from-[#FEF7D7]/10 to-yellow-200/10 rounded-2xl p-6 mb-6 border border-[#FEF7D7]/20">
+            <p className="text-[#FEF7D7] text-base leading-relaxed mb-4">
+              Every product is <span className="font-bold text-yellow-200">spiritually energized</span> in our sacred temple with proper mantras and rituals before reaching you.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center justify-center text-[#FEF7D7]/80">
+                <Star className="w-4 h-4 mr-2 text-yellow-300" />
+                Vedic Mantras
+              </div>
+              <div className="flex items-center justify-center text-[#FEF7D7]/80">
+                <Heart className="w-4 h-4 mr-2 text-yellow-300" />
+                Pure Intentions
+              </div>
+              <div className="flex items-center justify-center text-[#FEF7D7]/80">
+                <Gem className="w-4 h-4 mr-2 text-yellow-300" />
+                Sacred Rituals
+              </div>
+              <div className="flex items-center justify-center text-[#FEF7D7]/80">
+                <Shield className="w-4 h-4 mr-2 text-yellow-300" />
+                Divine Protection
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center">
+  <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-[#9C0B13] px-8 py-3 rounded-full font-bold text-sm shadow-lg animate-pulse border-2 border-white/50">
+    🏛️ Temple Blessed Promise 🏛️
+  </div>
+</div>
+
+          <div className="mt-4">
+            <div className="w-16 h-1 bg-[#FEF7D7]/30 rounded-full mx-auto overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full animate-progress"></div>
+            </div>
+            <p className="text-[#FEF7D7]/60 text-xs mt-2">Auto-closing...</p>
+          </div>
+        </div>
+
+        <div className="absolute top-4 left-4 w-8 h-8">
+          <div className="w-full h-0.5 bg-[#FEF7D7]/40 rounded"></div>
+          <div className="w-0.5 h-full bg-[#FEF7D7]/40 rounded absolute top-0 left-0"></div>
+        </div>
+        <div className="absolute top-4 right-4 w-8 h-8">
+          <div className="w-full h-0.5 bg-[#FEF7D7]/40 rounded"></div>
+          <div className="w-0.5 h-full bg-[#FEF7D7]/40 rounded absolute top-0 right-0"></div>
+        </div>
+        <div className="absolute bottom-4 left-4 w-8 h-8">
+          <div className="w-full h-0.5 bg-[#FEF7D7]/40 rounded absolute bottom-0"></div>
+          <div className="w-0.5 h-full bg-[#FEF7D7]/40 rounded absolute bottom-0 left-0"></div>
+        </div>
+        <div className="absolute bottom-4 right-4 w-8 h-8">
+          <div className="w-full h-0.5 bg-[#FEF7D7]/40 rounded absolute bottom-0"></div>
+          <div className="w-0.5 h-full bg-[#FEF7D7]/40 rounded absolute bottom-0 right-0"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -817,8 +960,63 @@ const categories = [
         </div>
       </section>
     </div>
-  );
+  
+);
+
+  
 };
+<style jsx>{`
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { 
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(254, 247, 215, 0.5); }
+  50% { text-shadow: 0 0 30px rgba(254, 247, 215, 0.8); }
+}
+
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.6s ease-out;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-progress {
+  animation: progress 8s linear;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+`}</style>
 
 // Export for use in React Router setup
 export default HomePage;
