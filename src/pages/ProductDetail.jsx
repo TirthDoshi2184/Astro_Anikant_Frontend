@@ -103,15 +103,15 @@ useEffect(() => {
   }
 }, [productID]);
 
-
-  useEffect(() => {
-    if (product?.images?.length > 0) {
-      const interval = setInterval(() => {
-        setSelectedImage((prev) => (prev + 1) % product.images.length);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [product?.images?.length]);
+useEffect(() => {
+  // Only auto-rotate if there are multiple images
+  if (product?.images && product.images.length > 1) {
+    const interval = setInterval(() => {
+      setSelectedImage((prev) => (prev + 1) % product.images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }
+}, [product?.images]);
 
   const fetchRelatedProducts = async (currentProductId) => {
   setIsLoadingRelated(true);
@@ -160,13 +160,13 @@ useEffect(() => {
     setExpandedSection(expandedSection === section ? "" : section);
   };
 
-  // Helper functions to process API data
   const getProductImages = () => {
-    if (!product?.images || product.images.length === 0) {
-      return ["/api/placeholder/500/500"];
-    }
-    return product.images.map((img) => img.url || "/api/placeholder/500/500");
-  };
+  if (!product?.images || product.images.length === 0) {
+    return ["/api/placeholder/500/500"];
+  }
+  console.log("Product images:", product.images); // Add this line
+  return product.images.map((img) => img.url || "/api/placeholder/500/500");
+};
 
   const getPrimaryImage = () => {
     if (!product?.images || product.images.length === 0) {

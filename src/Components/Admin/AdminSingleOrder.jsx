@@ -36,7 +36,7 @@ export const AdminSingleOrder = () => {
         try {
             setLoading(true)
             const response = await axios.get(`https://astroanikantbackend-2.onrender.com/order/getsingleorder/${id}`)
-            console.log(response.data.data);
+            console.log("...",response.data.data);
             setOrder(response.data.data)
         } catch (error) {
             console.error('Error fetching order:', error)
@@ -179,7 +179,12 @@ export const AdminSingleOrder = () => {
                             <div className="text-right">
                                 <p className="text-sm text-red-600">Total Amount</p>
                                 <p className="text-2xl font-bold text-red-900">
-                                    {formatCurrency(order?.cart?.product?.discountedPrice || order?.cart?.product?.price || 0)}
+                                   {formatCurrency(
+  order?.cart?.items?.[0]?.product?.discountedPrice || 
+  order?.cart?.items?.[0]?.product?.price || 
+  0
+)}
+
                                 </p>
                             </div>
                         </div>
@@ -258,14 +263,14 @@ export const AdminSingleOrder = () => {
                         </div>
                         <div className="p-6">
                             {/* Product Images */}
-                            {order?.cart?.product?.images && order.cart.product.images.length > 0 && (
+                            {order?.cart?.items?.product?.images && order.cart.product.images.length > 0 && (
                                 <div className="mb-6">
                                     <div className="flex items-center space-x-2 mb-3">
                                         <ImageIcon className="w-4 h-4 text-red-600" />
                                         <p className="font-semibold text-red-900">Product Images</p>
                                     </div>
                                     <div className="flex space-x-3 overflow-x-auto">
-                                        {order.cart.product.images.map((image, index) => (
+                                        {order.cart.items.product.images.map((image, index) => (
                                             <div key={index} className="flex-shrink-0">
                                                 <img 
                                                     src={image.url} 
@@ -284,12 +289,12 @@ export const AdminSingleOrder = () => {
                             <div className="space-y-4">
                                 <div>
                                     <p className="text-sm text-red-600">Product Name</p>
-                                    <p className="text-lg font-bold text-red-900">{order?.cart?.product?.name || 'N/A'}</p>
+                                    <p className="text-lg font-bold text-red-900">{order?.cart?.items?.[0]?.product?.name || 'N/A'}</p>
                                 </div>
                                 
                                 <div>
                                     <p className="text-sm text-red-600">Description</p>
-                                    <p className="text-red-800">{order?.cart?.product?.description || 'N/A'}</p>
+                                    <p className="text-red-800">{order?.cart?.items?.[0]?.product?.description || 'N/A'}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -298,7 +303,7 @@ export const AdminSingleOrder = () => {
                                         <div>
                                             <p className="text-sm text-red-600">Price</p>
                                             <p className="font-semibold text-red-900">
-                                                {formatCurrency(order?.cart?.product?.price || 0)}
+                                                {formatCurrency(order?.cart?.items?.[0]?.product?.price || 0)}
                                             </p>
                                         </div>
                                     </div>
@@ -307,7 +312,7 @@ export const AdminSingleOrder = () => {
                                         <div>
                                             <p className="text-sm text-red-600">Discounted Price</p>
                                             <p className="font-semibold text-green-700">
-                                                {formatCurrency(order?.cart?.product?.discountedPrice || 0)}
+                                                {formatCurrency(order?.cart?.items?.[0]?.product?.discountedPrice || 0)}
                                             </p>
                                         </div>
                                     </div>
@@ -318,14 +323,14 @@ export const AdminSingleOrder = () => {
                                         <Warehouse className="w-4 h-4 text-blue-600" />
                                         <div>
                                             <p className="text-sm text-red-600">Stock</p>
-                                            <p className="font-semibold text-red-900">{order?.cart?.product?.stock || 0}</p>
+                                            <p className="font-semibold text-red-900">{order?.cart?.items?.[0]?.product?.stock || 0}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Package className="w-4 h-4 text-purple-600" />
                                         <div>
                                             <p className="text-sm text-red-600">SKU</p>
-                                            <p className="font-semibold text-red-900">{order?.cart?.product?.sku || 'N/A'}</p>
+                                            <p className="font-semibold text-red-900">{order?.cart?.items?.[0]?.product?.sku || 'N/A'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -337,58 +342,73 @@ export const AdminSingleOrder = () => {
                                             <Gem className="w-4 h-4 text-purple-600" />
                                             <div>
                                                 <p className="text-sm text-red-600">Stone Type</p>
-                                                <p className="font-semibold text-red-900">{order?.cart?.product?.stoneType || 'N/A'}</p>
+                                                <p className="font-semibold text-red-900">{order?.cart?.items?.[0]?.product?.stoneType || 'N/A'}</p>
                                             </div>
                                         </div>
                                         
                                         <div className="flex items-center space-x-2">
-                                            <Scale className="w-4 h-4 text-amber-600" />
-                                            <div>
-                                                <p className="text-sm text-red-600">Weight</p>
-                                                <p className="font-semibold text-red-900">
-                                                    {order?.cart?.product?.weight?.value || 'N/A'} {order?.cart?.product?.weight?.unit || ''}
-                                                </p>
-                                            </div>
-                                        </div>
+  <Scale className="w-4 h-4 text-amber-600" />
+  <div>
+    <p className="text-sm text-red-600">Weight</p>
+    <p className="font-semibold text-red-900">
+      {order?.cart?.items?.[0]?.product?.weight?.value || 'N/A'}{" "}
+      {order?.cart?.items?.[0]?.product?.weight?.unit || ''}
+    </p>
+  </div>
+</div>
 
-                                        {order?.cart?.product?.dimensions && (
-                                            <div className="flex items-center space-x-2">
-                                                <Ruler className="w-4 h-4 text-blue-600" />
-                                                <div>
-                                                    <p className="text-sm text-red-600">Dimensions</p>
-                                                    <p className="font-semibold text-red-900">
-                                                        {order.cart.product.dimensions.length} × {order.cart.product.dimensions.width} × {order.cart.product.dimensions.height} {order.cart.product.dimensions.unit}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
+{/* Dimensions */}
+{order?.cart?.items?.[0]?.product?.dimensions && (
+  <div className="flex items-center space-x-2">
+    <Ruler className="w-4 h-4 text-blue-600" />
+    <div>
+      <p className="text-sm text-red-600">Dimensions</p>
+      <p className="font-semibold text-red-900">
+        {order?.cart?.items?.[0]?.product?.dimensions?.length} ×{" "}
+        {order?.cart?.items?.[0]?.product?.dimensions?.width} ×{" "}
+        {order?.cart?.items?.[0]?.product?.dimensions?.height}{" "}
+        {order?.cart?.items?.[0]?.product?.dimensions?.unit}
+      </p>
+    </div>
+  </div>
+)}
 
-                                        <div className="flex items-center space-x-2">
-                                            <Award className="w-4 h-4 text-yellow-600" />
-                                            <div>
-                                                <p className="text-sm text-red-600">Certification</p>
-                                                <p className="font-semibold text-red-900">{order?.cart?.product?.certification || 'N/A'}</p>
-                                            </div>
-                                        </div>
+{/* Certification */}
+<div className="flex items-center space-x-2">
+  <Award className="w-4 h-4 text-yellow-600" />
+  <div>
+    <p className="text-sm text-red-600">Certification</p>
+    <p className="font-semibold text-red-900">
+      {order?.cart?.items?.[0]?.product?.certification || 'N/A'}
+    </p>
+  </div>
+</div>
 
-                                        <div>
-                                            <p className="text-sm text-red-600">Usage Instructions</p>
-                                            <p className="text-red-800">{order?.cart?.product?.usage || 'N/A'}</p>
-                                        </div>
+{/* Usage */}
+<div>
+  <p className="text-sm text-red-600">Usage Instructions</p>
+  <p className="text-red-800">
+    {order?.cart?.items?.[0]?.product?.usage || 'N/A'}
+  </p>
+</div>
 
-                                        {order?.cart?.product?.astrologicalBenefits && (
-                                            <div>
-                                                <p className="text-sm text-red-600">Astrological Benefits</p>
-                                                <div className="flex flex-wrap gap-2 mt-1">
-                                                    {order.cart.product.astrologicalBenefits.map((benefit, index) => (
-                                                        <span key={index} className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs">
-                                                            {benefit}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
+{/* Astrological Benefits */}
+{order?.cart?.items?.[0]?.product?.astrologicalBenefits?.length > 0 && (
+  <div>
+    <p className="text-sm text-red-600">Astrological Benefits</p>
+    <div className="flex flex-wrap gap-2 mt-1">
+      {order.cart.items[0].product.astrologicalBenefits.map((benefit, index) => (
+        <span
+          key={index}
+          className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs"
+        >
+          {benefit}
+        </span>
+      ))}
+    </div>
+  </div>
+)}
+                                   </div>
                                 </div>
                             </div>
                         </div>

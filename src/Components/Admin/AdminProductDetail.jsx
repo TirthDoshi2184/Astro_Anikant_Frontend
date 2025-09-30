@@ -27,9 +27,11 @@ import {
   Package
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const IntegratedAdminProductDetail = () => {
-  // Sidebar state
+  const { id } = useParams(); // Get product ID from URL
+  
   const [activeMenuItem, setActiveMenuItem] = useState('astrology');
 
   // Navigation handler
@@ -69,53 +71,55 @@ const IntegratedAdminProductDetail = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   // Mock product data (replace with your API call)
-  const [product, setProduct] = useState({
-    name: "Premium Ruby Ring",
-    shortDescription: "Authentic Manik stone for enhancing confidence and leadership",
-    description: "This premium ruby ring is crafted with natural Manik stone, known for its powerful astrological benefits. The ruby enhances confidence, leadership qualities, and brings prosperity to the wearer. Carefully selected and energized by our expert astrologers.",
-    price: 15999,
-    discountedPrice: 12999,
-    stock: 25,
-    sku: "RUB001",
-    stoneType: "Ruby (Manik)",
-    weight: { value: 5.5, unit: "grams" },
-    dimensions: { length: 18, width: 15, height: 8, unit: "mm" },
-    images: [
-      "/api/placeholder/500/500",
-      "/api/placeholder/500/500",
-      "/api/placeholder/500/500"
-    ],
-    averageRating: 4.5,
-    reviewCount: 28,
-    astrologicalBenefits: [
-      "Enhances confidence and courage",
-      "Improves leadership qualities",
-      "Brings prosperity and success",
-      "Strengthens Sun's positive influence",
-      "Boosts energy and vitality"
-    ],
-    usage: "Wear on ring finger of right hand on Sunday morning after proper purification and energization.",
-    tags: ["Ruby", "Manik", "Leadership", "Confidence", "Success"],
-    certification: "Gem Testing Laboratory Certified",
-    views: 1250,
-    salesCount: 89,
-    isFeatured: true
-  });
+  const [product, setProduct] = useState(null);
+
+    useEffect(() => {
+    const fetchProduct = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`http://localhost:1921/product/getsingleproduct/${id}`);
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to fetch product');
+        }
+        
+        // Transform the data to match your frontend structure
+        const transformedProduct = {
+          ...result.data,
+          images: result.data.images?.map(img => img.url) || ["/api/placeholder/500/500"],
+          stoneType: result.data.category?.name || 'N/A',
+          // Add any other transformations needed
+        };
+        
+        setProduct(transformedProduct);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching product:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Auto-rotate images
-  useEffect(() => {
-    if (product?.images?.length > 1) {
-      const interval = setInterval(() => {
-        setSelectedImage((prev) => (prev + 1) % product.images.length);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [product?.images?.length]);
-
+useEffect(() => {
+  if (product?.images?.length > 1) {
+    const interval = setInterval(() => {
+      setSelectedImage((prev) => (prev + 1) % product.images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }
+}, [product?.images]);
   // Sidebar items
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
@@ -281,8 +285,8 @@ const IntegratedAdminProductDetail = () => {
             </div>
           </div>
         </div>
-
-        {/* Product Detail Content */}
+        
+{!isLoading && !error && product && (
         <div className="p-6">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -373,7 +377,7 @@ const IntegratedAdminProductDetail = () => {
                       </div>
                       <div className="text-sm text-gray-500 space-y-1">
                         <p><strong>SKU:</strong> {product.sku || 'N/A'}</p>
-                        <p><strong>Stone Type:</strong> {product.stoneType}</p>
+<p><strong>Stone Type:</strong> {product.category?.name || product.stoneType || 'N/A'}</p>
                         <p><strong>Weight:</strong> {getWeightDisplay()}</p>
                         <p><strong>Dimensions:</strong> {getDimensionsDisplay()}</p>
                       </div>
@@ -591,6 +595,7 @@ const IntegratedAdminProductDetail = () => {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

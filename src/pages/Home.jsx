@@ -27,14 +27,45 @@ const HomePage = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    if (!formData.productName || !formData.fullName || !formData.email || !formData.phone) {
-      alert('Please fill in all required fields.');
-      return;
+  const handleSubmit = async () => {
+  // Validation
+  if (!formData.productName || !formData.fullName || !formData.phone || !formData.email) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    alert('Please enter a valid email address');
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://localhost:1921/productrequest/insertproductrequest', {
+      name: formData.productName,
+      fullName: formData.fullName,
+      phoneNo: formData.phone,
+      email: formData.email,
+      additionalDetails: formData.additionalInfo || 'No additional details provided'
+    });
+
+    if (response.status === 201) {
+      alert('Thank you! Your product inquiry has been submitted. Our team will contact you soon.');
+      // Reset form
+      setFormData({
+        productName: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        additionalInfo: ''
+      });
     }
-    console.log('Form submitted:', formData);
-    alert('Thank you! Your product inquiry has been submitted. Our team will contact you soon.');
-  };
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    alert('Failed to submit request. Please try again later.');
+  }
+};
 const navigate = useNavigate();
 const [currentSlide, setCurrentSlide] = useState(0);
 const [productSlide, setProductSlide] = useState(0);
@@ -371,7 +402,7 @@ const categories = [
 
           <div className="flex items-center justify-center">
   <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-[#9C0B13] px-8 py-3 rounded-full font-bold text-sm shadow-lg animate-pulse border-2 border-white/50">
-    🏛️ Temple Blessed Promise 🏛️
+      Blessed for your cosmic journey ✨
   </div>
 </div>
 

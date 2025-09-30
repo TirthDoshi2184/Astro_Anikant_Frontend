@@ -291,10 +291,10 @@ export const AdminProductRequest = () => {
                             <div className="flex items-center">
                               <div className="w-8 h-8 bg-gradient-to-br from-red-800 to-red-900 rounded-full flex items-center justify-center mr-3">
                                 <span className="text-amber-50 font-semibold text-sm">
-                                  {request.fullname ? request.fullname.charAt(0) : 'C'}
+                                  {request.fullName ? request.fullName.charAt(0) : 'C'}
                                 </span>
                               </div>
-                              <div className="text-sm font-medium text-red-900">{request.fullname || 'N/A'}</div>
+                              <div className="text-sm font-medium text-red-900">{request.fullName || 'N/A'}</div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-red-700">
