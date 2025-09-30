@@ -49,7 +49,7 @@ export const AdminProductRequest = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get("http://localhost:1921/productrequest/getallrequest");
+      const response = await axios.get("https://astroanikantbackend-2.onrender.com/productrequest/getallrequest");
       setProductRequests(response.data.data || response.data);
       console.log(response.data);
     } catch (err) {

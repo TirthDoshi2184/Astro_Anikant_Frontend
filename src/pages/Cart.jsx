@@ -685,14 +685,16 @@ onClick={() => window.location.href = '/products'}
 
                 {/* Checkout Button */}
                 <button
-                  onClick={() => {
-                    window.location.href = `/orders/${userId}`;
-                  }}
-                  className="w-full bg-gradient-to-r from-[#9C0B13] to-red-600 text-white py-4 rounded-xl font-bold text-lg hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
-                >
-                  <span>Proceed to Checkout</span>
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+  onClick={() => {
+    window.location.href = `/orders/${userId}`;
+  }}
+  disabled
+  className="w-full bg-gray-400 text-gray-200 cursor-not-allowed py-4 rounded-xl font-bold text-lg flex items-center justify-center space-x-2"
+>
+  <span>Proceed to Checkout</span>
+  <ChevronRight className="w-5 h-5" />
+</button>
+
               </div>
 
               {/* Shiprocket Integration Display */}

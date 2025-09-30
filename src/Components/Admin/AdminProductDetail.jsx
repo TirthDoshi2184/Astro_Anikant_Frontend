@@ -78,7 +78,7 @@ const IntegratedAdminProductDetail = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost:1921/product/getsingleproduct/${id}`);
+        const response = await fetch(`https://astroanikantbackend-2.onrender.com/product/getsingleproduct/${id}`);
         const result = await response.json();
         
         if (!response.ok) {

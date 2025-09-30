@@ -17,7 +17,7 @@ const BookVisitPage = () => {
   const [error, setError] = useState('');
 
   // API Base URL - Update this to your actual backend URL
-  const API_BASE_URL = 'https://astroanikantbackend-2.onrender.com/visit'; // Change this to your backend URL
+  const API_BASE_URL = 'http://localhost:1921/visit'; // Change this to your backend URL
 
   const createVisit = async (visitData) => {
     try {
@@ -68,48 +68,50 @@ const BookVisitPage = () => {
 
   // Load all visits on component mount
   const handleSubmit = async () => {
-    setLoading(true);
-    setError('');
+  setLoading(true);
+  setError('');
 
-    // Validate required fields
-    if (!formData.name || !formData.email || !formData.phone || !formData.birthdate || !formData.message) {
-      setError('Please fill in all required fields');
-      setLoading(false);
-      return;
+  // Validate form
+  if (!formData.name || !formData.email || !formData.phone || !formData.birthdate || !formData.message) {
+    setError('Please fill in all required fields');
+    setLoading(false);
+    return;
+  }
+  if (!acceptedTerms) {
+    setError('You must accept the terms and conditions');
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const visitData = {
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      birthdate: formData.birthdate,
+      message: formData.message,
+      amount: 11,           // add amount field
+      status: "Pending",    // default before payment
+    };
+
+    // Step 1: create booking in DB
+    const result = await createVisit(visitData);
+
+    if (result.message === "Visit Added Successfully") {
+      setBookingDetails(result.data);
+
+      // Step 2: Initiate Razorpay for payment
+      await initiateRazorpayPayment(11, result.data._id);
+    } else {
+      setError('Failed to book visit. Please try again.');
     }
-    if (!acceptedTerms) {
-      setError('You must accept the terms and conditions');
-      setLoading(false);
-      return;
-    }
+  } catch (error) {
+    setError(error.message || 'An error occurred while booking the visit');
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      const visitData = {
-        name: formData.name,
-        phone: formData.phone, // keep as string unless backend requires int
-        email: formData.email,
-        birthdate: formData.birthdate,
-        message: formData.message,
-      };
-
-      // Create booking
-      const result = await createVisit(visitData);
-
-      if (result.message === "Visit Added Successfully") {
-        setBookingDetails(result.data);
-        setShowConfirmation(true);
-
-        // After successful booking, initiate Razorpay payment
-        await initiateRazorpayPayment(500); // Pass amount here (₹11 for your UI, adjust as needed)
-      } else {
-        setError('Failed to book visit. Please try again.');
-      }
-    } catch (error) {
-      setError(error.message || 'An error occurred while booking the visit');
-    } finally {
-      setLoading(false);
-    }
-  };
   // Load Razorpay checkout script
   const loadScript = (src) => {
     return new Promise((resolve) => {
@@ -121,58 +123,73 @@ const BookVisitPage = () => {
     });
   };
 
-  // Create Razorpay order and open checkout
-  const initiateRazorpayPayment = async (amount) => {
-    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-    if (!res) {
-      alert("Razorpay SDK failed to load. Please check your connection.");
+  const initiateRazorpayPayment = async (amount, bookingId) => {
+  const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+  if (!res) {
+    alert("Razorpay SDK failed to load.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:1921/payment/createorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: amount * 100, // paise
+        currency: "INR",
+        receipt: `receipt_order_${Date.now()}`,
+      }),
+    });
+    const order = await response.json();
+    console.log("Order:", order);
+
+    if (!order.id) {
+      alert("Failed to create payment order. Please try again.");
       return;
     }
 
-    try {
-      // Create Razorpay order from your backend
-      const response = await fetch("https://astroanikantbackend-2.onrender.com/payment/createorder", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: amount * 100, // amount in paise
-          currency: "INR",
-          receipt: `receipt_order_${Date.now()}`,
-        }),
-      });
-      const order = await response.json();
+    const options = {
+      key: "rzp_test_RNOxHvjfvDoP1q", // replace with LIVE key in prod
+      amount: order.amount,
+      currency: order.currency,
+      name: "Astro Anekant",
+      description: "Consultation Booking Payment",
+      order_id: order.id,
+      handler: async function (response) {
+        try {
+          // Step 3: Update booking status in backend after successful payment
+          await fetch(`https://astroanikantbackend-2.onrender.com/visit/updatevisit/${bookingId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              status: "Paid",
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
 
-      if (!order.id) {
-        alert("Failed to create payment order. Please try again.");
-        return;
-      }
+          alert("✅ Payment successful and booking updated!");
+        } catch (err) {
+          console.error("Error updating booking:", err);
+        }
+      },
+      prefill: {
+        name: formData.name,
+        email: formData.email,
+        contact: formData.phone,
+      },
+      theme: { color: "#9C0B13" },
+    };
 
-      const options = {
-        key: "rzp_test_m60EaJoASbqtGR", // Replace with your Razorpay key (live for production)
-        amount: order.amount,
-        currency: order.currency,
-        name: "Astro Anekant",
-        description: "Consultation Booking Payment",
-        order_id: order.id,
-        handler: async function (response) {
-          // Call backend to verify payment here (optional)
-          alert("Payment successful!");
-        },
-        prefill: {
-          name: formData.name,
-          email: formData.email,
-          contact: formData.phone,
-        },
-        theme: { color: "#9C0B13" },
-      };
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  } catch (err) {
+    alert("Payment initiation failed. Please try again.");
+    console.error(err);
+  }
+};
 
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
-    } catch (err) {
-      alert("Payment initiation failed. Please try again.");
-      console.error(err);
-    }
-  };
 
 
   const paymentProcess = async () => {
@@ -196,7 +213,7 @@ const BookVisitPage = () => {
         }
 
         const options = {
-          key: "rzp_test_m60EaJoASbqtGR", // replace with LIVE key in production
+          key: "rzp_test_RNOxHvjfvDoP1q", // replace with LIVE key in production
           amount: orderData.amount,
           currency: orderData.currency,
           name: "Astro Anekant",
@@ -237,7 +254,7 @@ const BookVisitPage = () => {
       const handleCreateOrder = async () => {
         try {
           const order = await axios.post("http://localhost:1921/payment/createorder", {
-            amount: 500,
+            amount: 11*100,
             currency: "INR",
             receipt: "receipt_order_123",
           });
@@ -453,8 +470,9 @@ const BookVisitPage = () => {
                 {/* Submit Button */}
                 <div className="text-center">
                   <button
-                    onClick={paymentProcess}
-                    disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message || !acceptedTerms}
+                  disabled
+                    onClick={handleSubmit}
+                    // disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message || !acceptedTerms}
                     className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Booking...' : 'Confirm Booking - ₹11'}
