@@ -28,7 +28,7 @@ export const ForgotUserEmail = () => {
 
     try {
       // Using axios with proper async/await
-      const response = await fetch("https://astroanikantbackend-2.onrender.com/user/getuserbyemail", {
+      const response = await fetch("https://localhost:1921/user/getuserbyemail", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
