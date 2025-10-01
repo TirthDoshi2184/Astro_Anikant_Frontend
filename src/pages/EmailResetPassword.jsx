@@ -16,7 +16,7 @@ export const EmailResetPassword = () => {
   // Simulated useParams and useNavigate
    // This would come from useParams() in real app
   const navigate = (path) => console.log(`Navigate to: ${path}`); // This would be useNavigate()
-  const token  = useParams()
+  const {token}  = useParams()
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
