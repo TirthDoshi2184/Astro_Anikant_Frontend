@@ -13,7 +13,8 @@ import {
   AlertTriangle,
   Phone,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Info
 } from 'lucide-react';
 
 const TermsConditionsPage = () => {
@@ -162,47 +163,47 @@ const TermsConditionsPage = () => {
                 </div>
               </div>
 
-              {/* Section 2: Astrology Services */}
-              <div className={`transition-all duration-500 ${activeSection === 1 ? 'block' : 'hidden'}`}>
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-red-900 to-red-700 rounded-full flex items-center justify-center">
-                    <Star className="w-6 h-6 text-white" />
-                  </div>
-                  <h2 className="text-3xl font-bold text-red-900">Astrology Services & Consultations</h2>
-                </div>
+           {/* Section 2: Astrology Services */}
+<div className={`transition-all duration-500 ${activeSection === 1 ? 'block' : 'hidden'}`}>
+  <div className="flex items-center space-x-4 mb-6">
+    <div className="w-12 h-12 bg-gradient-to-br from-red-900 to-red-700 rounded-full flex items-center justify-center">
+      <Star className="w-6 h-6 text-white" />
+    </div>
+    <h2 className="text-3xl font-bold text-red-900">Astrology Services & Consultations</h2>
+  </div>
 
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-200">
-                    <h3 className="text-xl font-semibold text-purple-900 mb-4">Purpose of Service</h3>
-                    <div className="space-y-3 text-gray-700">
-                      <p>All astrology consultations, predictions, remedies, and advice are intended for <span className="font-semibold text-purple-900">guidance only</span>.</p>
-                      <div className="bg-white/50 p-4 rounded-lg border-l-4 border-amber-500">
-                        <p className="text-sm">
-                          <strong>Important:</strong> We do not guarantee specific outcomes in personal, professional, financial, or health matters. 
-                          Any decisions taken by you based on our consultations are entirely your responsibility.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+  <div className="space-y-6">
+    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-200">
+      <h3 className="text-xl font-semibold text-purple-900 mb-4">Purpose of Service</h3>
+      <div className="space-y-3 text-gray-700">
+        <p>All astrology consultations, predictions, remedies, and advice are intended for <span className="font-semibold text-purple-900">guidance only</span>.</p>
+        <div className="bg-white/50 p-4 rounded-lg border-l-4 border-amber-500">
+          <p className="text-sm">
+            <strong>Important:</strong> We do not guarantee specific outcomes in personal, professional, financial, or health matters. 
+            Any decisions taken by you based on our consultations are entirely your responsibility.
+          </p>
+        </div>
+      </div>
+    </div>
 
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl">
-                    <h3 className="text-xl font-semibold text-green-900 mb-4">Online & Offline Consultations</h3>
-                    <div className="space-y-4">
-                      {[
-                        { icon: <CheckCircle className="w-5 h-5 text-green-600" />, text: 'Appointments must be booked in advance through our website, app, or designated contact details' },
-                        { icon: <AlertTriangle className="w-5 h-5 text-amber-600" />, text: 'Consultation fees are non-refundable once the session is confirmed' },
-                        { icon: <Shield className="w-5 h-5 text-blue-600" />, text: 'We reserve the right to reschedule or cancel appointments due to unforeseen circumstances' }
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-3 bg-white/60 rounded-lg">
-                          {item.icon}
-                          <span className="text-gray-700">{item.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl">
+      <h3 className="text-xl font-semibold text-green-900 mb-4">Online & Offline Consultations</h3>
+      <div className="space-y-4">
+        {[
+          { icon: <CheckCircle className="w-5 h-5 text-green-600" />, text: 'Appointments must be booked in advance through our website, app, or designated contact details' },
+          { icon: <AlertTriangle className="w-5 h-5 text-amber-600" />, text: 'Consultation fees are non-refundable once the session is confirmed' },
+          { icon: <Shield className="w-5 h-5 text-blue-600" />, text: 'We reserve the right to reschedule or cancel appointments due to unforeseen circumstances' },
+          { icon: <Info className="w-5 h-5 text-red-600" />, text: 'The ₹11 consultation fee is a nominal booking charge to prevent misuse of our services. Please note that this ₹11 payment does not constitute actual consultation services and is non-refundable' }
+        ].map((item, index) => (
+          <div key={index} className="flex items-start space-x-3 p-3 bg-white/60 rounded-lg">
+            {item.icon}
+            <span className="text-gray-700">{item.text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
               {/* Section 3: Products & Authenticity */}
               <div className={`transition-all duration-500 ${activeSection === 2 ? 'block' : 'hidden'}`}>
                 <div className="flex items-center space-x-4 mb-6">
