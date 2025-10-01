@@ -4,8 +4,7 @@ import { Star, Moon, Sun, Loader2, Lock, ArrowLeft, Eye, EyeOff, Shield } from "
 export const EmailResetPassword = () => {
   const [formData, setFormData] = useState({
     password: '',
-    confirmPassword: '',
-    otp: ''
+    confirmPassword: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,7 +33,7 @@ export const EmailResetPassword = () => {
     setSuccess('');
 
     // Validation
-    if (!formData.password || !formData.confirmPassword || !formData.otp) {
+    if (!formData.password || !formData.confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -49,17 +48,11 @@ export const EmailResetPassword = () => {
       return;
     }
 
-    if (!/^\d{4,6}$/.test(formData.otp)) {
-      setError('OTP must be 4-6 digits');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
       const requestData = {
         password: formData.password,
-        otp: parseInt(formData.otp),
       };
 
       // Replace with your actual API endpoint
@@ -76,14 +69,14 @@ export const EmailResetPassword = () => {
 
       if (response.status === 201 || response.ok) {
         setSuccess("🌟 Password reset successful! The stars have blessed your new cosmic key.");
-        setFormData({ password: '', confirmPassword: '', otp: '' });
+        setFormData({ password: '', confirmPassword: '' });
         
         // Navigate after a short delay to show success message
         setTimeout(() => {
           navigate("/");
         }, 2000);
       } else {
-        setError("Invalid OTP or request failed. Please check your cosmic code.");
+        setError("Request failed. Please try again.");
       }
     } catch (err) {
       console.error("Network Error:", err);
@@ -91,7 +84,7 @@ export const EmailResetPassword = () => {
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
         setError("Unable to connect to server. Please check your internet connection.");
       } else {
-        setError("Invalid OTP! Please check your cosmic verification code.");
+        setError("An error occurred. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -221,41 +214,12 @@ export const EmailResetPassword = () => {
               </div>
             </div>
 
-            {/* OTP Code */}
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#660B05' }}>
-                OTP Code
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="otp"
-                  value={formData.otp}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 pl-12 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-center text-lg font-mono tracking-widest"
-                  style={{ 
-                    borderColor: '#660B05',
-                    backgroundColor: 'rgba(255, 240, 196, 0.5)',
-                  }}
-                  placeholder="000000"
-                  required
-                  disabled={isLoading}
-                  maxLength={6}
-                  pattern="\d{4,6}"
-                />
-                <Star className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: '#660B05' }} />
-              </div>
-              <p className="text-xs mt-2 opacity-80" style={{ color: '#8B0E08' }}>
-                Enter the cosmic verification code sent to your email
-              </p>
-            </div>
-
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isLoading || !formData.password || !formData.confirmPassword || !formData.otp}
+                disabled={isLoading || !formData.password || !formData.confirmPassword || formData.password !== formData.confirmPassword}
                 className="flex-1 py-3 px-4 rounded-xl font-semibold focus:ring-2 focus:ring-offset-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
                 style={{ 
                   background: 'linear-gradient(135deg, #660B05 0%, #8B0E08 100%)',
@@ -295,17 +259,6 @@ export const EmailResetPassword = () => {
           {/* Additional Help */}
           <div className="text-center mt-6 p-4 rounded-xl" style={{ backgroundColor: 'rgba(102, 11, 5, 0.05)' }}>
             <p className="text-xs" style={{ color: '#8B0E08' }}>
-              Didn't receive the OTP?{' '}
-              <button
-                type="button"
-                className="font-semibold hover:opacity-70 transition-opacity underline"
-                style={{ color: '#660B05' }}
-                onClick={() => console.log('Resend OTP')}
-              >
-                Request new code
-              </button>
-            </p>
-            <p className="text-xs mt-2" style={{ color: '#8B0E08' }}>
               Need help? Contact our{' '}
               <button
                 type="button"
