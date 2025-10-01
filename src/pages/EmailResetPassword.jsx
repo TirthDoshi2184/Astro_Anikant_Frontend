@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Star, Moon, Sun, Loader2, Lock, ArrowLeft, Eye, EyeOff, Shield } from "lucide-react";
+import { useParams } from 'react-router-dom';
 
 export const EmailResetPassword = () => {
   const [formData, setFormData] = useState({
@@ -13,9 +14,9 @@ export const EmailResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Simulated useParams and useNavigate
-  const id = "user123"; // This would come from useParams() in real app
+   // This would come from useParams() in real app
   const navigate = (path) => console.log(`Navigate to: ${path}`); // This would be useNavigate()
-
+  const token  = useParams()
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -56,7 +57,7 @@ export const EmailResetPassword = () => {
       };
 
       // Replace with your actual API endpoint
-      const response = await fetch(`https://astroanikantbackend-2.onrender.com/user/updateforgotuser/${id}`, {
+      const response = await fetch(`https://astroanikantbackend-2.onrender.com/user/updateforgotuser/${token}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
