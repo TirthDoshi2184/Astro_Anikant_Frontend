@@ -57,7 +57,7 @@ export const EmailResetPassword = () => {
       };
 
       // Replace with your actual API endpoint
-      const response = await fetch(`https://astroanikantbackend-2.onrender.com/user/updateforgotuser/${token}`, {
+      const response = await fetch(`https://astroanikantbackend-2.onrender.com/user/updateforgotuserpassword/${token}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
