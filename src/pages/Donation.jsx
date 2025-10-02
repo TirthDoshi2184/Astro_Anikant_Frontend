@@ -1,5 +1,5 @@
   import React, { useState } from 'react';
-  import { Heart, Star, Sparkles, Gift, Users, Shield, Phone, Mail, User, DollarSign, CheckCircle } from 'lucide-react';
+  import { Heart, Star, Sparkles, Gift, Users, Shield, Phone, Mail, User, DollarSign, CheckCircle, IndianRupee } from 'lucide-react';
 
   const Donation = () => {
     const [formData, setFormData] = useState({
@@ -233,7 +233,7 @@ const handlePaymentComplete = async () => {
 
                   {selectedAmount === 'custom' && (
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#9C0B13]" />
+                      <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#9C0B13]" />
                       <input
                         type="number"
                         name="customAmount"

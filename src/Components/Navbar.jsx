@@ -128,7 +128,6 @@ const AstrologyNavbar = () => {
   const profileMenuItems = isAuthenticated 
     ? [
         { id: 'profile', label: 'View Profile', icon: Eye, path: '/profile' },
-        { id: 'password', label: 'Change Password', icon: Lock, path: '/change-password' },
         { id: 'logout', label: 'Logout', icon: LogOut, action: 'logout' }
       ]
     : [

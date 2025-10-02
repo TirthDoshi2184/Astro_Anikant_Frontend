@@ -327,12 +327,11 @@ const reduceQuantityByOne = useCallback(async (itemId) => {
 // Memoize calculations
 const calculations = useMemo(() => {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = selectedShipping === 'express' ? 200 : selectedShipping === 'same-day' ? 500 : 100;
-  const gst = Math.round(subtotal * 0.18);
-  const packaging = 50; // Fixed packaging fee
-  const total = subtotal + shipping + gst + packaging;
+  const shipping = 0; // Changed to 0
+  const packaging = 0; // Changed to 0
+  const total = subtotal ; // Removed shipping and packaging
 
-  return { subtotal, shipping, gst, total, packaging };
+  return { subtotal, shipping, total, packaging };
 }, [cartItems, selectedShipping]);
 
 // Removed recommendedProducts since it's not part of your API
@@ -633,20 +632,21 @@ onClick={() => window.location.href = '/products'}
                     <span className="font-semibold text-[#9C0B13]">₹{calculations.subtotal?.toLocaleString()}</span>
                   </div>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Handling Fee</span>
-                    <span className="font-semibold text-[#9C0B13]">₹{calculations.shipping?.toLocaleString()}</span>
-                  </div>
+<div className="flex justify-between items-center">
+  <span className="text-gray-700">Handling Fee</span>
+  <div className="flex items-center space-x-2">
+    <span className="text-gray-400 line-through text-sm">₹100</span>
+    <span className="font-semibold text-green-600">₹0</span>
+  </div>
+</div>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Packaging Fee</span>
-                    <span className="font-semibold text-[#9C0B13]">₹{calculations.packaging?.toLocaleString()}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Taxes (18%)</span>
-                    <span className="font-semibold text-[#9C0B13]">₹{calculations.gst?.toLocaleString()}</span>
-                  </div>
+<div className="flex justify-between items-center">
+  <span className="text-gray-700">Packaging Fee</span>
+  <div className="flex items-center space-x-2">
+    <span className="text-gray-400 line-through text-sm">₹50</span>
+    <span className="font-semibold text-green-600">₹0</span>
+  </div>
+</div>
 
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between items-center">
@@ -678,7 +678,7 @@ onClick={() => window.location.href = '/products'}
                     </div>
                     <div className="bg-[#FEF7D7] p-3 rounded-lg text-center">
                       <Truck className="w-6 h-6 text-[#9C0B13] mx-auto mb-1" />
-                      <div className="text-xs font-semibold text-[#9C0B13]">Shiprocket</div>
+                      <div className="text-xs font-semibold text-[#9C0B13]">Free Delivery</div>
                     </div>
                   </div>
                 </div>
@@ -775,7 +775,6 @@ onClick={() => window.location.href = '/products'}
 </div>
 <div>
   <div className="font-bold text-[#9C0B13] text-sm sm:text-base">Free Shipping</div>
-  <div className="text-xs sm:text-sm text-gray-600">Orders above ₹2,000</div>
 </div>
 </div>
 
@@ -784,8 +783,7 @@ onClick={() => window.location.href = '/products'}
                   <Sparkles className="w-6 h-6 text-[#FEF7D7] animate-pulse" />
                 </div>
                 <div>
-                  <div className="font-bold text-[#9C0B13]">Free Energizing</div>
-                  <div className="text-sm text-gray-600">All products blessed</div>
+                  <div className="font-bold text-[#9C0B13]">Temple Blessed Products</div>
                 </div>
               </div>
 
@@ -794,8 +792,7 @@ onClick={() => window.location.href = '/products'}
                   <Shield className="w-6 h-6 text-[#FEF7D7] animate-bounce" />
                 </div>
                 <div>
-                  <div className="font-bold text-[#9C0B13]">30-Day Return</div>
-                  <div className="text-sm text-gray-600">Satisfaction guaranteed</div>
+                  <div className="font-bold text-[#9C0B13]">Satisfaction guaranteed</div>
                 </div>
               </div>
             </div>

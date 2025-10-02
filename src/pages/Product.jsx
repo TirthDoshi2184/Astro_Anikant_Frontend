@@ -82,22 +82,30 @@ const ProductPage = () => {
     // Category filter
    
     // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'price-low':
-          return (a.discountedPrice || a.price || 0) - (b.discountedPrice || b.price || 0);
-        case 'price-high':
-          return (b.discountedPrice || b.price || 0) - (a.discountedPrice || a.price || 0);
-        case 'rating':
-          return (b.averageRating || 0) - (a.averageRating || 0);
-        case 'newest':
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        case 'popularity':
-        default:
-          return (b.salesCount || 0) - (a.salesCount || 0);
-      }
-    });
-
+    // Sort products - prioritize in-stock items
+filtered.sort((a, b) => {
+  // First, sort by stock availability (in-stock first, out-of-stock last)
+  const aInStock = a.stock > 0 && a.isActive;
+  const bInStock = b.stock > 0 && b.isActive;
+  
+  if (aInStock && !bInStock) return -1;
+  if (!aInStock && bInStock) return 1;
+  
+  // If both have same stock status, apply the selected sorting
+  switch (sortBy) {
+    case 'price-low':
+      return (a.discountedPrice || a.price || 0) - (b.discountedPrice || b.price || 0);
+    case 'price-high':
+      return (b.discountedPrice || b.price || 0) - (a.discountedPrice || a.price || 0);
+    case 'rating':
+      return (b.averageRating || 0) - (a.averageRating || 0);
+    case 'newest':
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    case 'popularity':
+    default:
+      return (b.salesCount || 0) - (a.salesCount || 0);
+  }
+});
     setFilteredProducts(filtered);
     setCurrentPage(1); // Reset to first page when filters change
   }, [allProducts, searchQuery, priceRange, sortBy]);
@@ -295,7 +303,7 @@ const clearAllFilters = () => {
           <img 
             src={product.images && product.images.length > 0 
               ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
-              : 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400'
+              : 'https://res.cloudinary.com/dnbfumeob/image/upload/v1759396265/FInal_logo_sparby.png'
             } 
             alt={product.name}
             className="w-full h-40 sm:h-48 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"

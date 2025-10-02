@@ -195,7 +195,7 @@ const socialLinks = [
                 {productCategories.map((category, index) => (
                   <li key={index}>
                     <button
-                      onClick={() => handleNavigation(category.path)}
+                      // onClick={() => handleNavigation(category.path)}
                       className="flex items-center space-x-3 text-amber-700 hover:text-orange-600 transition-all duration-300 text-sm font-medium hover:translate-x-1 transform group"
                     >
                       <category.icon className="w-4 h-4 text-orange-500 group-hover:text-orange-600" />

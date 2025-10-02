@@ -307,22 +307,22 @@ const categories = [
 
     {/* Energization Popup */}
 {showEnergizationPopup && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
-    <div className="relative mx-4 max-w-md w-full">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4">
+    <div className="relative w-full max-w-md">
       <button
         onClick={() => setShowEnergizationPopup(false)}
-        className="absolute -top-4 -right-4 z-10 w-12 h-12 bg-gradient-to-br from-[#FEF7D7] to-yellow-300 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300"
+        className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 z-10 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#FEF7D7] to-yellow-300 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300"
       >
-        <svg className="w-6 h-6 text-[#9C0B13]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#9C0B13]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
 
-      <div className="relative bg-gradient-to-br from-[#9C0B13] to-red-900 rounded-3xl p-8 shadow-2xl border-4 border-[#FEF7D7]/30 animate-scale-in">
+      <div className="relative bg-gradient-to-br from-[#9C0B13] to-red-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border-2 sm:border-4 border-[#FEF7D7]/30 animate-scale-in">
         
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-          <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center animate-bounce shadow-xl">
-            <Sparkles className="w-8 h-8 text-white animate-pulse" />
+        <div className="absolute -top-4 sm:-top-6 left-1/2 transform -translate-x-1/2">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center animate-bounce shadow-xl">
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-white animate-pulse" />
           </div>
         </div>
         
@@ -349,18 +349,18 @@ const categories = [
           </svg>
         </div>
 
-        <div className="relative z-10 text-center pt-6">
-          <div className="mb-6 flex justify-center">
+        <div className="relative z-10 text-center pt-4 sm:pt-6">
+          <div className="mb-4 sm:mb-6 flex justify-center">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#FEF7D7]/20 to-yellow-200/20 rounded-full flex items-center justify-center border-3 border-[#FEF7D7]/50 animate-pulse shadow-2xl">
-<Sun className="w-10 h-10 text-[#FEF7D7] animate-spin-slow" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#FEF7D7]/20 to-yellow-200/20 rounded-full flex items-center justify-center border-3 border-[#FEF7D7]/50 animate-pulse shadow-2xl">
+                <Sun className="w-8 h-8 sm:w-10 sm:h-10 text-[#FEF7D7] animate-spin-slow" />
               </div>
               <div className="absolute inset-0 rounded-full border-2 border-[#FEF7D7]/30 animate-ping"></div>
               <div className="absolute inset-0 rounded-full border border-yellow-300/20 animate-ping delay-500"></div>
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-[#FEF7D7] mb-4 animate-glow">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#FEF7D7] mb-4 animate-glow">
             🙏 Temple Blessed 🙏
           </h2>
           
@@ -401,10 +401,10 @@ const categories = [
           </div>
 
           <div className="flex items-center justify-center">
-  <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-[#9C0B13] px-8 py-3 rounded-full font-bold text-sm shadow-lg animate-pulse border-2 border-white/50">
-      Blessed for your cosmic journey ✨
-  </div>
-</div>
+            <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-[#9C0B13] px-8 py-3 rounded-full font-bold text-sm shadow-lg animate-pulse border-2 border-white/50">
+              Blessed for your cosmic journey ✨
+            </div>
+          </div>
 
           <div className="mt-4">
             <div className="w-16 h-1 bg-[#FEF7D7]/30 rounded-full mx-auto overflow-hidden">
