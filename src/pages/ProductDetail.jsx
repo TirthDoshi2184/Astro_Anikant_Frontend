@@ -52,6 +52,9 @@ const ProductDetailPage = () => {
   const [activeTab, setActiveTab] = useState("benefits");
   const [expandedSection, setExpandedSection] = useState("");
   const [isWishlisted, setIsWishlisted] = useState(false);
+  // Add these state variables at the top with other useState declarations
+const [isCheckingWishlist, setIsCheckingWishlist] = useState(false);
+const [wishlistId, setWishlistId] = useState(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
 const [isLoadingRelated, setIsLoadingRelated] = useState(false);
@@ -90,9 +93,52 @@ const isUserLoggedIn = () => {
       helpful: 8,
     },
   ];
+
+  // Add this function to check if product is in wishlist
+const checkWishlistStatus = async () => {
+  if (!isUserLoggedIn()) return;
+  
+  setIsCheckingWishlist(true);
+  try {
+    const userId = getUserId();
+    const response = await axios.get(
+      "https://astroanikantbackend-2.onrender.com/wishlist/getallwishlist"
+    );
+    
+    const userWishlistItem = response.data.data.find(
+      item => item.user._id === userId && item.product._id === productID
+    );
+    
+    if (userWishlistItem) {
+      setIsWishlisted(true);
+      setWishlistId(userWishlistItem._id);
+    }
+  } catch (error) {
+    console.error("Error checking wishlist:", error);
+  } finally {
+    setIsCheckingWishlist(false);
+  }
+};
+
+// Add getUserId helper function
+const getUserId = () => {
+  const authToken = localStorage.getItem("authToken");
+  if (authToken) {
+    try {
+      const payload = JSON.parse(atob(authToken.split(".")[1]));
+      return payload.id || payload.userId || payload._id;
+    } catch (e) {
+      console.log("Token decode error:", e);
+    }
+  }
+  return null;
+};
+
+// Update the useEffect to check wishlist status
 useEffect(() => {
   if (productID) {
     fetchProduct(productID);
+    checkWishlistStatus();
   }
 }, [productID]);
 
@@ -112,6 +158,130 @@ useEffect(() => {
     return () => clearInterval(interval);
   }
 }, [product?.images]);
+
+
+// Add toggle wishlist function
+const toggleWishlist = async () => {
+  if (!isUserLoggedIn()) {
+    toast.error(
+      <CustomToast 
+        type="error"
+        title="Login Required! 🔐"
+        message="Please login to add items to your wishlist"
+        icon={Heart}
+      />,
+      {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "mystical-toast",
+        bodyClassName: "mystical-body",
+        closeButton: false
+      }
+    );
+    return;
+  }
+
+  try {
+    const userId = getUserId();
+    
+    if (isWishlisted && wishlistId) {
+      // Remove from wishlist
+      await axios.delete(
+        `https://astroanikantbackend-2.onrender.com/wishlist/deletewishlist/${wishlistId}`
+      );
+      
+      setIsWishlisted(false);
+      setWishlistId(null);
+      
+      toast.success(
+        <CustomToast 
+          type="success"
+          title="Removed from Wishlist 💔"
+          message={`${product.name} removed from your wishlist`}
+          icon={Heart}
+        />,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          className: "mystical-toast mystical-success",
+          bodyClassName: "mystical-body",
+          closeButton: false
+        }
+      );
+    } else {
+      // Add to wishlist
+      const wishlistData = {
+        user: userId,
+        product: productID
+      };
+
+      const response = await axios.post(
+        "https://astroanikantbackend-2.onrender.com/wishlist/insertwishlist",
+        wishlistData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        setIsWishlisted(true);
+        setWishlistId(response.data.data._id);
+        
+        toast.success(
+          <CustomToast 
+            type="success"
+            title="Added to Wishlist! ❤️"
+            message={`${product.name} saved to your wishlist`}
+            icon={Heart}
+          />,
+          {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            className: "mystical-toast mystical-success",
+            bodyClassName: "mystical-body",
+            closeButton: false
+          }
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Error toggling wishlist:", error);
+    toast.error(
+      <CustomToast 
+        type="error"
+        title="Action Failed! ❌"
+        message="Could not update wishlist. Please try again."
+        icon={Heart}
+      />,
+      {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "mystical-toast",
+        bodyClassName: "mystical-body",
+        closeButton: false
+      }
+    );
+  }
+};
 
   const fetchRelatedProducts = async (currentProductId) => {
   setIsLoadingRelated(true);
@@ -477,20 +647,19 @@ useEffect(() => {
                   className="w-full h-96 object-cover rounded-xl group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute top-4 right-4 flex flex-col space-y-2">
-                  <Link
-                    to={`/wishlisted/${productID}`}
-                    className={`p-2 rounded-full shadow-lg transition-all duration-300 ${
-                      isWishlisted
-                        ? "bg-red-800 text-white"
-                        : "bg-white text-gray-600 hover:bg-red-50"
-                    }`}
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${
-                        isWishlisted ? "fill-current" : ""
-                      }`}
-                    />
-                  </Link>
+                  <button
+  onClick={toggleWishlist}
+  disabled={isCheckingWishlist}
+  className={`p-2 rounded-full shadow-lg transition-all duration-300 ${
+    isWishlisted
+      ? "bg-red-800 text-white"
+      : "bg-white text-gray-600 hover:bg-red-50"
+  }`}
+>
+  <Heart
+    className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`}
+  />
+</button>
                   <button
                     onClick={handleShare}
                     className="p-2 bg-white rounded-full shadow-lg text-gray-600 hover:bg-red-50 transition-all duration-300"

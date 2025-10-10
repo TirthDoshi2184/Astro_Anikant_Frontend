@@ -329,6 +329,7 @@ const calculations = useMemo(() => {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = 0; // Changed to 0
   const packaging = 0; // Changed to 0
+  const Shipping = 0;
   const total = subtotal ; // Removed shipping and packaging
 
   return { subtotal, shipping, total, packaging };
@@ -535,13 +536,6 @@ onClick={() => window.location.href = '/products'}
 </div>
                           <div className="flex space-x-2 sm:space-x-2">
                             <button
-                              onClick={() => saveForLater(item.id)}
-                              className="p-2 text-gray-500 hover:text-[#9C0B13] transition-colors"
-                              title="Save for Later"
-                            >
-                              <Heart className="w-5 h-5" />
-                            </button>
-                            <button
                               onClick={() => removeIndividualItem(item.productId)}
                               className="p-2 text-gray-500 hover:text-red-600 transition-colors"
                               title="Remove Item"
@@ -635,7 +629,7 @@ onClick={() => window.location.href = '/products'}
 <div className="flex justify-between items-center">
   <span className="text-gray-700">Handling Fee</span>
   <div className="flex items-center space-x-2">
-    <span className="text-gray-400 line-through text-sm">₹100</span>
+    <span className="text-gray-400 line-through text-sm">₹80</span>
     <span className="font-semibold text-green-600">₹0</span>
   </div>
 </div>
@@ -643,7 +637,14 @@ onClick={() => window.location.href = '/products'}
 <div className="flex justify-between items-center">
   <span className="text-gray-700">Packaging Fee</span>
   <div className="flex items-center space-x-2">
-    <span className="text-gray-400 line-through text-sm">₹50</span>
+    <span className="text-gray-400 line-through text-sm">₹90</span>
+    <span className="font-semibold text-green-600">₹0</span>
+  </div>
+</div>
+<div className="flex justify-between items-center">
+  <span className="text-gray-700">Shipping Fee</span>
+  <div className="flex items-center space-x-2">
+    <span className="text-gray-400 line-through text-sm">₹110</span>
     <span className="font-semibold text-green-600">₹0</span>
   </div>
 </div>

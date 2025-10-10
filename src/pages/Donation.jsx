@@ -108,7 +108,7 @@ const handlePaymentComplete = async () => {
           <div className="max-w-md mx-auto text-center">
             <div className="bg-white p-8 rounded-2xl shadow-2xl border-2 border-[#9C0B13]/20">
               <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6 animate-bounce" />
-              <h2 className="text-3xl font-bold text-[#9C0B13] mb-4">Donation Received!</h2>
+              <h2 className="text-3xl font-bold text-[#9C0B13] mb-4">Support Us Received!</h2>
               <p className="text-gray-700 mb-6">
                 Thank you for your sacred contribution of ₹{finalAmount}. Your generosity supports our spiritual mission.
               </p>
@@ -138,7 +138,7 @@ const handlePaymentComplete = async () => {
                 </div>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold text-[#9C0B13] mb-6">
-    Sacred Donations
+     Support Us
   </h1>
   <div className="mb-6 p-4 bg-gradient-to-r from-[#9C0B13]/10 to-red-600/10 rounded-2xl border-2 border-[#9C0B13]/20 max-w-4xl mx-auto">
     <p className="text-lg md:text-xl font-bold text-[#9C0B13] mb-2">
@@ -197,13 +197,13 @@ const handlePaymentComplete = async () => {
           </div>
         </section>
 
-        {/* Donation Form Section */}
+        {/* Support Us Form Section */}
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-[#9C0B13]/10">
               <div className="bg-gradient-to-r from-[#9C0B13] to-red-600 p-8 text-white text-center">
                 <Heart className="w-12 h-12 mx-auto mb-4 animate-pulse" />
-                <h2 className="text-3xl font-bold mb-2">Make a Sacred Donation</h2>
+                <h2 className="text-3xl font-bold mb-2">Support Us</h2>
                 <p className="text-lg opacity-90">Your contribution helps us continue our spiritual mission</p>
               </div>
 
@@ -303,10 +303,10 @@ const handlePaymentComplete = async () => {
                   </div>
                 </div>
 
-                {/* Donation Summary */}
+                {/* Support Us Summary */}
                 {finalAmount && (
                   <div className="bg-gradient-to-r from-[#FEF7D7] to-[#FEF7D7]/50 p-6 rounded-xl border border-[#9C0B13]/20">
-                    <h3 className="text-xl font-bold text-[#9C0B13] mb-2">Donation Summary</h3>
+                    <h3 className="text-xl font-bold text-[#9C0B13] mb-2">Support Us Summary</h3>
                     <div className="flex justify-between items-center">
                       <span className="text-lg text-gray-700">Amount:</span>
                       <span className="text-2xl font-bold text-[#9C0B13]">₹{finalAmount}</span>
@@ -316,7 +316,7 @@ const handlePaymentComplete = async () => {
 
 {showPaymentOptions && (
     <div className="bg-gradient-to-r from-[#FEF7D7] to-[#FEF7D7]/50 p-8 rounded-xl border border-[#9C0B13]/20 mb-6">
-        <h3 className="text-2xl font-bold text-[#9C0B13] mb-6 text-center">Complete Your Sacred Offering</h3>
+        <h3 className="text-2xl font-bold text-[#9C0B13] mb-6 text-center">Complete Your  Offering</h3>
         
         <div className="grid md:grid-cols-2 gap-6">
             {/* QR Code Section */}
@@ -378,25 +378,25 @@ const handlePaymentComplete = async () => {
                   className="w-full bg-gradient-to-r from-[#9C0B13] to-red-600 text-white py-4 px-8 rounded-xl font-bold text-xl hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
                 >
                   <Heart className="w-6 h-6" />
-                  <span>Complete Sacred Donation</span>
+                  <span>Complete</span>
                   <Sparkles className="w-6 h-6 animate-pulse" />
                 </button>
 
                 {/* Security Notice */}
                 <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
                   <Shield className="w-4 h-4 text-[#9C0B13]" />
-                  <span>Your information is secure and will be used only for donation processing</span>
+                  <span>Your information is secure and will be used only for Support Us processing</span>
                 </div>
               </form>
             </div>
           </div>
         </section>
 
-        {/* How Your Donation Helps */}
+        {/* How Your Support Us Helps */}
         <section className="py-16 bg-gradient-to-br from-[#9C0B13] to-red-600 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">How Your Donation Creates Impact</h2>
+              <h2 className="text-4xl font-bold mb-4">How Your Support Creates Impact</h2>
               <p className="text-xl opacity-90">Every contribution helps us fulfill our sacred mission</p>
             </div>
 

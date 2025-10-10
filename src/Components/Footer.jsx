@@ -30,10 +30,12 @@ import {
   Infinity
 } from 'lucide-react';
 import { SiFacebook, SiInstagram, SiWhatsapp, SiYoutube } from 'react-icons/si';
-import { BsTwitterX } from 'react-icons/bs';
+import { BsImageAlt, BsTwitterX } from 'react-icons/bs';
 // react-icons (best matching icons from FontAwesome & others)
-import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat } from "react-icons/fa";
-import { GiLotus, GiPrayerBeads } from "react-icons/gi"; // for Rudraksha (spiritual)
+import { FaAward, FaBusinessTime, FaBookReader, FaHeartbeat, FaAddressCard, FaRegAddressCard } from "react-icons/fa";
+import { GiBallPyramid, GiChainedHeart, GiLotus, GiPrayerBeads, GiTreeBranch } from "react-icons/gi"; // for Rudraksha (spiritual)
+import { p } from 'framer-motion/client';
+import { TbGeometry } from 'react-icons/tb';
 
 
 
@@ -56,7 +58,7 @@ const Footer = () => {
     { name: "Terms & Conditions", path: "/terms-conditions" },
     // { name: "Shipping Info", path: "/shipping-info" },
     { name: "Book a Consultation", path: "/booking" },
-    { name: "Donation", path: "/donation" }
+    { name: "Support Us", path: "/donation" }
   ];
 
   // On click, handleNavigation is already used in the button below to redirect to the given path.
@@ -64,51 +66,52 @@ const Footer = () => {
 
 
 const productCategories = [
-  { 
-    id: 1, 
-    name: "Sarv Karya Siddhi", 
-      icon: Infinity, // success / siddhi / accomplishment, // success / siddhi / accomplishment
-    count: "150+ Remedies", 
-    color: "from-red-500 to-pink-600", 
-    path: "/products?category=sarv-karya-siddhi" 
-  },
-  { 
-    id: 2, 
-    name: "Vyapar Vriddhi", 
-    icon: FaBusinessTime, // business growth / prosperity
-    count: "80+ Solutions", 
-    color: "from-amber-500 to-orange-600", 
-    path: "/products?category=vyapar-vriddhi" 
-  },
-  { 
-    id: 3, 
-    name: "Vidhya Prapti", 
-    icon: FaBookReader, // knowledge, learning, wisdom
-    count: "120+ Practices", 
-    color: "from-purple-500 to-indigo-600", 
-    path: "/products?category=vidhya-prapti" 
-  },
-  { 
-    id: 4, 
-    name: "Sarv Rog Nivaran", 
-    icon: Pill, // health, disease cure
-    count: "60+ Treatments", 
-    color: "from-emerald-500 to-teal-600", 
-    path: "/products?category=sarv-rog-nivaran" 
-  },
-  { 
-    id: 5, 
-    name: "Rudraksha", 
-    icon: GiPrayerBeads, // spirituality / meditation / beads
-    count: "90+ Beads", 
-    color: "from-yellow-500 to-amber-700", 
-    path: "/products?category=rudraksha" 
-  }
+   { 
+      id: "68dca101b36a12dbda6d84e9", 
+      name: "Bracelet", 
+      icon: GiChainedHeart, // from react-icons/gi - beaded jewelry
+      count: "150+ Designs", 
+      color: "from-red-500 to-pink-600" ,
+      path: "/products?category=Bracelet"
+    },
+    { 
+      id: "68dca0f6b36a12dbda6d84e6", 
+      name: "Pyramid", 
+      icon: GiBallPyramid, // from react-icons/gi - pyramid icon
+      count: "80+ Pieces", 
+      color: "from-amber-500 to-orange-600",
+      path: "/products?category=Pyramid"
+    },
+    { 
+      id: "68dca115b36a12dbda6d84ec", 
+      name: "Yantra", 
+      icon: TbGeometry, // from react-icons/tb - sacred geometry
+      count: "120+ Sacred Designs", 
+      color: "from-purple-500 to-indigo-600",
+      path: "/products?category=Yantra" 
+    },
+    { 
+      id: "68dca124b36a12dbda6d84ef", 
+      name: "Stone Tree", 
+      icon: GiTreeBranch, // from react-icons/gi - tree representation
+      count: "60+ Variations", 
+      color: "from-emerald-500 to-teal-600",
+      path: "/products?category=Stone%20Tree"
+    },
+    { 
+        id: "68de4259d8a59d0022eb46b2", 
+        name: "Frame", 
+        icon: BsImageAlt, // from react-icons/bs - picture frame
+        count: "80+ Frames", 
+        color: "from-teal-500 to-emerald-600",
+        path: "/products?category=Frame" 
+      },
 ];
 
   const contactInfo = {
     phone: "+91 98765 43210",
     email: "astroanekant@gmail.com",
+    address:"Astro anekant setho ki gali salumbar 313027",
     whatsapp: "+91 98765 43210"
   };
 
@@ -195,7 +198,7 @@ const socialLinks = [
                 {productCategories.map((category, index) => (
                   <li key={index}>
                     <button
-                      // onClick={() => handleNavigation(category.path)}
+                      onClick={() => handleNavigation(category.path)}
                       className="flex items-center space-x-3 text-amber-700 hover:text-orange-600 transition-all duration-300 text-sm font-medium hover:translate-x-1 transform group"
                     >
                       <category.icon className="w-4 h-4 text-orange-500 group-hover:text-orange-600" />
@@ -221,6 +224,13 @@ const socialLinks = [
                   <div>
                     <p className="text-amber-900 font-semibold text-sm">Email</p>
                     <p className="text-amber-800 text-sm">{contactInfo.email}</p>
+                  </div>
+                </div>
+                  <div className="flex items-center space-x-3">
+                  <FaRegAddressCard className="w-4 h-4 text-orange-600" />
+                  <div>
+                    <p className="text-amber-900 font-semibold text-sm">Address</p>
+                    <p className="text-amber-800 text-sm">{contactInfo.address}</p>
                   </div>
                 </div>
               </div>

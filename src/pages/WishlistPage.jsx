@@ -17,7 +17,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import axios from "axios";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -51,7 +51,6 @@ const CustomToast = ({ type, title, message, icon: Icon }) => (
 
 const WishlistPage = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
-  const [allWishlistItems, setAllWishlistItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState("grid");
@@ -61,7 +60,6 @@ const WishlistPage = () => {
   const [quantities, setQuantities] = useState({});
   const [processingItems, setProcessingItems] = useState({});
   
-  const { productId } = useParams();
   const navigate = useNavigate();
 
   const isUserLoggedIn = () => {
@@ -75,40 +73,35 @@ const WishlistPage = () => {
     if (authToken) {
       try {
         const payload = JSON.parse(atob(authToken.split(".")[1]));
-        return payload.id || payload.userId || payload._id || "user123";
+        return payload.id || payload.userId || payload._id;
       } catch (e) {
-        console.log("Token decode error:", e);
-        return "user123";
+        console.error("Token decode error:", e);
+        toast.error("Session expired. Please login again.");
+        setTimeout(() => navigate('/login'), 2000);
+        return null;
       }
     }
-    return "user123";
+    return null;
   };
 
   useEffect(() => {
     if (!isUserLoggedIn()) {
+      toast.error("Please login to view your wishlist");
       navigate('/login');
       return;
     }
     fetchWishlistItems();
   }, []);
 
-  useEffect(() => {
-    // If productId is provided, add it to wishlist
-    if (productId) {
-      handleAddToWishlist(productId);
-    }
-  }, [productId]);
-
   const fetchWishlistItems = async () => {
     setLoading(true);
     setError(null);
     try {
       const currentUserId = getUserId();
+      if (!currentUserId) return;
+
       const authToken = localStorage.getItem("authToken");
       
-      console.log("Current User ID:", currentUserId);
-      
-      // Fetch ALL wishlist items from the API
       const response = await axios.get(
         "https://astroanikantbackend-2.onrender.com/wishlist/getallwishlist",
         {
@@ -118,22 +111,13 @@ const WishlistPage = () => {
         }
       );
       
-      console.log("All wishlist items:", response.data);
-      
       if (response.data && response.data.data) {
-        setAllWishlistItems(response.data.data);
-        
         // Filter wishlist items for the current user
         const userWishlistItems = response.data.data.filter(item => {
-          // Check various possible user field names and formats
-          const itemUserId = item.user?._id || item.user?.id || item.user || item.userId;
-          console.log("Item user ID:", itemUserId, "Current user ID:", currentUserId);
-          
-          // Convert both to strings for comparison in case one is ObjectId and other is string
+          const itemUserId = item.user?._id || item.user;
           return String(itemUserId) === String(currentUserId);
         });
         
-        console.log("Filtered user wishlist items:", userWishlistItems);
         setWishlistItems(userWishlistItems);
         
         // Initialize quantities for user's items
@@ -145,76 +129,26 @@ const WishlistPage = () => {
       }
     } catch (error) {
       console.error("Error fetching wishlist:", error);
-      setError("Failed to fetch wishlist items");
       
-      // If wishlist endpoint doesn't exist, show empty state instead of error
+      // If wishlist endpoint doesn't exist or returns 404, show empty state
       if (error.response?.status === 404) {
         setWishlistItems([]);
-        setAllWishlistItems([]);
         setError(null);
+      } else {
+        setError("Failed to fetch wishlist items");
+        toast.error("Failed to load wishlist. Please try again.");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddToWishlist = async (productId) => {
-    try {
-      const userId = getUserId();
-      const authToken = localStorage.getItem("authToken");
-      
-      const wishlistData = {
-        user: userId,
-        product: productId,
-        dateAdded: new Date().toISOString()
-      };
-
-      // Replace with your actual add to wishlist endpoint
-      await axios.post(
-        "https://astroanikantbackend-2.onrender.com/wishlist/addtowishlist",
-        wishlistData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...(authToken && { Authorization: `Bearer ${authToken}` }),
-          },
-        }
-      );
-
-      toast.success(
-        <CustomToast 
-          type="success"
-          title="Added to Sacred Wishlist! ✨"
-          message="Item added to your spiritual collection"
-          icon={Heart}
-        />,
-        {
-          position: "top-center",
-          autoClose: 4000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          className: "mystical-toast mystical-success",
-          bodyClassName: "mystical-body",
-          closeButton: false
-        }
-      );
-
-      // Refresh wishlist
-      fetchWishlistItems();
-    } catch (error) {
-      console.error("Error adding to wishlist:", error);
-    }
-  };
-
-  const handleRemoveFromWishlist = async (itemId) => {
+  const handleRemoveFromWishlist = async (itemId, productName) => {
     setProcessingItems(prev => ({ ...prev, [itemId]: true }));
     
     try {
       const authToken = localStorage.getItem("authToken");
       
-      // Replace with your actual remove from wishlist endpoint
       await axios.delete(
         `https://astroanikantbackend-2.onrender.com/wishlist/deletewishlist/${itemId}`,
         {
@@ -229,8 +163,8 @@ const WishlistPage = () => {
       toast.success(
         <CustomToast 
           type="remove"
-          title="Removed from Wishlist"
-          message="Item removed from your collection"
+          title="Removed from Wishlist 💔"
+          message={`${productName} removed from your collection`}
           icon={Trash2}
         />,
         {
@@ -247,7 +181,7 @@ const WishlistPage = () => {
       );
     } catch (error) {
       console.error("Error removing from wishlist:", error);
-      toast.error("Failed to remove item from wishlist");
+      toast.error("Failed to remove item from wishlist. Please try again.");
     } finally {
       setProcessingItems(prev => ({ ...prev, [itemId]: false }));
     }
@@ -259,11 +193,14 @@ const WishlistPage = () => {
     
     try {
       const userId = getUserId();
+      if (!userId) return;
+
       const authToken = localStorage.getItem("authToken");
+      const product = item.product || item;
       
       const cartData = {
         user: userId,
-        product: item.product?._id || item._id || item.id,
+        product: product._id || product.id,
         quantity: quantities[itemId] || 1,
         order_dt: new Date().toISOString(),
         status: "pending",
@@ -280,12 +217,12 @@ const WishlistPage = () => {
         }
       );
 
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         toast.success(
           <CustomToast 
             type="success"
             title="Added to Sacred Cart! 🛒"
-            message={`${item.product?.name || item.name} added successfully`}
+            message={`${product.name} added successfully`}
             icon={ShoppingCart}
           />,
           {
@@ -303,10 +240,13 @@ const WishlistPage = () => {
 
         // Reset quantity to 1 after adding to cart
         setQuantities(prev => ({ ...prev, [itemId]: 1 }));
+
+        // Optionally remove from wishlist after adding to cart
+        // await handleRemoveFromWishlist(itemId, product.name);
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add item to cart");
+      toast.error("Failed to add item to cart. Please try again.");
     } finally {
       setProcessingItems(prev => ({ ...prev, [`cart_${itemId}`]: false }));
     }
@@ -314,7 +254,8 @@ const WishlistPage = () => {
 
   const handleQuantityChange = (itemId, type) => {
     const item = wishlistItems.find(item => (item._id || item.id) === itemId);
-    const stock = item?.product?.stock || item?.stock || 99;
+    const product = item?.product || item;
+    const stock = product?.stock || 99;
     
     setQuantities(prev => {
       const currentQty = prev[itemId] || 1;
@@ -376,7 +317,7 @@ const WishlistPage = () => {
         case "rating":
           return (productB.averageRating || 0) - (productA.averageRating || 0);
         case "date":
-          return new Date(b.dateAdded || b.createdAt) - new Date(a.dateAdded || a.createdAt);
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
         default:
           return productA.name?.localeCompare(productB.name) || 0;
       }
@@ -414,75 +355,62 @@ const WishlistPage = () => {
       {/* Header */}
       <div className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Sacred Wishlist</h1>
-                <p className="text-gray-600">Your spiritual treasures await</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="bg-red-800 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                {wishlistItems.length} items
-              </span>
-              {/* Debug info - remove in production */}
-              <span className="bg-gray-500 text-white px-2 py-1 rounded text-xs">
-                Total: {allWishlistItems.length}
-              </span>
-            </div>
-          </div>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+  <div className="flex items-center space-x-2 sm:space-x-4">
+    <button
+      onClick={() => navigate(-1)}
+      className="p-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+    >
+      <ArrowLeft className="w-5 h-5" />
+    </button>
+    <div>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Sacred Wishlist</h1>
+      <p className="text-sm sm:text-base text-gray-600">Your spiritual treasures await</p>
+    </div>
+  </div>
+  <div className="flex items-center">
+    <span className="bg-red-800 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold">
+      {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'}
+    </span>
+  </div>
+</div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Debug Panel - Remove in production */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="bg-gray-100 p-4 rounded-lg mb-4 text-sm">
-            <p><strong>Current User ID:</strong> {getUserId()}</p>
-            <p><strong>Total Wishlist Items:</strong> {allWishlistItems.length}</p>
-            <p><strong>User's Wishlist Items:</strong> {wishlistItems.length}</p>
-          </div>
-        )}
-
         {/* Controls */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search wishlist..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                />
-              </div>
+          <div className="flex flex-col space-y-4">
+  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <div className="relative flex-1 sm:flex-none sm:w-64">
+  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+  <input
+    type="text"
+    placeholder="Search wishlist..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-800 focus:border-transparent text-sm sm:text-base"
+  />
+</div>
               <select
-                value={filterBy}
-                onChange={(e) => setFilterBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-800 focus:border-transparent"
-              >
+  value={filterBy}
+  onChange={(e) => setFilterBy(e.target.value)}
+  className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-800 focus:border-transparent text-sm sm:text-base"
+>
                 <option value="all">All Items</option>
-                <option value="rings">Rings</option>
-                <option value="pendants">Pendants</option>
-                <option value="yantras">Yantras</option>
-                <option value="malas">Malas</option>
+                <option value="gemstone">Gemstones</option>
+                <option value="yantra">Yantras</option>
+                <option value="rudraksha">Rudraksha</option>
+                <option value="bracelet">Bracelets</option>
               </select>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-800 focus:border-transparent"
-              >
+           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+  <select
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value)}
+    className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-800 focus:border-transparent text-sm sm:text-base"
+  >
                 <option value="name">Sort by Name</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
@@ -493,13 +421,13 @@ const WishlistPage = () => {
               <div className="flex items-center border border-gray-300 rounded-lg">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 ${viewMode === "grid" ? "bg-red-800 text-white" : "text-gray-600 hover:bg-gray-100"} transition-colors`}
+                  className={`p-2 ${viewMode === "grid" ? "bg-red-800 text-white" : "text-gray-600 hover:bg-gray-100"} transition-colors rounded-l-lg`}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 ${viewMode === "list" ? "bg-red-800 text-white" : "text-gray-600 hover:bg-gray-100"} transition-colors`}
+                  className={`p-2 ${viewMode === "list" ? "bg-red-800 text-white" : "text-gray-600 hover:bg-gray-100"} transition-colors rounded-r-lg`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -510,10 +438,16 @@ const WishlistPage = () => {
 
         {/* Wishlist Items */}
         {filteredAndSortedItems.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
-            <p className="text-gray-600 mb-6">Start adding spiritual treasures to your wishlist</p>
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-12 text-center">
+  <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
+  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
+              {searchTerm || filterBy !== "all" ? "No items found" : "Your wishlist is empty"}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {searchTerm || filterBy !== "all" 
+                ? "Try adjusting your search or filters" 
+                : "Start adding spiritual treasures to your wishlist"}
+            </p>
             <Link
               to="/products"
               className="bg-red-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-900 transition-colors inline-flex items-center"
@@ -535,23 +469,23 @@ const WishlistPage = () => {
 
               if (viewMode === "grid") {
                 return (
-                  <div key={itemId} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    <div className="relative">
-                      <img
-                        src={getProductImage(item)}
-                        alt={product.name}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute top-3 right-3 flex flex-col space-y-2">
+                  <div key={itemId} className="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+  <div className="relative">
+    <img
+      src={getProductImage(item)}
+      alt={product.name}
+      className="w-full h-40 sm:h-48 object-cover"
+    />
+    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col space-y-1.5 sm:space-y-2">
                         <button
-                          onClick={() => handleRemoveFromWishlist(itemId)}
+                          onClick={() => handleRemoveFromWishlist(itemId, product.name)}
                           disabled={processingItems[itemId]}
                           className="p-2 bg-white rounded-full shadow-lg text-red-600 hover:bg-red-50 transition-all duration-300 disabled:opacity-50"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                         <Link
-                          to={`/product/${product._id || product.id}`}
+                          to={`/productdetail/${product._id || product.id}`}
                           className="p-2 bg-white rounded-full shadow-lg text-gray-600 hover:bg-gray-50 transition-all duration-300"
                         >
                           <Eye className="w-4 h-4" />
@@ -564,10 +498,9 @@ const WishlistPage = () => {
                       )}
                     </div>
                     
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{product.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">{product.shortDescription}</p>
-                      
+                    <div className="p-3 sm:p-4">
+  <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">{product.name}</h3>
+  <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{product.shortDescription}</p>  
                       <div className="flex items-center mb-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
@@ -583,12 +516,12 @@ const WishlistPage = () => {
                       </div>
                       
                       <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <span className="text-lg font-bold text-red-800">₹{currentPrice.toLocaleString()}</span>
-                          {originalPrice && (
-                            <span className="text-sm text-gray-500 line-through ml-1">₹{originalPrice.toLocaleString()}</span>
-                          )}
-                        </div>
+  <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+    <span className="text-base sm:text-lg font-bold text-red-800">₹{currentPrice.toLocaleString()}</span>
+    {originalPrice && (
+      <span className="text-xs sm:text-sm text-gray-500 line-through">₹{originalPrice.toLocaleString()}</span>
+    )}
+  </div>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           (product.stock || 0) > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                         }`}>
@@ -596,56 +529,55 @@ const WishlistPage = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center border border-gray-300 rounded-lg">
-                          <button
-                            onClick={() => handleQuantityChange(itemId, "decrement")}
-                            className="p-1 hover:bg-red-50 transition-colors"
-                            disabled={quantities[itemId] <= 1}
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="px-2 py-1 text-sm font-medium">{quantities[itemId] || 1}</span>
-                          <button
-                            onClick={() => handleQuantityChange(itemId, "increment")}
-                            className="p-1 hover:bg-red-50 transition-colors"
-                            disabled={quantities[itemId] >= (product.stock || 99)}
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                      
+                      <div className="flex items-center justify-center mb-3">
+  <div className="flex items-center border border-gray-300 rounded-lg">
+    <button
+      onClick={() => handleQuantityChange(itemId, "decrement")}
+      className="p-1.5 sm:p-2 hover:bg-red-50 transition-colors"
+      disabled={quantities[itemId] <= 1}
+    >
+      <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
+    </button>
+    <span className="px-3 sm:px-4 py-1 text-sm font-medium">{quantities[itemId] || 1}</span>
+    <button
+      onClick={() => handleQuantityChange(itemId, "increment")}
+      className="p-1.5 sm:p-2 hover:bg-red-50 transition-colors"
+      disabled={quantities[itemId] >= (product.stock || 99)}
+    >
+      <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+    </button>
+  </div>
+</div>
                       <button
-                        onClick={() => handleAddToCart(item)}
-                        disabled={(product.stock || 0) === 0 || processingItems[`cart_${itemId}`]}
-                        className="w-full bg-red-800 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      >
-                        {processingItems[`cart_${itemId}`] ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            Adding...
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingCart className="w-4 h-4 mr-2" />
-                            Add to Cart
-                          </>
-                        )}
-                      </button>
+  onClick={() => handleAddToCart(item)}
+  disabled={(product.stock || 0) === 0 || processingItems[`cart_${itemId}`]}
+  className="w-full bg-red-800 text-white py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg text-sm sm:text-base font-semibold hover:bg-red-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+>
+  {processingItems[`cart_${itemId}`] ? (
+    <>
+      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
+      <span className="text-xs sm:text-sm">Adding...</span>
+    </>
+  ) : (
+    <>
+      <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+      <span className="text-xs sm:text-sm">Add to Cart</span>
+    </>
+  )}
+</button>
                     </div>
                   </div>
                 );
               } else {
                 return (
-                  <div key={itemId} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center space-x-6">
-                      <div className="relative flex-shrink-0">
-                        <img
-                          src={getProductImage(item)}
-                          alt={product.name}
-                          className="w-24 h-24 object-cover rounded-xl"
-                        />
+                  <div key={itemId} className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-6 hover:shadow-xl transition-all duration-300">
+  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+    <div className="relative flex-shrink-0 w-full sm:w-auto">
+      <img
+        src={getProductImage(item)}
+        alt={product.name}
+        className="w-full sm:w-24 h-48 sm:h-24 object-cover rounded-xl"
+      />
                         {discountPercentage > 0 && (
                           <div className="absolute -top-2 -right-2 bg-red-800 text-white px-2 py-1 rounded-full text-xs font-semibold">
                             {discountPercentage}% OFF
@@ -723,14 +655,14 @@ const WishlistPage = () => {
                                 )}
                               </button>
                               <button
-                                onClick={() => handleRemoveFromWishlist(itemId)}
+                                onClick={() => handleRemoveFromWishlist(itemId, product.name)}
                                 disabled={processingItems[itemId]}
                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                               <Link
-                                to={`/product/${product._id || product.id}`}
+                                to={`/productdetail/${product._id || product.id}`}
                                 className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
                               >
                                 <Eye className="w-4 h-4" />
@@ -749,11 +681,11 @@ const WishlistPage = () => {
 
         {/* Expert Consultation CTA */}
         {wishlistItems.length > 0 && (
-          <div className="mt-12 bg-gradient-to-r from-red-800 to-red-900 rounded-2xl p-8 text-white shadow-xl">
-            <div className="text-center">
-              <MessageCircle className="w-12 h-12 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">Need Guidance for Your Collection?</h3>
-              <p className="text-red-100 mb-6">
+          <div className="mt-8 sm:mt-12 bg-gradient-to-r from-red-800 to-red-900 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-white shadow-xl">
+  <div className="text-center">
+    <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4" />
+    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2">Need Guidance for Your Collection?</h3>
+    <p className="text-sm sm:text-base text-red-100 mb-4 sm:mb-6">
                 Our expert astrologers can help you choose the perfect items from your wishlist
               </p>
               <button

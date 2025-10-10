@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, User, ChevronDown, Lock, LogOut, Eye, Home, LogIn, Star, Sparkles } from 'lucide-react';
+import { ShoppingCart, User, ChevronDown, Lock, LogOut, Eye, Home, LogIn, Star, Sparkles,Heart } from 'lucide-react';
 
 const AstrologyNavbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -9,6 +9,7 @@ const AstrologyNavbar = () => {
   const [cartCount, setCartCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
 
   // Navigation items
   const navItems = [
@@ -16,7 +17,7 @@ const AstrologyNavbar = () => {
     { id: 'products', label: 'Products', path: '/products' },
     { id: 'about', label: 'About Us', path: '/about' },
     { id: 'order', label: 'My Orders', path: '/order' },
-    { id: 'donation', label: 'Donation', path: '/donation' },
+    { id: 'Support', label: 'Support Us', path: '/donation' },
     { id: 'booking', label: 'Book Consultation', path: '/booking' }
   ];
 
@@ -62,27 +63,68 @@ const AstrologyNavbar = () => {
     }
   };
 
+  // Fetch wishlist count from API
+const fetchWishlistCount = async (userId) => {
+  try {
+    const response = await fetch('https://astroanikantbackend-2.onrender.com/wishlist/getallwishlist', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result && result.data && Array.isArray(result.data)) {
+        // Filter wishlist items for current user
+        const userWishlistItems = result.data.filter(item => {
+          const itemUserId = item.user?._id || item.user;
+          return String(itemUserId) === String(userId);
+        });
+        setWishlistCount(userWishlistItems.length);
+        localStorage.setItem('wishlistCount', userWishlistItems.length.toString());
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching wishlist count:', error);
+    setWishlistCount(0);
+  }
+};
+
   // Listen for cart count updates from other pages
   useEffect(() => {
-    // Listen for cart count updates
-    const handleCartCountUpdate = (event) => {
-      console.log('Cart count updated via event:', event.detail.count);
-      setCartCount(event.detail.count);
-    };
-    
-    // Check localStorage on mount
-    const storedCartCount = localStorage.getItem('cartCount');
-    if (storedCartCount) {
-      setCartCount(parseInt(storedCartCount, 10));
-    }
-    
-    window.addEventListener('cartCountUpdated', handleCartCountUpdate);
-    
-    return () => {
-      window.removeEventListener('cartCountUpdated', handleCartCountUpdate);
-    };
-  }, []);
-
+  // Listen for cart count updates
+  const handleCartCountUpdate = (event) => {
+    console.log('Cart count updated via event:', event.detail.count);
+    setCartCount(event.detail.count);
+  };
+  
+  // ADD THIS - Listen for wishlist count updates
+  const handleWishlistCountUpdate = (event) => {
+    console.log('Wishlist count updated via event:', event.detail.count);
+    setWishlistCount(event.detail.count);
+  };
+  
+  // Check localStorage on mount
+  const storedCartCount = localStorage.getItem('cartCount');
+  if (storedCartCount) {
+    setCartCount(parseInt(storedCartCount, 10));
+  }
+  
+  // ADD THIS - Check wishlist count from localStorage
+  const storedWishlistCount = localStorage.getItem('wishlistCount');
+  if (storedWishlistCount) {
+    setWishlistCount(parseInt(storedWishlistCount, 10));
+  }
+  
+  window.addEventListener('cartCountUpdated', handleCartCountUpdate);
+  window.addEventListener('wishlistCountUpdated', handleWishlistCountUpdate); // ADD THIS
+  
+  return () => {
+    window.removeEventListener('cartCountUpdated', handleCartCountUpdate);
+    window.removeEventListener('wishlistCountUpdated', handleWishlistCountUpdate); // ADD THIS
+  };
+}, []);
   // Check authentication and fetch user data
   useEffect(() => {
     const checkAuth = async () => {
@@ -96,9 +138,11 @@ const AstrologyNavbar = () => {
         try {
           const parsedUser = JSON.parse(userString);
           const userId = parsedUser.userId || parsedUser.id || parsedUser._id;
-          if (userId) {
-            await fetchCartCount(userId);
-          }
+          // Inside checkAuth function, after fetchCartCount call:
+if (userId) {
+  await fetchCartCount(userId);
+  await fetchWishlistCount(userId); // ADD THIS LINE
+}
         } catch (e) {
           console.error('Error parsing user from localStorage', e);
         }
@@ -151,16 +195,17 @@ const AstrologyNavbar = () => {
   };
 
   // Logout handler
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    localStorage.removeItem('cartCount');
-    setIsAuthenticated(false);
-    setUser(null);
-    setCartCount(0);
-    window.location.href = '/login';
-  };
-
+const handleLogout = () => {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+  localStorage.removeItem('cartCount');
+  localStorage.removeItem('wishlistCount'); // ADD THIS LINE
+  setIsAuthenticated(false);
+  setUser(null);
+  setCartCount(0);
+  setWishlistCount(0); // ADD THIS LINE
+  window.location.href = '/login';
+};
   // Cart handler with enhanced debugging and proper navigation
   const handleCartClick = (e) => {
     e.preventDefault();
@@ -202,7 +247,7 @@ const AstrologyNavbar = () => {
 
       <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#FEF7D7] via-amber-50 to-[#FEF7D7] border-b-3 border-[#9C0B13]/30 shadow-2xl backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-24">
+          <div className="flex items-center justify-between h-16 lg:h-20">
             
             {/* Enhanced Logo Section - Mobile Optimized */}
             <div 
@@ -215,7 +260,7 @@ const AstrologyNavbar = () => {
                 </div>
               </div>
               <div className="flex flex-col min-w-0">
-                <div className="text-lg lg:text-2xl font-bold bg-gradient-to-r from-[#9C0B13] to-red-800 bg-clip-text text-transparent tracking-wide truncate">
+                <div className="text-base lg:text-xl font-bold bg-gradient-to-r from-[#9C0B13] to-red-800 bg-clip-text text-transparent tracking-wide truncate">
                   Astro Anekant
                 </div>
                 <div className="text-xs text-[#9C0B13]/70 font-medium tracking-wider hidden sm:block">
@@ -225,7 +270,7 @@ const AstrologyNavbar = () => {
             </div>
 
             {/* Enhanced Navigation Items */}
-            <div className="hidden lg:flex items-center space-x-2">
+            <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item, index) => (
                 <div
                   key={item.id}
@@ -234,10 +279,10 @@ const AstrologyNavbar = () => {
                 >
                   <button
                     onClick={() => handleNavClick(item)}
-                    className={`relative px-6 py-4 rounded-full font-semibold transition-all duration-300 transform hover:scale-110 group overflow-hidden ${
-                      activeItem === item.id
-                        ? 'text-[#FEF7D7] bg-gradient-to-r from-[#9C0B13] to-red-800 shadow-xl shadow-[#9C0B13]/40 border-2 border-amber-300/50'
-                        : 'text-[#9C0B13] hover:text-[#FEF7D7] hover:bg-gradient-to-r hover:from-[#9C0B13]/90 hover:to-red-800/90 border-2 border-transparent hover:border-amber-300/30'
+                   className={`relative px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 transform hover:scale-105 group overflow-hidden ${
+  activeItem === item.id
+    ? 'text-[#FEF7D7] bg-gradient-to-r from-[#9C0B13] to-red-800 shadow-lg shadow-[#9C0B13]/30 border border-amber-300/50'
+    : 'text-[#9C0B13] hover:text-[#FEF7D7] hover:bg-gradient-to-r hover:from-[#9C0B13]/90 hover:to-red-800/90 border border-transparent hover:border-amber-300/30'
                     }`}
                   >
                     <span className="relative z-10 flex items-center space-x-2">
@@ -256,9 +301,37 @@ const AstrologyNavbar = () => {
               ))}
             </div>
 
+            
+
             {/* Enhanced Right Section - Mobile Optimized */}
-            <div className="flex items-center space-x-2 lg:space-x-6 flex-shrink-0">
-              
+            {/* Enhanced Right Section - Mobile Optimized */}
+<div className="flex items-center space-x-2 lg:space-x-6 flex-shrink-0">
+  
+  {/* ADD THIS - Enhanced Wishlist Button with Count */}
+  <div className="relative group">
+    <a 
+      href="/wishlist"
+      onClick={(e) => {
+        e.preventDefault();
+        const authToken = localStorage.getItem('authToken');
+        if (authToken) {
+          window.location.href = '/wishlist';
+        } else {
+          window.location.href = '/login';
+        }
+      }}
+      className="block p-3 lg:p-4 rounded-full bg-gradient-to-br from-pink-600 via-red-600 to-pink-700 text-white shadow-2xl hover:shadow-pink-600/50 transition-all duration-500 transform hover:scale-110 hover:rotate-6 border-2 lg:border-3 border-pink-200/50"
+    >
+      <Heart className="w-5 h-5 lg:w-6 lg:h-6 relative z-10" />
+    </a>
+    
+    {/* Wishlist Count Badge */}
+    {wishlistCount > 0 && (
+      <div className="absolute -top-1 -right-1 lg:-top-2 lg:-right-2 bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 text-white text-xs lg:text-sm rounded-full w-6 h-6 lg:w-8 lg:h-8 flex items-center justify-center font-bold shadow-lg border-2 border-white animate-bounce">
+        {wishlistCount > 99 ? '99+' : wishlistCount}
+      </div>
+    )}
+  </div>
               {/* Enhanced Cart Button with Count - Mobile Optimized */}
               <div className="relative group">
                 <a 
