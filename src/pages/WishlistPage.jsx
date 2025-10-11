@@ -529,25 +529,7 @@ const WishlistPage = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-center mb-3">
-  <div className="flex items-center border border-gray-300 rounded-lg">
-    <button
-      onClick={() => handleQuantityChange(itemId, "decrement")}
-      className="p-1.5 sm:p-2 hover:bg-red-50 transition-colors"
-      disabled={quantities[itemId] <= 1}
-    >
-      <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
-    </button>
-    <span className="px-3 sm:px-4 py-1 text-sm font-medium">{quantities[itemId] || 1}</span>
-    <button
-      onClick={() => handleQuantityChange(itemId, "increment")}
-      className="p-1.5 sm:p-2 hover:bg-red-50 transition-colors"
-      disabled={quantities[itemId] >= (product.stock || 99)}
-    >
-      <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-    </button>
-  </div>
-</div>
+        
                       <button
   onClick={() => handleAddToCart(item)}
   disabled={(product.stock || 0) === 0 || processingItems[`cart_${itemId}`]}

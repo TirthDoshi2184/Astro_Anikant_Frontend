@@ -107,57 +107,58 @@ export default function AstrologyLogin() {
     }
 
     try {
-      // Updated to match controller fields
-      const response = await fetch("https://astroanikantbackend-2.onrender.com/user/useradd", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-  name: `${formData.firstName} ${formData.lastName}`,
-  email: formData.email.trim().toLowerCase(),
-  phone: formData.phone,
-  password: formData.password, 
-  role: "customer",
-  isActive: true,
-  gender: formData.gender,
-}),
+  const response = await fetch("https://astroanikantbackend-2.onrender.com/user/useradd", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email.trim().toLowerCase(),
+      phone: formData.phone,
+      password: formData.password, 
+      role: "customer",
+      isActive: true,
+      gender: formData.gender,
+    }),
+  });
+
+  // Add console logs to debug
+  console.log("Signup response status:", response.status);
+  console.log("Signup response ok:", response.ok);
+
+  const data = await response.json();
+  console.log("Signup response data:", data);
+
+  // Check for both 201 and 200 status codes
+  if (response.ok || response.status === 201 || response.status === 200) {
+    setSuccess(data.message || "Account created successfully! You can now sign in.");
+    
+    // Clear error state
+    setError("");
+    
+    // Switch to login tab after a brief delay to show success message
+    setTimeout(() => {
+      setIsLogin(true);
+      setFormData({
+        email: formData.email,
+        password: "",
+        confirmPassword: "",
+        firstName: "",
+        lastName: "",
+        phone: "",
+        gender: "",
       });
-
-      let data;
-      if (response.headers.get("content-type")?.includes("application/json")) {
-        data = await response.json();
-      } else {
-        const text = await response.text(); // fallback for HTML error page
-        throw new Error(`Unexpected response: ${text}`);
-      }
-
-      if (response.ok) {
-        // success
-      } else {
-        setError(data?.message || "Something went wrong");
-      }
-      if (response.status === 201) {
-        setSuccess("Account created successfully! You can now sign in.");
-        setIsLogin(true);
-        setFormData({
-  email: formData.email,
-  password: "",
-  confirmPassword: "",
-  firstName: "",
-  lastName: "",
-  phone: "",
-  gender: "",
-});
-      } else {
-        setError(data.message || "Registration failed. Please try again.");
-      }
-    } catch (err) {
-      console.error("Signup error:", err);
-      setError("Network error. Please check your connection and try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    }, 1500);
+  } else {
+    setError(data.message || data.error || "Registration failed. Please try again.");
+  }
+} catch (err) {
+  console.error("Signup error:", err);
+  setError("Network error. Please check your connection and try again.");
+} finally {
+  setIsLoading(false);
+}
   };
 
   const handleSubmit = () => {
