@@ -685,11 +685,10 @@ onClick={() => window.location.href = '/products'}
                 </div>
 
                 {/* Checkout Button */}
-                <button
+               <button
   onClick={() => {
     window.location.href = `/orders/${userId}`;
   }}
-  disabled
   className="w-full bg-gray-400 text-gray-200 cursor-not-allowed py-4 rounded-xl font-bold text-lg flex items-center justify-center space-x-2"
 >
   <span>Proceed to Checkout</span>
