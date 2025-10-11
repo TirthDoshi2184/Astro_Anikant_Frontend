@@ -685,7 +685,7 @@ onClick={() => window.location.href = '/products'}
                 </div>
 
                 {/* Checkout Button */}
-                <button
+               <button
   onClick={() => {
     window.location.href = `/orders/${userId}`;
   }}

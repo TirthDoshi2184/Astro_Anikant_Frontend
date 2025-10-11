@@ -9,25 +9,25 @@ export default function AstrologyLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
-  email: "",
-  password: "",
-  confirmPassword: "",
-  firstName: "",
-  lastName: "",
-  phone: "",
-  gender: "",
-});
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    gender: "",
+  });
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-    // Clear errors when user starts typing
     if (error) setError("");
   };
 
-  const navigate = useNavigate()
   const handleLogin = async () => {
     setIsLoading(true);
     setError("");
@@ -46,32 +46,27 @@ export default function AstrologyLogin() {
       });
 
       const data = await response.json();
-      console.log("Login response:", data.data);
+      console.log("Login response:", data);
 
       if (response.ok) {
-        // Login successful
         setSuccess("Login successful! Welcome back!");
-        navigate("/astrohome")
-        console.log("Login successful:", data);
 
         // Store token and user data
         if (data.data && data.data.token) {
-          // You can store the token in localStorage or context
           localStorage.setItem('authToken', data.data.token);
           localStorage.setItem('user', JSON.stringify(data.data.user));
-
-          // For demo purposes, we'll just log it
           console.log("Token:", data.data.token);
-          console.log("User:", <data value="" className="data user"></data>);
+          console.log("User:", data.data.user);
         }
 
         // Reset form
         setFormData({ ...formData, email: "", password: "" });
 
-        // Redirect or update app state here
-        window.location.href = "/";
+        // Navigate to home
+        setTimeout(() => {
+          navigate("/astrohome");
+        }, 1000);
       } else {
-        // Handle different error cases
         if (response.status === 404) {
           setError("User not found. Please check your email or sign up.");
         } else if (response.status === 401) {
@@ -89,22 +84,22 @@ export default function AstrologyLogin() {
   };
 
   const handleSignup = async () => {
-    setIsLoading(true);
-    setError("");
-    setSuccess("");
+  setIsLoading(true);
+  setError("");
+  setSuccess("");
 
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      setIsLoading(false);
-      return;
-    }
+  // Validation
+  if (formData.password !== formData.confirmPassword) {
+    setError("Passwords do not match.");
+    setIsLoading(false);
+    return;
+  }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long.");
-      setIsLoading(false);
-      return;
-    }
+  if (formData.password.length < 6) {
+    setError("Password must be at least 6 characters long.");
+    setIsLoading(false);
+    return;
+  }
 
     try {
   const response = await fetch("https://astroanikantbackend-2.onrender.com/user/useradd", {
@@ -171,16 +166,16 @@ export default function AstrologyLogin() {
     if (isLogin) {
       handleLogin();
     } else {
-     if (
-  !formData.firstName ||
-  !formData.lastName ||
-  !formData.phone ||
-  !formData.gender ||
-  !formData.confirmPassword
-) {
-  setError("Please fill in all required fields.");
-  return;
-}
+      if (
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.phone ||
+        !formData.gender ||
+        !formData.confirmPassword
+      ) {
+        setError("Please fill in all required fields.");
+        return;
+      }
       handleSignup();
     }
   };
@@ -216,13 +211,14 @@ export default function AstrologyLogin() {
           {/* Tab Switcher */}
           <div className="flex mb-6 p-1 rounded-2xl" style={{ backgroundColor: 'rgba(102, 11, 5, 0.1)' }}>
             <button
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all ${
-                isLogin
-                  ? "shadow-md"
-                  : "hover:opacity-80"
-              }`}
-              style={isLogin ? 
+              onClick={() => {
+                setIsLogin(true);
+                setError("");
+                setSuccess("");
+              }}
+              className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all ${isLogin ? "shadow-md" : "hover:opacity-80"
+                }`}
+              style={isLogin ?
                 { backgroundColor: '#FFF0C4', color: '#660B05' } :
                 { color: '#660B05' }
               }
@@ -230,13 +226,14 @@ export default function AstrologyLogin() {
               Sign In
             </button>
             <button
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all ${
-                !isLogin
-                  ? "shadow-md"
-                  : "hover:opacity-80"
-              }`}
-              style={!isLogin ? 
+              onClick={() => {
+                setIsLogin(false);
+                setError("");
+                setSuccess("");
+              }}
+              className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all ${!isLogin ? "shadow-md" : "hover:opacity-80"
+                }`}
+              style={!isLogin ?
                 { backgroundColor: '#FFF0C4', color: '#660B05' } :
                 { color: '#660B05' }
               }
@@ -271,10 +268,9 @@ export default function AstrologyLogin() {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
-                    style={{ 
+                    style={{
                       borderColor: '#660B05',
                       backgroundColor: 'rgba(255, 240, 196, 0.5)',
-                      focusRingColor: '#660B05'
                     }}
                     placeholder="John"
                     required={!isLogin}
@@ -290,10 +286,9 @@ export default function AstrologyLogin() {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
-                    style={{ 
+                    style={{
                       borderColor: '#660B05',
                       backgroundColor: 'rgba(255, 240, 196, 0.5)',
-                      focusRingColor: '#660B05'
                     }}
                     placeholder="Doe"
                     required={!isLogin}
@@ -313,40 +308,39 @@ export default function AstrologyLogin() {
                   value={formData.phone}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
-                  style={{ 
+                  style={{
                     borderColor: '#660B05',
                     backgroundColor: 'rgba(255, 240, 196, 0.5)',
-                    focusRingColor: '#660B05'
                   }}
                   placeholder="+91 12345 67890"
                   required={!isLogin}
                 />
               </div>
             )}
+
             {!isLogin && (
-  <div>
-    <label className="block text-sm font-medium mb-2" style={{ color: '#660B05' }}>
-      Gender
-    </label>
-    <select
-      name="gender"
-      value={formData.gender}
-      onChange={handleInputChange}
-      className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
-      style={{ 
-        borderColor: '#660B05',
-        backgroundColor: 'rgba(255, 240, 196, 0.5)',
-        focusRingColor: '#660B05'
-      }}
-      required={!isLogin}
-    >
-      <option value="">Select Gender</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-  </div>
-)}
-            
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#660B05' }}>
+                  Gender
+                </label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
+                  style={{
+                    borderColor: '#660B05',
+                    backgroundColor: 'rgba(255, 240, 196, 0.5)',
+                  }}
+                  required={!isLogin}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: '#660B05' }}>
                 Email Address
@@ -357,10 +351,9 @@ export default function AstrologyLogin() {
                 value={formData.email}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
-                style={{ 
+                style={{
                   borderColor: '#660B05',
                   backgroundColor: 'rgba(255, 240, 196, 0.5)',
-                  focusRingColor: '#660B05'
                 }}
                 placeholder="your@email.com"
                 required
@@ -377,10 +370,9 @@ export default function AstrologyLogin() {
                 value={formData.password}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 pr-12 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
-                style={{ 
+                style={{
                   borderColor: '#660B05',
                   backgroundColor: 'rgba(255, 240, 196, 0.5)',
-                  focusRingColor: '#660B05'
                 }}
                 placeholder="••••••••"
                 required
@@ -410,10 +402,9 @@ export default function AstrologyLogin() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
-                  style={{ 
+                  style={{
                     borderColor: '#660B05',
                     backgroundColor: 'rgba(255, 240, 196, 0.5)',
-                    focusRingColor: '#660B05'
                   }}
                   placeholder="••••••••"
                   required={!isLogin}
@@ -432,7 +423,7 @@ export default function AstrologyLogin() {
                   <span className="ml-2" style={{ color: '#8B0E08' }}>Remember me</span>
                 </label>
                 <Link
-                  to={"/forgotuseremail"}
+                  to="/forgotuseremail"
                   className="font-medium hover:opacity-70"
                   style={{ color: '#660B05' }}
                 >
@@ -446,10 +437,9 @@ export default function AstrologyLogin() {
               onClick={handleSubmit}
               disabled={isLoading}
               className="w-full py-3 px-4 rounded-xl font-semibold focus:ring-2 focus:ring-offset-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
-              style={{ 
+              style={{
                 background: 'linear-gradient(135deg, #660B05 0%, #8B0E08 100%)',
                 color: '#FFF0C4',
-                focusRingColor: '#660B05'
               }}
             >
               {isLoading ? (
@@ -476,7 +466,11 @@ export default function AstrologyLogin() {
           <div className="text-center mt-6 text-sm" style={{ color: '#660B05' }}>
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError("");
+                setSuccess("");
+              }}
               className="font-semibold hover:opacity-70"
               style={{ color: '#8B0E08' }}
             >
