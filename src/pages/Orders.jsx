@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { CreditCard, Truck, MapPin, User, Phone, Mail, Package, Shield, Gift, AlertCircle, CheckCircle } from 'lucide-react';
+import { Truck, MapPin, User, Phone, Mail, Package, Shield, Gift, AlertCircle, CheckCircle } from 'lucide-react';
 
 const OrderCheckoutPage = () => {
   const [loading, setLoading] = useState(true);
@@ -8,9 +7,7 @@ const OrderCheckoutPage = () => {
   const [cartData, setCartData] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [orderDetails, setOrderDetails] = useState({});
 
-  const [paymentMethod, setPaymentMethod] = useState('card');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -25,7 +22,6 @@ const OrderCheckoutPage = () => {
     deliveryPreference: 'standard'
   });
 
-  // Get cart_id from URL params or use demo ID
   const getCartIdFromUrl = () => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('userId') || 'demo-user-id';
@@ -33,18 +29,6 @@ const OrderCheckoutPage = () => {
 
   const cartId = getCartIdFromUrl();
 
-  // Load Razorpay script
-  const loadScript = (src) => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
-  // Fetch cart details on component mount
   useEffect(() => {
     fetchCartDetails(cartId);
   }, [cartId]);
@@ -54,7 +38,6 @@ const OrderCheckoutPage = () => {
       setLoading(true);
       setError('');
 
-      // First try to get user ID from localStorage
       const user = localStorage.getItem("user");
       let userId = null;
 
@@ -72,7 +55,6 @@ const OrderCheckoutPage = () => {
         return;
       }
 
-      // Use the same endpoint as cart page - get user's cart, not single cart
       const response = await fetch(`https://astroanikantbackend-2.onrender.com/cart/getcart/${userId}`);
       const result = await response.json();
 
@@ -81,7 +63,6 @@ const OrderCheckoutPage = () => {
       if (response.ok && result.data) {
         setCartData(result.data);
 
-        // Pre-fill form with user data if available
         if (result.data.user) {
           const user = result.data.user;
           setFormData(prev => ({
@@ -124,20 +105,17 @@ const OrderCheckoutPage = () => {
       }
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
       return false;
     }
 
-    // Phone validation
     if (!/^\+?[\d\s-]{10,}$/.test(formData.phone)) {
       setError('Please enter a valid phone number');
       return false;
     }
 
-    // PIN code validation
     if (!/^\d{6}$/.test(formData.pincode)) {
       setError('Please enter a valid 6-digit PIN code');
       return false;
@@ -145,90 +123,6 @@ const OrderCheckoutPage = () => {
 
     return true;
   };
-
-  // Create Razorpay order
-  const createRazorpayOrder = async (amount) => {
-    try {
-      const response = await fetch("https://astroanikantbackend-2.onrender.com/payment/createorder", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: amount * 100, // Razorpay expects amount in paise
-          currency: "INR",
-          receipt: `receipt_order_${Date.now()}`,
-        })
-      });
-
-      const order = await response.json();
-      console.log('Razorpay Order Created:', order);
-      return order;
-    } catch (error) {
-      console.error("Order creation failed:", error);
-      throw error;
-    }
-  };
-
-  // Display Razorpay payment modal
-  const displayRazorpay = async (orderData, orderInfo) => {
-  const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-  console.log("Razorpay script loaded:", res);
-  if (!res) {
-    setError("Razorpay SDK failed to load. Please check your internet connection.");
-    setSubmitting(false);
-    return;
-  }
-
-  if (!orderData || !orderData.id) {
-    setError("Invalid Razorpay order data.");
-    setSubmitting(false);
-    return;
-  }
-
-  const options = {
-    key: "rzp_test_RNOxHvjfvDoP1q",
-    amount: orderData.amount,
-    currency: orderData.currency,
-    name: "Astro Anekant",
-    description: "Spiritual Products Purchase",
-    image: "/logo.png",
-    order_id: orderData.id,
-    handler: async function (response) {
-      // Your payment verification code
-    },
-    prefill: {
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      contact: formData.phone,
-    },
-    notes: {
-      address: formData.address,
-      city: formData.city,
-      state: formData.state,
-      pincode: formData.pincode,
-    },
-    theme: { color: "#9C0B13" },
-    modal: {
-      ondismiss: function () {
-        setSubmitting(false);
-        setError("Payment was cancelled. Please try again.");
-      },
-    },
-  };
-
-  try {
-    const paymentObject = new window.Razorpay(options);
-    console.log("Opening Razorpay modal");
-    paymentObject.open();
-  } catch (err) {
-    console.error("Razorpay open error:", err);
-    setError("Payment initialization failed. Please try again.");
-    setSubmitting(false);
-  }
-};
-
-
 
   const handleSubmitOrder = async () => {
     if (!validateForm()) return;
@@ -243,10 +137,9 @@ const OrderCheckoutPage = () => {
 
       const total = calculateTotal();
 
-      // STEP 1: Create order in backend
       const orderPayload = {
         cart: cartData._id,
-        typeOfPayment: paymentMethod,
+        typeOfPayment: 'COD',
         shippingAddress: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -264,6 +157,8 @@ const OrderCheckoutPage = () => {
         status: 'pending',
       };
 
+      console.log('Sending order payload:', orderPayload);
+
       const orderResponse = await fetch(
         'https://astroanikantbackend-2.onrender.com/order/createorder',
         {
@@ -274,22 +169,22 @@ const OrderCheckoutPage = () => {
       );
 
       const orderResult = await orderResponse.json();
+      
       if (!orderResponse.ok || !orderResult.data) {
         throw new Error(orderResult.message || 'Failed to create order');
       }
 
-      // STEP 2: Create Razorpay order (pass amount)
-      const razorpayOrder = await createRazorpayOrder(total);
-
-      // STEP 3: Open Razorpay modal with payment details
-      await displayRazorpay(razorpayOrder, orderResult.data);
+      setSuccess('Order placed successfully! You will receive a confirmation email shortly.');
+      
+      setTimeout(() => {
+        window.location.href = `/order`;
+      }, 2000);
 
     } catch (err) {
       setError(err.message || 'Failed to process order. Please try again.');
       setSubmitting(false);
     }
   };
-
 
   const calculateSubtotal = () => {
     if (!cartData || !cartData.items || !Array.isArray(cartData.items)) return 0;
@@ -303,11 +198,10 @@ const OrderCheckoutPage = () => {
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
-    const shipping = subtotal >= 2000 ? 0 : 150; // Free shipping above ₹2000
+    const shipping = 0;
     return subtotal + shipping;
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
@@ -319,7 +213,6 @@ const OrderCheckoutPage = () => {
     );
   }
 
-  // Empty cart state
   if (!cartData || !cartData.items || !Array.isArray(cartData.items) || cartData.items.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
@@ -345,16 +238,17 @@ const OrderCheckoutPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-800 to-red-900 rounded-full mb-4 animate-pulse">
             <Package className="w-8 h-8 text-amber-100" />
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Complete Your Order</h1>
           <p className="text-lg text-gray-600">Sacred treasures await your spiritual journey</p>
+          <div className="mt-4 inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full">
+            <span className="font-semibold">💰 Cash on Delivery Available</span>
+          </div>
         </div>
 
-        {/* Error/Success Messages */}
         {error && (
           <div className="max-w-4xl mx-auto mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center">
             <AlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0" />
@@ -370,10 +264,8 @@ const OrderCheckoutPage = () => {
         )}
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Forms */}
           <div className="lg:col-span-2 space-y-8">
 
-            {/* Billing Information */}
             <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-all duration-300 border border-red-100">
               <div className="flex items-center mb-6">
                 <div className="bg-gradient-to-r from-red-800 to-red-900 p-3 rounded-full mr-4 animate-bounce">
@@ -440,7 +332,6 @@ const OrderCheckoutPage = () => {
               </div>
             </div>
 
-            {/* Shipping Information */}
             <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-all duration-300 border border-red-100">
               <div className="flex items-center mb-6">
                 <div className="bg-gradient-to-r from-red-800 to-red-900 p-3 rounded-full mr-4 animate-pulse">
@@ -520,45 +411,6 @@ const OrderCheckoutPage = () => {
               </div>
             </div>
 
-            {/* Payment Options */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-all duration-300 border border-red-100">
-              <div className="flex items-center mb-6">
-                <div className="bg-gradient-to-r from-red-800 to-red-900 p-3 rounded-full mr-4 animate-bounce">
-                  <CreditCard className="w-6 h-6 text-amber-100" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-800">Payment Options</h2>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-4 mb-6">
-                {[
-                  { id: 'card', label: 'Credit/Debit Card', icon: '💳' },
-                  { id: 'upi', label: 'UPI Payment', icon: '📱' },
-                  { id: 'netbanking', label: 'Net Banking', icon: '🏦' }
-                ].map((method) => (
-                  <div
-                    key={method.id}
-                    onClick={() => setPaymentMethod(method.id)}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-105 ${paymentMethod === method.id
-                      ? 'border-red-800 bg-red-50 shadow-lg'
-                      : 'border-gray-200 hover:border-red-400 hover:bg-red-50'
-                      }`}
-                  >
-                    <div className="text-center">
-                      <div className="text-2xl mb-2">{method.icon}</div>
-                      <p className="font-semibold text-gray-700">{method.label}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-700 font-medium">
-                  🔒 Secure payment powered by Razorpay - All major cards, UPI, and net banking supported
-                </p>
-              </div>
-            </div>
-
-            {/* Order Notes */}
             <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-all duration-300 border border-red-100">
               <div className="flex items-center mb-6">
                 <div className="bg-gradient-to-r from-red-800 to-red-900 p-3 rounded-full mr-4 animate-pulse">
@@ -579,24 +431,9 @@ const OrderCheckoutPage = () => {
                     placeholder="Any special requests or instructions for your spiritual items..."
                   ></textarea>
                 </div>
-
-                <div className="group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Delivery Preferences</label>
-                  <select
-                    name="deliveryPreference"
-                    value={formData.deliveryPreference}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-800 focus:ring-4 focus:ring-red-100 transition-all duration-300 group-hover:border-red-400"
-                  >
-                    <option value="standard">Standard Delivery (3-5 days)</option>
-                    <option value="express">Express Delivery (1-2 days)</option>
-                    <option value="weekend">Weekend Delivery</option>
-                  </select>
-                </div>
               </div>
             </div>
 
-            {/* Terms & Conditions */}
             <div className="bg-gradient-to-r from-red-50 to-amber-50 rounded-2xl p-6 border border-red-200">
               <div className="flex items-center mb-4">
                 <Shield className="w-6 h-6 text-red-800 mr-3" />
@@ -606,7 +443,7 @@ const OrderCheckoutPage = () => {
               <div className="space-y-3">
                 <label className="flex items-start cursor-pointer group">
                   <input type="checkbox" className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" required />
-                  <span className="text-sm text-gray-700">I agree to the <a href="/terms-condition  " className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
+                  <span className="text-sm text-gray-700">I agree to the <a href="/terms-condition" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
                 </label>
 
                 <label className="flex items-start cursor-pointer group">
@@ -617,7 +454,6 @@ const OrderCheckoutPage = () => {
             </div>
           </div>
 
-          {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl p-8 sticky top-8 border border-red-100">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Order Review</h2>
@@ -636,30 +472,11 @@ const OrderCheckoutPage = () => {
                     <div className="flex-1">
                       <p className="font-semibold text-gray-800 text-sm">{item.product?.name || 'Unknown Product'}</p>
                       <p className="text-xs text-gray-600">Qty: {item.quantity || 1}</p>
-                      {item.product?.weight && (
-                        <p className="text-xs text-gray-500">
-                          {typeof item.product.weight === 'object'
-                            ? `${item.product.weight.value}${item.product.weight.unit}`
-                            : `${item.product.weight}g`}
-                        </p>
-                      )}
-                      {item.product?.category && (
-                        <p className="text-xs text-gray-500">Category: {item.product.category}</p>
-                      )}
-                      <p className="text-xs text-gray-400">Status: {cartData.status}</p>
                     </div>
                     <div className="text-right">
-                      {item.product?.price && item.product?.discountedPrice && item.product.discountedPrice < item.product.price && (
-                        <p className="text-xs text-gray-400 line-through">₹{item.product.price}</p>
-                      )}
                       <p className="font-bold text-red-800">
                         ₹{item.product?.discountedPrice || item.product?.price || 0}
                       </p>
-                      {item.quantity > 1 && (
-                        <p className="text-xs text-gray-600">
-                          ₹{(item.product?.discountedPrice || item.product?.price || 0) * item.quantity} total
-                        </p>
-                      )}
                     </div>
                   </div>
                 )) : (
@@ -669,13 +486,11 @@ const OrderCheckoutPage = () => {
                 )}
               </div>
 
-              {subtotal >= 2000 && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                  <p className="text-sm text-green-700 font-semibold text-center">
-                    🎉 Free Shipping Applied!
-                  </p>
-                </div>
-              )}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+  <p className="text-sm text-green-700 font-semibold text-center">
+    🎉 Free Shipping on All Orders!
+  </p>
+</div>
 
               <div className="border-t pt-6 space-y-3">
                 <div className="flex justify-between text-gray-700">
@@ -683,20 +498,26 @@ const OrderCheckoutPage = () => {
                   <span className="font-semibold">₹{subtotal}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
-                  <span>Shipping:</span>
-                  <span className="font-semibold">
-                    {shippingCost === 0 ? 'Free' : `₹${shippingCost}`}
-                  </span>
-                </div>
+  <span>Shipping:</span>
+  <span className="font-semibold">
+    <span className="line-through text-gray-400 mr-2">₹150</span>
+    <span className="text-green-600">₹0</span>
+  </span>
+</div>
                 <div className="flex justify-between text-xl font-bold text-gray-800 pt-3 border-t">
                   <span>Total:</span>
                   <span className="text-red-800">₹{total}</span>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
+                  <p className="text-sm text-amber-800 font-semibold text-center">
+                    💰 Cash on Delivery
+                  </p>
                 </div>
               </div>
 
               <button
                 onClick={handleSubmitOrder}
-                disabled
+                disabled={submitting}
                 className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${submitting
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
@@ -708,21 +529,19 @@ const OrderCheckoutPage = () => {
                     Processing Order...
                   </div>
                 ) : (
-                  `Place Order ₹${total} ✨`
+                  `Place Order - COD ₹${total} ✨`
                 )}
               </button>
 
-
-
               <div className="mt-4 text-center">
-                <p className="text-xs text-gray-500">Secure checkout powered by SSL encryption</p>
+                <p className="text-xs text-gray-500">Pay when you receive your order</p>
                 <p className="text-xs text-gray-500 mt-1">Cart ID: {cartId}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

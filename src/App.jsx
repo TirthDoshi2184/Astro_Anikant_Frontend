@@ -33,6 +33,18 @@ import { Payment } from "./pages/Payment";
 import WishlistPage from "./pages/WishlistPage";
 import PrivacyPolicyPage from "./pages/Privacy_Policy";
 import TermsConditionsPage from "./pages/Terms_and_Condition";
+import { useEffect } from "react";
+
+function ScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  return null;
+}
+
 
 function App() {
   const location = useLocation();
@@ -66,6 +78,7 @@ function App() {
 
   return (
     <>
+    <ScrollToTop />
       {/* Add navbar here, inside the Router context */}
       {!hideLayout && <AstrologyNavbar />}
       

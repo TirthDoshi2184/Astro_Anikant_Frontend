@@ -69,7 +69,7 @@ export const EmailResetPassword = () => {
       console.log("API Response:", data);
 
       if (response.status === 201 || response.ok) {
-        setSuccess("🌟 Password reset successful! The stars have blessed your new cosmic key.");
+        setSuccess("🌟 Password reset successful! The stars have blessed your new astro key.");
         setFormData({ password: '', confirmPassword: '' });
         
         // Navigate after a short delay to show success message
@@ -121,7 +121,7 @@ export const EmailResetPassword = () => {
               Reset Password
             </h1>
             <p className="text-sm" style={{ color: '#8B0E08' }}>
-              Create a new cosmic key for your account
+              Create a new astro key for your account
             </p>
           </div>
 
@@ -157,7 +157,7 @@ export const EmailResetPassword = () => {
                     borderColor: '#660B05',
                     backgroundColor: 'rgba(255, 240, 196, 0.5)',
                   }}
-                  placeholder="Enter your new cosmic password"
+                  placeholder="Enter your new astro password"
                   required
                   disabled={isLoading}
                   minLength={8}
@@ -176,7 +176,7 @@ export const EmailResetPassword = () => {
                 </button>
               </div>
               <p className="text-xs mt-2 opacity-80" style={{ color: '#8B0E08' }}>
-                Minimum 8 characters for cosmic security
+                Minimum 8 characters for astro security
               </p>
             </div>
 
@@ -196,7 +196,7 @@ export const EmailResetPassword = () => {
                     borderColor: '#660B05',
                     backgroundColor: 'rgba(255, 240, 196, 0.5)',
                   }}
-                  placeholder="Confirm your cosmic password"
+                  placeholder="Confirm your astro password"
                   required
                   disabled={isLoading}
                 />
@@ -265,9 +265,9 @@ export const EmailResetPassword = () => {
                 type="button"
                 className="font-semibold hover:opacity-70 transition-opacity underline"
                 style={{ color: '#660B05' }}
-                onClick={() => console.log('Contact support')}
+                onClick={() => window.open('mailto:astroanekantsup@gmail.com', '_blank')}
               >
-                cosmic support team
+                Astro Anekant Support
               </button>
             </p>
           </div>

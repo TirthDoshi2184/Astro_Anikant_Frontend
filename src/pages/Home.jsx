@@ -79,7 +79,7 @@ const HomePage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:1921/productrequest/insertproductrequest",
+        "https://astroanikantbackend-2.onrender.com/productrequest/insertproductrequest",
         {
           name: formData.productName,
           fullName: formData.fullName,
@@ -346,7 +346,7 @@ const HomePage = () => {
   },
   { 
     id: "68de4868d8a59d0022eb46e2", 
-    name: "Extra products", 
+    name: "Other Essentials", 
     icon: BsBox, // from react-icons/bs - general products box
     count: "300+ Items", 
     color: "from-violet-500 to-fuchsia-600" 

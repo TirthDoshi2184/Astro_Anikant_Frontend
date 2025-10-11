@@ -9,6 +9,7 @@ const [selectedShipping, setSelectedShipping] = useState('standard');
 const [isVisible, setIsVisible] = useState({});
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
+const [submitting, setSubmitting] = useState(false);
 
 const userId = useMemo(() => {
   if (typeof window === 'undefined') return null;
@@ -495,7 +496,6 @@ onClick={() => window.location.href = '/products'}
 
                         <div className="flex-1 min-w-0">
 <h3 className="text-base sm:text-lg font-bold text-[#9C0B13] mb-1 break-words">{item.name}</h3>
-<p className="text-xs sm:text-sm text-gray-600 mb-2">Category: {item.category}</p>
 {item.description && (
   <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2 hidden sm:block">{item.description}</p>
 )}
@@ -689,8 +689,11 @@ onClick={() => window.location.href = '/products'}
   onClick={() => {
     window.location.href = `/orders/${userId}`;
   }}
-  disabled
-  className="w-full bg-gray-400 text-gray-200 cursor-not-allowed py-4 rounded-xl font-bold text-lg flex items-center justify-center space-x-2"
+  className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center space-x-2 transform transition-all duration-300 shadow-lg hover:shadow-xl
+  ${ submitting
+    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+    : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105 cursor-pointer'
+}`}
 >
   <span>Proceed to Checkout</span>
   <ChevronRight className="w-5 h-5" />

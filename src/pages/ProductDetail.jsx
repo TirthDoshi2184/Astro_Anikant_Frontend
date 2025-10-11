@@ -74,25 +74,10 @@ const isUserLoggedIn = () => {
 };
   // Static data that might not come from API
 
-  const reviews = [
-    {
-      id: 1,
-      name: "Priya Sharma",
-      rating: 5,
-      date: "2024-01-15",
-      comment:
-        "Amazing quality ruby ring! I can feel the positive energy already.",
-      helpful: 12,
-    },
-    {
-      id: 2,
-      name: "Rajesh Kumar",
-      rating: 4,
-      date: "2024-01-10",
-      comment: "Good product, fast delivery. The ring fits perfectly.",
-      helpful: 8,
-    },
-  ];
+  const [reviews, setReviews] = useState([]);
+const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   // Add this function to check if product is in wishlist
 const checkWishlistStatus = async () => {
@@ -139,6 +124,7 @@ useEffect(() => {
   if (productID) {
     fetchProduct(productID);
     checkWishlistStatus();
+    fetchReviews(productID);
   }
 }, [productID]);
 
@@ -317,6 +303,176 @@ const toggleWishlist = async () => {
       setIsLoading(false);
     }
   };
+
+  const fetchReviews = async (productId) => {
+  setIsLoadingReviews(true);
+  try {
+    const response = await axios.get(
+      `https://astroanikantbackend-2.onrender.com/review/product/${productId}`
+    );
+    setReviews(response.data.data || []);
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    setReviews([]);
+  } finally {
+    setIsLoadingReviews(false);
+  }
+};
+
+const handleSubmitReview = async () => {
+  if (!isUserLoggedIn()) {
+    toast.error(
+      <CustomToast 
+        type="error"
+        title="Login Required! 🔐"
+        message="Please login to write a review"
+        icon={MessageCircle}
+      />,
+      {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "mystical-toast",
+        bodyClassName: "mystical-body",
+        closeButton: false
+      }
+    );
+    return;
+  }
+
+  if (!newReview.comment.trim()) {
+    toast.error(
+      <CustomToast 
+        type="error"
+        title="Comment Required! ✍️"
+        message="Please write a comment for your review"
+        icon={MessageCircle}
+      />,
+      {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "mystical-toast",
+        bodyClassName: "mystical-body",
+        closeButton: false
+      }
+    );
+    return;
+  }
+
+  setIsSubmittingReview(true);
+  try {
+    // Get userId from localStorage
+    const userId = getUserId();
+    
+    if (!userId) {
+      toast.error(
+        <CustomToast 
+          type="error"
+          title="Session Error! 🔐"
+          message="Please login again to submit review"
+          icon={MessageCircle}
+        />,
+        {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          className: "mystical-toast",
+          bodyClassName: "mystical-body",
+          closeButton: false
+        }
+      );
+      return;
+    }
+
+    const reviewData = {
+      product: productID,
+      user: userId,
+      rating: newReview.rating,
+      comment: newReview.comment
+    };
+
+    const response = await axios.post(
+      'https://astroanikantbackend-2.onrender.com/review/create',
+      reviewData,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (response.status === 201) {
+      toast.success(
+        <CustomToast 
+          type="success"
+          title="Review Submitted! ⭐"
+          message="Thank you for your feedback"
+          icon={Star}
+        />,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          className: "mystical-toast mystical-success",
+          bodyClassName: "mystical-body",
+          closeButton: false
+        }
+      );
+
+      // Reset form and refresh reviews
+      setNewReview({ rating: 5, comment: '' });
+      fetchReviews(productID);
+      fetchProduct(productID); // Refresh product to update average rating
+    }
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    const errorMessage = error.response?.data?.message || 'Could not submit review. Please try again.';
+    toast.error(
+      <CustomToast 
+        type="error"
+        title="Submission Failed! ❌"
+        message={errorMessage}
+        icon={MessageCircle}
+      />,
+      {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "mystical-toast",
+        bodyClassName: "mystical-body",
+        closeButton: false
+      }
+    );
+  } finally {
+    setIsSubmittingReview(false);
+  }
+};
+const handleMarkHelpful = async (reviewId) => {
+  try {
+    await axios.put(
+      `https://astroanikantbackend-2.onrender.com/review/helpful/${reviewId}`
+    );
+    fetchReviews(productID); // Refresh reviews
+  } catch (error) {
+    console.error('Error marking review helpful:', error);
+  }
+};
 
   const handleQuantityChange = (type) => {
     if (type === "increment" && quantity < product?.stock) {
@@ -746,9 +902,7 @@ const toggleWishlist = async () => {
                           }`}
                         />
                       ))}
-                      <span className="ml-2 text-sm text-gray-600">
-                        ({product.reviewCount || 0} reviews)
-                      </span>
+                      
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 space-y-1">
@@ -1043,58 +1197,127 @@ const toggleWishlist = async () => {
             )}
 
             {activeTab === "reviews" && (
-              <div className="space-y-6 animate-fadeIn">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Customer Reviews
-                  </h3>
-                  <button className="bg-red-800 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-900 transition-colors">
-                    Write a Review
-                  </button>
-                </div>
+  <div className="space-y-6 animate-fadeIn">
+    {/* Review Form */}
+    <div className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-xl p-6 border-2 border-red-200">
+      <h3 className="text-xl font-semibold text-gray-900 mb-4">Write a Review</h3>
+      
+      <div className="space-y-4">
+        {/* Rating Selector */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Your Rating
+          </label>
+          <div className="flex items-center space-x-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setNewReview({ ...newReview, rating: star })}
+                className="focus:outline-none transition-transform hover:scale-110"
+              >
+                <Star
+                  className={`w-8 h-8 ${
+                    star <= newReview.rating
+                      ? "text-yellow-400 fill-current"
+                      : "text-gray-300"
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
 
-                <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <div
-                      key={review.id}
-                      className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-red-800 text-white rounded-full flex items-center justify-center font-semibold">
-                            {review.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {review.name}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {review.date}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-4 h-4 ${
-                                star <= review.rating
-                                  ? "text-yellow-400 fill-current"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-gray-700 mb-3">{review.comment}</p>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <span>Helpful ({review.helpful})</span>
-                      </div>
-                    </div>
-                  ))}
+        {/* Comment Input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Your Review
+          </label>
+          <textarea
+            value={newReview.comment}
+            onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+            rows="4"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            placeholder="Share your experience with this product..."
+          />
+        </div>
+
+        {/* Submit Button */}
+        <button
+          onClick={handleSubmitReview}
+          disabled={isSubmittingReview}
+          className="bg-red-800 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+        </button>
+      </div>
+    </div>
+
+    {/* Reviews List */}
+    <div className="flex items-center justify-between mb-6">
+      <h3 className="text-xl font-semibold text-gray-900">
+        Customer Reviews ({reviews.length})
+      </h3>
+    </div>
+
+    {isLoadingReviews ? (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-800 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading reviews...</p>
+      </div>
+    ) : reviews.length > 0 ? (
+      <div className="space-y-4">
+        {reviews.map((review) => (
+          <div
+            key={review._id}
+            className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-red-800 text-white rounded-full flex items-center justify-center font-semibold">
+                  {review.user?.name?.charAt(0) || 'U'}
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {review.user?.name || 'Anonymous'}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
-            )}
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-4 h-4 ${
+                      star <= review.rating
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="text-gray-700 mb-3">{review.comment}</p>
+            <div className="flex items-center text-sm text-gray-500">
+              <button
+                onClick={() => handleMarkHelpful(review._id)}
+                className="hover:text-red-800 transition-colors"
+              >
+                Helpful ({review.helpful})
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="text-center py-8 bg-gray-50 rounded-xl">
+        <p className="text-gray-600">No reviews yet. Be the first to review this product!</p>
+      </div>
+    )}
+  </div>
+)}
           </div>
         </div>
 
@@ -1135,6 +1358,9 @@ const toggleWishlist = async () => {
             </h3>
             <p className="text-red-800 font-semibold">
               ₹{(item.discountedPrice || item.price).toLocaleString()}
+              <span className="text-gray-400 line-through ml-2">
+                                  ₹{item.price}
+                                  </span>
             </p>
           </div>
         </Link>

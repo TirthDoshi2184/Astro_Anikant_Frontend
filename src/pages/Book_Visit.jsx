@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MapPin, Clock, Phone, Mail, Calendar, Users, Star, CheckCircle, AlertCircle, Home, User } from 'lucide-react';
-import axios from 'axios';
 
 const BookVisitPage = () => {
   const [formData, setFormData] = useState({
@@ -15,267 +14,91 @@ const BookVisitPage = () => {
   const [bookingDetails, setBookingDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [visitId, setVisitId] = useState(null);
+  const [upiTransactionId, setUpiTransactionId] = useState('');
 
-  // API Base URL - Update this to your actual backend URL
-  const API_BASE_URL = 'http://localhost:1921/visit'; // Change this to your backend URL
+  const API_BASE_URL = 'https://astroanikantbackend-2.onrender.com/visit';
 
-  const createVisit = async (visitData) => {
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError('');
+
+    if (!formData.name || !formData.email || !formData.phone || !formData.birthdate || !formData.message) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+    if (!acceptedTerms) {
+      setError('You must accept the terms and conditions');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/createvisit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(visitData),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          birthdate: formData.birthdate,
+          message: formData.message,
+          amount: 11,
+          status: 'Pending'
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create visit');
+      const result = await response.json();
+      
+      if (result.message === "Visit Added Successfully") {
+        setVisitId(result.data._id);
+        setShowPaymentOptions(true);
+      } else {
+        setError('Failed to book visit. Please try again.');
       }
-
-      return await response.json();
     } catch (error) {
-      throw error;
+      setError(error.message || 'An error occurred while booking the visit');
+    } finally {
+      setLoading(false);
     }
   };
 
-
-  const getSingleVisit = async (id) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/getsinglevisit/${id}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch visit');
-      }
-      return await response.json();
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const deleteVisit = async (id) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/deletevisit/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to delete visit');
-      }
-      return await response.json();
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  // Load all visits on component mount
-  const handleSubmit = async () => {
-  setLoading(true);
-  setError('');
-
-  // Validate form
-  if (!formData.name || !formData.email || !formData.phone || !formData.birthdate || !formData.message) {
-    setError('Please fill in all required fields');
-    setLoading(false);
-    return;
-  }
-  if (!acceptedTerms) {
-    setError('You must accept the terms and conditions');
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const visitData = {
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email,
-      birthdate: formData.birthdate,
-      message: formData.message,
-      amount: 11,           // add amount field
-      status: "Pending",    // default before payment
-    };
-
-    // Step 1: create booking in DB
-    const result = await createVisit(visitData);
-
-    if (result.message === "Visit Added Successfully") {
-      setBookingDetails(result.data);
-
-      // Step 2: Initiate Razorpay for payment
-      await initiateRazorpayPayment(11, result.data._id);
-    } else {
-      setError('Failed to book visit. Please try again.');
-    }
-  } catch (error) {
-    setError(error.message || 'An error occurred while booking the visit');
-  } finally {
-    setLoading(false);
-  }
-};
-
-  // Load Razorpay checkout script
-  const loadScript = (src) => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
-  const initiateRazorpayPayment = async (amount, bookingId) => {
-  const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-  if (!res) {
-    alert("Razorpay SDK failed to load.");
-    return;
-  }
-
-  try {
-    const response = await fetch("http://localhost:1921/payment/createorder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: amount * 100, // paise
-        currency: "INR",
-        receipt: `receipt_order_${Date.now()}`,
-      }),
-    });
-    const order = await response.json();
-    console.log("Order:", order);
-
-    if (!order.id) {
-      alert("Failed to create payment order. Please try again.");
+  const handlePaymentComplete = async () => {
+    if (!upiTransactionId.trim()) {
+      setError('Please enter transaction ID');
       return;
     }
 
-    const options = {
-      key: "rzp_test_RNOxHvjfvDoP1q", // replace with LIVE key in prod
-      amount: order.amount,
-      currency: order.currency,
-      name: "Astro Anekant",
-      description: "Consultation Booking Payment",
-      order_id: order.id,
-      handler: async function (response) {
-        try {
-          // Step 3: Update booking status in backend after successful payment
-          await fetch(`https://astroanikantbackend-2.onrender.com/visit/updatevisit/${bookingId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              status: "Paid",
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          });
-
-          alert("✅ Payment successful and booking updated!");
-        } catch (err) {
-          console.error("Error updating booking:", err);
-        }
-      },
-      prefill: {
-        name: formData.name,
-        email: formData.email,
-        contact: formData.phone,
-      },
-      theme: { color: "#9C0B13" },
-    };
-
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
-  } catch (err) {
-    alert("Payment initiation failed. Please try again.");
-    console.error(err);
-  }
-};
-
-
-
-  const paymentProcess = async () => {
     try {
-      const loadScript = (src) => {
-        return new Promise((resolve) => {
-          const script = document.createElement("script");
-          script.src = src;
-          script.onload = () => resolve(true);
-          script.onerror = () => resolve(false);
-          document.body.appendChild(script);
-        });
-      };
+      const response = await fetch(`${API_BASE_URL}/updatevisit/${visitId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'Paid',
+          upiTransactionId: upiTransactionId
+        }),
+      });
 
-      const displayRazorpay = async (orderData) => {
-        const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-
-        if (!res) {
-          alert("Razorpay SDK failed to load. Are you online?");
-          return;
-        }
-
-        const options = {
-          key: "rzp_test_RNOxHvjfvDoP1q", // replace with LIVE key in production
-          amount: orderData.amount,
-          currency: orderData.currency,
-          name: "Astro Anekant",
-          description: "Test Transaction",
-          order_id: orderData.id,
-          handler: async function (response) {
-            try {
-              const res = await axios.post("http://localhost:1921/payment/verify-payment", {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              });
-
-              if (res.data.status === "success") {
-                alert("✅ Payment verified successfully!");
-              } else {
-                alert("❌ Payment verification failed.");
-              }
-            } catch (error) {
-              console.error("Verification error:", error);
-            }
-          },
-          prefill: {
-            name: "Astro Anekant",
-            email: "astro@gmail.com",
-            contact: "09010291209",
-          },
-          theme: {
-            color: "#61dafb",
-          },
-        };
-
-        const paymentObject = new window.Razorpay(options);
-        paymentObject.open();
-      };
-
-      // 👇 THIS was missing in your code
-      const handleCreateOrder = async () => {
-        try {
-          const order = await axios.post("http://localhost:1921/payment/createorder", {
-            amount: 11*100,
-            currency: "INR",
-            receipt: "receipt_order_123",
-          });
-
-          displayRazorpay(order.data);
-        } catch (error) {
-          console.error("Order creation failed:", error);
-        }
-      };
-
-      // 👇 Call it here
-      await handleCreateOrder();
-
+      const result = await response.json();
+      
+      if (result.message === "Visit Updated Successfully") {
+        setBookingDetails(result.data);
+        setShowConfirmation(true);
+        setShowPaymentOptions(false);
+      } else {
+        setError('Error confirming payment');
+      }
     } catch (error) {
-      console.error("Payment process error:", error);
+      console.error('Error:', error);
+      setError('Error confirming payment');
     }
   };
-
-
-
-
 
   const FloatingElement = ({ children, delay = 0 }) => (
     <div
@@ -286,14 +109,80 @@ const BookVisitPage = () => {
     </div>
   );
 
+  if (showConfirmation && bookingDetails) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white flex items-center justify-center p-6">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl border-2 border-red-900/20">
+            <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6 animate-bounce" />
+            <h2 className="text-3xl font-bold text-red-900 mb-4 text-center">Consultation Confirmed!</h2>
+            <p className="text-gray-700 mb-6 text-center">
+              Thank you for your booking. We will contact you shortly to confirm your consultation details.
+            </p>
+            
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl mb-6">
+              <h3 className="font-bold text-red-900 mb-3 text-lg">Booking Details:</h3>
+              <div className="space-y-2 text-gray-700">
+                <p><strong>Name:</strong> {bookingDetails.name}</p>
+                <p><strong>Phone:</strong> {bookingDetails.phone}</p>
+                <p><strong>Email:</strong> {bookingDetails.email}</p>
+                <p><strong>Date of Birth:</strong> {bookingDetails.birthdate}</p>
+                <p><strong>Consultation Purpose:</strong> {bookingDetails.message}</p>
+                <p><strong>Amount Paid:</strong> ₹{bookingDetails.amount}</p>
+                <p><strong>Status:</strong> <span className="text-green-600 font-semibold">{bookingDetails.status}</span></p>
+                <p><strong>Booking ID:</strong> #{bookingDetails._id}</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg mb-6">
+              <h4 className="font-semibold text-red-900 mb-2">What's Next?</h4>
+              <ul className="space-y-1 text-sm text-gray-700">
+                <li>📧 Confirmation email sent to {bookingDetails.email}</li>
+                <li>📱 We will call you to confirm consultation details</li>
+                <li>🏠 Please ensure availability at scheduled time</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-center">
+              <div className="flex space-x-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-6 h-6 text-yellow-400 fill-current animate-pulse" style={{animationDelay: `${i * 0.2}s`}} />
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowConfirmation(false);
+                setFormData({
+                  name: '',
+                  email: '',
+                  phone: '',
+                  birthdate: '',
+                  message: ''
+                });
+                setBookingDetails(null);
+                setVisitId(null);
+                setUpiTransactionId('');
+                setAcceptedTerms(false);
+              }}
+              className="mt-6 w-full bg-gradient-to-r from-red-900 to-red-700 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              Book Another Consultation
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FEF7D7] via-white to-[#FEF7D7]">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-50">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#9C0B13] to-red-800 text-white py-20">
+      <div className="relative overflow-hidden bg-gradient-to-r from-red-900 to-red-700 text-white py-20">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 rounded-full opacity-20 animate-ping"></div>
         <div className="absolute bottom-10 right-10 w-16 h-16 bg-orange-400 rounded-full opacity-30 animate-pulse"></div>
-        <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-pink-400 rounded-full opacity-25 animate-bounce"></div>
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center">
@@ -305,16 +194,6 @@ const BookVisitPage = () => {
             <p className="text-xl md:text-2xl mb-8 text-yellow-100">
               Expert Astrologers at Your Fingertips
             </p>
-            <div className="flex justify-center space-x-8 text-lg flex-wrap gap-4">
-              <div className="flex items-center animate-fadeIn">
-                <Home className="mr-2 text-yellow-400" />
-                <span>Home Consultations</span>
-              </div>
-              <div className="flex items-center animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-                <User className="mr-2 text-green-400" />
-                <span>Expert Astrologers</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -324,8 +203,8 @@ const BookVisitPage = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-[#9C0B13] mb-4">Book Your Consultation </h2>
-              <p className="text-xl text-gray-600">Fill in your details and we'll bring the expertise</p>
+              <h2 className="text-4xl font-bold text-red-900 mb-4">Book Your Consultation</h2>
+              <p className="text-xl text-gray-600">Fill in your details for personalized guidance</p>
             </div>
 
             {error && (
@@ -334,248 +213,228 @@ const BookVisitPage = () => {
               </div>
             )}
 
-            {!showConfirmation ? (
-              <div className="space-y-8">
-                {/* Personal Details */}
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl shadow-lg">
-                  <h3 className="text-2xl font-bold text-[#9C0B13] mb-6">Personal Information</h3>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">Full Name *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">Phone Number *</label>
-                      <input
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="Enter 10-digit phone number"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">Email Address *</label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                        placeholder="your.email@example.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#9C0B13] font-bold mb-2">Date of Birth *</label>
-                      <input
-                        type="date"
-                        required
-                        value={formData.birthdate}
-                        onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })}
-                        className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Consultation Purpose */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl shadow-lg">
-                  <h3 className="text-2xl font-bold text-[#9C0B13] mb-6 flex items-center">
-                    <User className="mr-3 animate-pulse" />
-                    Purpose of Consultation
-                  </h3>
+            <div className="space-y-8">
+              {/* Personal Details */}
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl shadow-lg">
+                <h3 className="text-2xl font-bold text-red-900 mb-6">Personal Information</h3>
+                <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[#9C0B13] font-bold mb-2">Tell us about your consultation needs *</label>
-                    <textarea
-                      required
-                      value={formData.message}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        message: e.target.value
-                      })}
-                      rows={4}
-                      className="w-full p-3 border-2 border-[#9C0B13] rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
-                      placeholder="Describe what you'd like to discuss - career, relationships, health, business, etc."
+                    <label className="block text-red-900 font-bold mb-2">Full Name *</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full p-3 border-2 border-red-900 rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-red-900 font-bold mb-2">Phone Number *</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full p-3 border-2 border-red-900 rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
+                      placeholder="Enter 10-digit phone number"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-red-900 font-bold mb-2">Email Address *</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full p-3 border-2 border-red-900 rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-red-900 font-bold mb-2">Date of Birth *</label>
+                    <input
+                      type="date"
+                      value={formData.birthdate}
+                      onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })}
+                      className="w-full p-3 border-2 border-red-900 rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
                     />
                   </div>
                 </div>
+              </div>
 
+              {/* Consultation Purpose */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl shadow-lg">
+                <h3 className="text-2xl font-bold text-red-900 mb-6 flex items-center">
+                  <User className="mr-3 animate-pulse" />
+                  Purpose of Consultation
+                </h3>
+                <div>
+                  <label className="block text-red-900 font-bold mb-2">Tell us about your consultation needs *</label>
+                  <textarea
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    rows={4}
+                    className="w-full p-3 border-2 border-red-900 rounded-lg focus:ring-4 focus:ring-red-200 transition-all duration-300"
+                    placeholder="Describe what you'd like to discuss - career, relationships, health, business, etc."
+                  />
+                </div>
+              </div>
 
-
-                {/* Payment Summary */}
-                <div className="bg-gradient-to-r from-yellow-100 to-orange-100 p-6 rounded-2xl shadow-lg">
-                  <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Payment Summary</h3>
-                  <div className="space-y-3">
+              {/* Payment Summary */}
+              <div className="bg-gradient-to-r from-yellow-100 to-orange-100 p-6 rounded-2xl shadow-lg">
+                <h3 className="text-2xl font-bold text-red-900 mb-4">Payment Summary</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">Consultation Fee:</span>
+                    <span className="font-bold text-red-900">₹11</span>
+                  </div>
+                  <div className="border-t-2 border-red-900 pt-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-700">Fee:</span>
-                      <span className="font-bold text-[#9C0B13]">₹11</span>
+                      <span className="text-xl font-bold text-red-900">Total Amount:</span>
+                      <span className="text-2xl font-bold text-red-900">₹11</span>
                     </div>
-                    <div className="border-t-2 border-[#9C0B13] pt-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xl font-bold text-[#9C0B13]">Total Amount:</span>
-                        <span className="text-2xl font-bold text-[#9C0B13]">₹11</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Options (shown after form submission) */}
+              {showPaymentOptions && (
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-8 rounded-xl border border-red-900/20">
+                  <h3 className="text-2xl font-bold text-red-900 mb-6 text-center">Complete Your Payment</h3>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* QR Code Section */}
+                    <div className="text-center">
+                      <h4 className="text-lg font-semibold text-red-900 mb-4">Scan QR Code</h4>
+                      <div className="bg-white p-4 rounded-xl shadow-lg inline-block">
+                        <img 
+                          src="https://res.cloudinary.com/dnbfumeob/image/upload/v1760212975/Astro_Anekant_QR_qutlyf.jpg"
+                          alt="UPI QR Code" 
+                          className="w-150 h-150 mx-auto"
+                        />
+                      </div>
+                      <p className="text-sm text-gray-600 mt-2">Scan with any UPI app</p>
+                    </div>
+                    
+                    {/* UPI ID Section */}
+                    <div className="text-center">
+                      <h4 className="text-lg font-semibold text-red-900 mb-4">UPI ID</h4>
+                      <div className="bg-white p-6 rounded-xl shadow-lg">
+                        <p className="text-2xl font-bold text-red-900 mb-4">8239210022@yescred</p>
+                        <p className="text-lg text-gray-700 mb-2">Amount: ₹11</p>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText('823910022@yescred');
+                            alert('UPI ID copied to clipboard!');
+                          }}
+                          className="bg-red-900 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          Copy UPI ID
+                        </button>
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Transaction ID Input */}
+                  <div className="mt-6">
+                    <label className="block text-lg font-semibold text-red-900 mb-2">
+                      Enter Transaction ID (after payment) *
+                    </label>
+                    <input
+                      type="text"
+                      value={upiTransactionId}
+                      onChange={(e) => setUpiTransactionId(e.target.value)}
+                      placeholder="Enter UPI transaction ID"
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-red-900 focus:outline-none"
+                    />
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={handlePaymentComplete}
+                    disabled={!upiTransactionId.trim()}
+                    className="w-full mt-6 bg-green-600 text-white py-3 px-6 rounded-xl font-bold text-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Confirm Payment Completion
+                  </button>
                 </div>
-                {/* Terms & Conditions */}
-                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-2xl shadow-lg">
-                  <h3 className="text-2xl font-bold text-[#9C0B13] mb-4 flex items-center">
-                    <AlertCircle className="mr-3 text-yellow-500" />
-                    Terms & Conditions
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-start">
-                      <input
-                        type="checkbox"
-                        id="terms"
-                        checked={acceptedTerms}
-                        onChange={(e) => setAcceptedTerms(e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 text-[#9C0B13] focus:ring-[#9C0B13] border-2 border-[#9C0B13] rounded"
-                        required
-                      />
-                      <label htmlFor="terms" className="text-gray-700 text-sm leading-relaxed">
-                        <span className="text-red-500">*</span> I agree to the{' '}
-                        <button
-                          type="button"
-                          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
-                          onClick={() => {
-                            window.open('/terms-conditions', '_blank');
-                          }}
-                        >
-                          Terms & Conditions
-                        </button>
-                        {' '}and{' '}
-                        <button
-                          type="button"
-                          className="text-[#9C0B13] underline hover:text-red-800 font-medium"
-                          onClick={() => {
-                            window.open('/privacy-policy', '_blank');
-                          }}
-                        >
-                          Privacy Policy
-                        </button>
-                      </label>
-                    </div>
+              )}
+
+              {/* Terms & Conditions */}
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-2xl shadow-lg">
+                <h3 className="text-2xl font-bold text-red-900 mb-4 flex items-center">
+                  <AlertCircle className="mr-3 text-yellow-500" />
+                  Terms & Conditions
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-start">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-1 mr-3 h-4 w-4 text-red-900 focus:ring-red-900 border-2 border-red-900 rounded"
+                    />
+                    <label htmlFor="terms" className="text-gray-700 text-sm leading-relaxed">
+                      <span className="text-red-500">*</span> I agree to the terms and conditions and privacy policy
+                    </label>
                   </div>
                 </div>
-                {/* Submit Button */}
+              </div>
+
+              {/* Submit Button */}
+              {!showPaymentOptions && (
                 <div className="text-center">
                   <button
-                  disabled
+                    type="button"
                     onClick={handleSubmit}
-                    // disabled={loading || !formData.name || !formData.phone || !formData.email || !formData.birthdate || !formData.message || !acceptedTerms}
-                    className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={loading || !acceptedTerms}
+                    className="bg-gradient-to-r from-red-900 to-red-700 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Booking...' : 'Confirm Booking - ₹11'}
+                    {loading ? 'Processing...' : 'Proceed to Payment - ₹11'}
                   </button>
                 </div>
-              </div>
-            ) : (
-              /* Confirmation Section */
-              <div className="text-center bg-gradient-to-r from-green-50 to-emerald-50 p-12 rounded-3xl shadow-2xl">
-                <CheckCircle className="mx-auto text-green-600 mb-6 animate-bounce" size={80} />
-                <h3 className="text-3xl font-bold text-green-800 mb-4">Consultation Confirmed!</h3>
-                <p className="text-xl text-green-700 mb-6">Your booking has been successfully created</p>
-
-                {bookingDetails && (
-                  <div className="bg-white p-6 rounded-2xl shadow-lg inline-block text-left max-w-md">
-                    <h4 className="font-bold text-[#9C0B13] mb-3">Booking Details:</h4>
-                    <div className="space-y-2 text-gray-700">
-                      <p><strong>Name:</strong> {bookingDetails.name}</p>
-                      <p><strong>Phone:</strong> {bookingDetails.phone}</p>
-                      <p><strong>Email:</strong> {bookingDetails.email}</p>
-                      <p><strong>Date of Birth:</strong> {bookingDetails.birthdate}</p>
-                      <p><strong>Message:</strong> {bookingDetails.message}</p>
-                      <p><strong>Amount:</strong> ₹{bookingDetails.amount}</p>
-                      <p><strong>Status:</strong> {bookingDetails.status}</p>
-                      <p><strong>Booking ID:</strong> #{bookingDetails._id}</p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-8 text-gray-600 space-y-2">
-                  <p>📧 Confirmation email sent to {formData.email}</p>
-                  <p>📱 We will call you to confirm the appointment details</p>
-                  <p>🏠 Please ensure someone is available at the given address</p>
-                  <p>💼 Our astrologer will carry all necessary items for the consultation</p>
-                </div>
-
-                <div className="mt-8">
-                  <button
-                    onClick={() => {
-                      setShowConfirmation(false);
-                      setFormData({
-                        name: '',
-                        email: '',
-                        phone: '',
-                        birthdate: '',
-                        message: ''
-                      });
-                      setBookingDetails(null);
-                    }}
-                    className="bg-gradient-to-r from-[#9C0B13] to-red-800 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-                  >
-                    Book Another Consultation
-                  </button>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-
       {/* Service Guidelines Section */}
-      <div className="py-16 bg-white">
+      <div className="py-16 bg-gradient-to-br from-red-900 to-red-700 text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-[#9C0B13] text-center mb-12">Important Guidelines</h2>
+            <h2 className="text-3xl font-bold text-center mb-12">Important Guidelines</h2>
 
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gradient-to-r from-[#FEF7D7] to-yellow-50 p-6 rounded-2xl shadow-lg">
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
                 <div className="flex items-center mb-4">
-                  <Home className="text-blue-500 mr-3" />
-                  <h3 className="text-xl font-bold text-[#9C0B13]">Before the Visit</h3>
+                  <Home className="text-yellow-300 mr-3" />
+                  <h3 className="text-xl font-bold">Before the Consultation</h3>
                 </div>
-                <ul className="space-y-2 text-gray-700">
-                  <li>• Ensure clean and peaceful space for consultation</li>
+                <ul className="space-y-2 text-yellow-100">
                   <li>• Keep birth details ready (date, time, place)</li>
                   <li>• Prepare any specific questions or concerns</li>
+                  <li>• Ensure a quiet environment for the call</li>
                 </ul>
               </div>
 
-              <div className="bg-gradient-to-r from-orange-50 to-[#FEF7D7] p-6 rounded-2xl shadow-lg">
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
                 <div className="flex items-center mb-4">
-                  <Clock className="text-orange-500 mr-3" />
-                  <h3 className="text-xl font-bold text-[#9C0B13]">Flexible Consultation</h3>
+                  <Clock className="text-orange-300 mr-3" />
+                  <h3 className="text-xl font-bold">Flexible Consultation</h3>
                 </div>
-                <ul className="space-y-2 text-gray-700">
-                  <li>• Instant access from the comfort of your home</li>
-                  <li>• Choose chat, audio, or video as per your preference</li>
-                  <li>• We will get in touch with you as soon as possible</li>
+                <ul className="space-y-2 text-yellow-100">
+                  <li>• Access from the comfort of your home</li>
+                  <li>• Choose chat, audio, or video preference</li>
+                  <li>• We will contact you as soon as possible</li>
                 </ul>
               </div>
-
             </div>
 
-            <div className="mt-12 text-center">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-2xl shadow-lg">
-                <h3 className="text-2xl font-bold text-[#9C0B13] mb-4">Contact Information</h3>
-                <div className="">
-
-                  <div className="flex items-center justify-center">
-                    <span className="text-lg font-semibold">📧 astroanekant@gmail.com</span>
-                  </div>
-                </div>
+            <div className="mt-12 text-center bg-white/10 backdrop-blur-sm p-8 rounded-2xl">
+              <h3 className="text-2xl font-bold mb-4">Contact Information</h3>
+              <div className="flex items-center justify-center">
+                <span className="text-lg font-semibold">📧 astroanekant@gmail.com</span>
               </div>
             </div>
           </div>

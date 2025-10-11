@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Star, Moon, Sun, Loader2, Mail, ArrowLeft } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 export const ForgotUserEmail = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
@@ -27,7 +29,6 @@ export const ForgotUserEmail = () => {
     setSuccess('');
 
     try {
-      // Using axios with proper async/await
       const response = await fetch("https://astroanikantbackend-2.onrender.com/user/getuserbyemail", {
         method: "POST",
         headers: {
@@ -45,22 +46,26 @@ export const ForgotUserEmail = () => {
             data.message === "User Not found" || 
             data.message === "User not found" ||
             data.success === false) {
-          setError("Email not found. Please check your email address or sign up for a new account.");
+          setError("📧 Email not found. Please check your email address or sign up for a new account.");
         } else {
-          setSuccess("✨ The stars have aligned! An OTP has been sent to your cosmic email address. Please check your inbox and spam folder.");
-          setEmail(''); // Clear the form
+          setSuccess("✨ The stars have aligned! A password reset link has been sent to your astro anekant email address. Please check your inbox and spam folder.");
+          setEmail('');
           
-          // Optional: You could navigate to OTP verification page here
-          console.log("Email verification successful, user data:", data.data);
+          // Optional: Navigate to a confirmation page after 3 seconds
+          setTimeout(() => {
+            // navigate('/login');
+          }, 3000);
         }
       } else {
         // Handle HTTP error responses
         if (response.status === 404) {
-          setError("Email not found in our cosmic database. Please check your email or sign up.");
+          setError("📧 Email not found in our astro anekant database. Please check your email or sign up.");
         } else if (response.status === 400) {
-          setError("Invalid email format. Please enter a valid email address.");
+          setError("❌ Invalid email format. Please enter a valid email address.");
+        } else if (response.status === 429) {
+          setError("⏰ Too many requests. Please wait a few minutes before trying again.");
         } else {
-          setError(data.message || "Something went wrong. Please try again.");
+          setError(data.message || "❌ Something went wrong. Please try again.");
         }
       }
     } catch (err) {
@@ -68,11 +73,11 @@ export const ForgotUserEmail = () => {
       
       // Handle different types of errors
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        setError("Unable to connect to server. Please check your internet connection.");
+        setError("🌐 Unable to connect to server. Please check your internet connection.");
       } else if (err.code === 'NETWORK_ERROR') {
-        setError("Network error. Please check your connection and try again.");
+        setError("🌐 Network error. Please check your connection and try again.");
       } else {
-        setError("An unexpected error occurred. Please try again later.");
+        setError("❌ An unexpected error occurred. Please try again later.");
       }
     } finally {
       setIsLoading(false);
@@ -81,14 +86,18 @@ export const ForgotUserEmail = () => {
 
   const handleInputChange = (e) => {
     setEmail(e.target.value);
-    if (error) setError(''); // Clear errors when user starts typing
-    if (success) setSuccess(''); // Clear success message when typing
+    if (error) setError('');
+    if (success) setSuccess('');
   };
 
   const handleBackToLogin = () => {
-    // In a real app, you'd use useNavigate() from react-router-dom
-    console.log('Navigate back to login');
-    // navigate('/login') or navigate(-1) for going back
+    navigate('/login');
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && email && !isLoading) {
+      handleSubmit(e);
+    }
   };
 
   return (
@@ -128,14 +137,14 @@ export const ForgotUserEmail = () => {
             </div>
           )}
           {success && (
-            <div className="bg-green-50 border-2 border-green-300 text-green-700 px-4 py-3 rounded-xl text-sm mb-6 flex items-start">
+            <div className="bg-green-50 border-2 border-green-300 text-green-700 px-4 py-3 rounded-xl text-sm mb-6 flex items-start animate-pulse">
               <div className="flex-shrink-0 mr-2">✨</div>
               <div>{success}</div>
             </div>
           )}
 
           {/* Form */}
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: '#660B05' }}>
                 Email Address
@@ -145,26 +154,27 @@ export const ForgotUserEmail = () => {
                   type="email"
                   value={email}
                   onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
                   className="w-full px-4 py-3 pl-12 border-2 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all"
                   style={{ 
                     borderColor: '#660B05',
                     backgroundColor: 'rgba(255, 240, 196, 0.5)',
                   }}
-                  placeholder="Enter your cosmic email address"
+                  placeholder="Enter your astro anekant email address"
                   required
                   disabled={isLoading}
                   autoComplete="email"
+                  autoFocus
                 />
                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: '#660B05' }} />
               </div>
               <p className="text-xs mt-2 opacity-80" style={{ color: '#8B0E08' }}>
-                We'll send you an OTP to reset your password
+                We'll send you a password reset link
               </p>
             </div>
 
             <button
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               disabled={isLoading || !email}
               className="w-full py-3 px-4 rounded-xl font-semibold focus:ring-2 focus:ring-offset-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
               style={{ 
@@ -180,11 +190,11 @@ export const ForgotUserEmail = () => {
               ) : (
                 <>
                   <Star className="w-5 h-5 mr-2" />
-                  Send Reset Code
+                  Send Reset Link
                 </>
               )}
             </button>
-          </div>
+          </form>
 
           {/* Divider */}
           <div className="flex items-center my-6">
@@ -198,7 +208,8 @@ export const ForgotUserEmail = () => {
             <button
               type="button"
               onClick={handleBackToLogin}
-              className="inline-flex items-center justify-center px-6 py-2 rounded-xl font-medium transition-all hover:shadow-md transform hover:-translate-y-0.5"
+              disabled={isLoading}
+              className="inline-flex items-center justify-center px-6 py-2 rounded-xl font-medium transition-all hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50"
               style={{ 
                 backgroundColor: 'rgba(102, 11, 5, 0.1)',
                 color: '#660B05',
@@ -219,6 +230,7 @@ export const ForgotUserEmail = () => {
                 className="font-semibold hover:opacity-70 transition-opacity underline"
                 style={{ color: '#660B05' }}
                 onClick={handleBackToLogin}
+                disabled={isLoading}
               >
                 Sign in here
               </button>
@@ -229,9 +241,9 @@ export const ForgotUserEmail = () => {
                 type="button"
                 className="font-semibold hover:opacity-70 transition-opacity underline"
                 style={{ color: '#660B05' }}
-                onClick={() => console.log('Contact support')}
+                onClick={() => window.open('mailto:astroanekantsup@gmail.com', '_blank')}
               >
-                cosmic support team
+                Astro Anekant Support
               </button>
             </p>
           </div>
