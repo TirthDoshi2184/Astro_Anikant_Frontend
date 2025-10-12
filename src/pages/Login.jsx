@@ -64,7 +64,7 @@ export default function AstrologyLogin() {
 
         // Navigate to home
         setTimeout(() => {
-          navigate("/astrohome");
+          navigate("/");
         }, 1000);
       } else {
         if (response.status === 404) {

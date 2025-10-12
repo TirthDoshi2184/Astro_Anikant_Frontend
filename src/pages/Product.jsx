@@ -363,9 +363,9 @@ const clearAllFilters = () => {
                 />
               ))}
             </div>
-            <span className="text-xs lg:text-sm text-gray-600">
+            {/* <span className="text-xs lg:text-sm text-gray-600">
               {(product.averageRating || 0).toFixed(1)}
-            </span>
+            </span> */}
           </div>
 
           {/* Benefits - Show only 2 on mobile, 3 on desktop */}

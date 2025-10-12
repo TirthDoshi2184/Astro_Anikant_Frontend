@@ -22,6 +22,9 @@ const OrderCheckoutPage = () => {
     deliveryPreference: 'standard'
   });
 
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+
   const getCartIdFromUrl = () => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('userId') || 'demo-user-id';
@@ -118,6 +121,16 @@ const OrderCheckoutPage = () => {
 
     if (!/^\d{6}$/.test(formData.pincode)) {
       setError('Please enter a valid 6-digit PIN code');
+      return false;
+    }
+
+    if (!agreedToTerms) {
+      setError('Please agree to the Terms & Conditions to proceed');
+      return false;
+    }
+
+    if (!agreedToPrivacy) {
+      setError('Please accept the Privacy Policy to proceed');
       return false;
     }
 
@@ -442,12 +455,24 @@ const OrderCheckoutPage = () => {
 
               <div className="space-y-3">
                 <label className="flex items-start cursor-pointer group">
-                  <input type="checkbox" className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" required />
+                  <input 
+                    type="checkbox" 
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" 
+                    required 
+                  />
                   <span className="text-sm text-gray-700">I agree to the <a href="/terms-condition" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
                 </label>
 
                 <label className="flex items-start cursor-pointer group">
-                  <input type="checkbox" className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" required />
+                  <input 
+                    type="checkbox" 
+                    checked={agreedToPrivacy}
+                    onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                    className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" 
+                    required 
+                  />
                   <span className="text-sm text-gray-700">I accept the <a href="#" className="text-red-800 hover:underline font-semibold">Privacy Policy</a> and consent to data processing</span>
                 </label>
               </div>
@@ -517,10 +542,11 @@ const OrderCheckoutPage = () => {
 
               <button
                 onClick={handleSubmitOrder}
-                disabled={submitting}
-                className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${submitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
+                disabled={submitting || !agreedToTerms || !agreedToPrivacy}
+                className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${
+                  submitting || !agreedToTerms || !agreedToPrivacy
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
                   }`}
               >
                 {submitting ? (
@@ -532,7 +558,6 @@ const OrderCheckoutPage = () => {
                   `Place Order - COD ₹${total} ✨`
                 )}
               </button>
-
               <div className="mt-4 text-center">
                 <p className="text-xs text-gray-500">Pay when you receive your order</p>
                 <p className="text-xs text-gray-500 mt-1">Cart ID: {cartId}</p>
