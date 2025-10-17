@@ -16,7 +16,6 @@ import {
   Filter,
   Search,
 } from "lucide-react";
-import axios from "axios";
 
 const Previous_Order_Page = () => {
   const [allOrders, setAllOrders] = useState([]);
@@ -26,19 +25,14 @@ const Previous_Order_Page = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
 
-  // Get user ID from localStorage
-  // Get user ID from localStorage
   useEffect(() => {
     const userData = localStorage.getItem("user");
     const token = localStorage.getItem("authToken");
-    // console.log(userData);
-    
 
     if (userData) {
       try {
         const user = JSON.parse(userData);
         setCurrentUser(user);
-        
       } catch (error) {
         console.error("Error parsing user data:", error);
         setCurrentUser(null);
@@ -54,23 +48,20 @@ const Previous_Order_Page = () => {
     } else {
       setCurrentUser(null);
     }
-    setLoading(false); // Add this line
+    setLoading(false);
   }, []);
 
-  // Fetch all orders
-  // Remove the getAllOrders function and replace with:
   const getUserOrders = async () => {
     if (!currentUser) return;
 
     try {
       setLoading(true);
-      console.log('Current ...',currentUser);
-      
+      console.log('Current ...', currentUser);
+
       const userId = currentUser.userId || currentUser._id || currentUser.id;
       console.log("Current user:", currentUser);
       console.log("Using user ID:", userId);
 
-      // Use the correct backend URL
       const response = await fetch(
         `https://astroanikantbackend-2.onrender.com/order/user/${userId}`
       );
@@ -80,7 +71,7 @@ const Previous_Order_Page = () => {
       if (response.ok) {
         console.log("Orders received:", data.data);
         setAllOrders(data.data);
-        setUserOrders(data.data); // Add this line to populate userOrders
+        setUserOrders(data.data);
       } else {
         console.error("Failed to fetch orders:", data.message);
         setAllOrders([]);
@@ -94,24 +85,24 @@ const Previous_Order_Page = () => {
       setLoading(false);
     }
   };
-  // Update the useEffect that calls the function:
-  useEffect(() => {
-  if (currentUser) {
-    getUserOrders();
-  }
-}, [currentUser]);
 
-// Keep the existing filter useEffect:
-useEffect(() => {
-  if (filterStatus === "all") {
-    setUserOrders(allOrders);
-  } else {
-    const filtered = allOrders.filter(
-      (order) => order.cart?.status === filterStatus
-    );
-    setUserOrders(filtered);
-  }
-}, [filterStatus, allOrders]);
+  useEffect(() => {
+    if (currentUser) {
+      getUserOrders();
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (filterStatus === "all") {
+      setUserOrders(allOrders);
+    } else {
+      const filtered = allOrders.filter(
+        (order) => order.cart?.status === filterStatus
+      );
+      setUserOrders(filtered);
+    }
+  }, [filterStatus, allOrders]);
+
   const getStatusColor = (status) => {
     switch (status) {
       case "delivered":
@@ -154,14 +145,10 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FEF7D7] to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full mx-auto mb-4 flex items-center justify-center animate-spin">
-            <Package className="w-8 h-8 text-[#FEF7D7]" />
-          </div>
-          <p className="text-[#9C0B13] font-semibold">
-            Loading your sacred orders...
-          </p>
+          <div className="w-16 h-16 border-4 border-red-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading your orders...</p>
         </div>
       </div>
     );
@@ -169,10 +156,10 @@ useEffect(() => {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FEF7D7] to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">
-          <User className="w-20 h-20 text-[#9C0B13] mx-auto mb-6" />
-          <h2 className="text-3xl font-bold text-[#9C0B13] mb-4">
+          <User className="w-20 h-20 text-red-800 mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-red-800 mb-4">
             Please Login
           </h2>
           <p className="text-gray-700 mb-6">
@@ -180,7 +167,7 @@ useEffect(() => {
           </p>
           <button
             onClick={() => (window.location.href = "/login")}
-            className="bg-gradient-to-r from-[#9C0B13] to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300"
+            className="bg-gradient-to-r from-red-800 to-red-900 text-white px-8 py-3 rounded-xl font-semibold hover:from-red-900 hover:to-red-800 transition-all duration-300"
           >
             Login Now
           </button>
@@ -190,25 +177,25 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FEF7D7] to-white">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#9C0B13]/10 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-800/10 to-transparent"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center">
             <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-600 rounded-full flex items-center justify-center animate-pulse">
-                <ShoppingBag className="w-10 h-10 text-[#FEF7D7]" />
+              <div className="w-20 h-20 bg-gradient-to-br from-red-800 to-red-900 rounded-full flex items-center justify-center animate-pulse">
+                <ShoppingBag className="w-10 h-10 text-amber-100" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-[#9C0B13] mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-red-800 mb-6">
               Your Sacred Orders
             </h1>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
               Track your spiritual journey through your previous purchases
             </p>
             <div className="mt-8 flex justify-center">
-              <div className="w-24 h-1 bg-gradient-to-r from-[#9C0B13] to-red-600 rounded-full"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-red-800 to-red-900 rounded-full"></div>
             </div>
           </div>
         </div>
@@ -217,13 +204,13 @@ useEffect(() => {
       {/* User Info */}
       <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-[#FEF7D7] to-[#FEF7D7]/50 p-6 rounded-2xl">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-[#FEF7D7]" />
+              <div className="w-12 h-12 bg-red-800 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-amber-100" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-[#9C0B13]">
+                <h3 className="text-xl font-bold text-red-800">
                   Welcome, {currentUser.name || currentUser.email}
                 </h3>
                 <p className="text-gray-600">
@@ -236,34 +223,33 @@ useEffect(() => {
       </section>
 
       {/* Filter Section */}
-      {/* Filter Section */}
-<section className="py-6">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="bg-white rounded-2xl p-4 shadow-md">
-      <div className="flex items-center space-x-2 mb-4 sm:mb-0">
-        <Filter className="w-5 h-5 text-[#9C0B13]" />
-        <span className="font-semibold text-[#9C0B13]">Filter by Status:</span>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex gap-2 mt-4 sm:mt-0">
-        {["all", "processing", "shipped", "delivered", "cancelled"].map(
-          (status) => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`px-3 py-2 rounded-lg text-sm font-medium capitalize transition-colors duration-300 ${
-                filterStatus === status
-                  ? "bg-[#9C0B13] text-white"
-                  : "bg-white text-gray-700 hover:bg-[#FEF7D7] border border-gray-200"
-              }`}
-            >
-              {status}
-            </button>
-          )
-        )}
-      </div>
-    </div>
-  </div>
-</section>
+      <section className="py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl p-4 shadow-md">
+            <div className="flex items-center space-x-2 mb-4 sm:mb-0">
+              <Filter className="w-5 h-5 text-red-800" />
+              <span className="font-semibold text-red-800">Filter by Status:</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex gap-2 mt-4 sm:mt-0">
+              {["all", "processing", "shipped", "delivered", "cancelled"].map(
+                (status) => (
+                  <button
+                    key={status}
+                    onClick={() => setFilterStatus(status)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium capitalize transition-colors duration-300 ${
+                      filterStatus === status
+                        ? "bg-red-800 text-white"
+                        : "bg-white text-gray-700 hover:bg-amber-50 border border-gray-200"
+                    }`}
+                  >
+                    {status}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Orders List */}
       <section className="py-8">
@@ -280,7 +266,7 @@ useEffect(() => {
                   : `No ${filterStatus} orders found. Try a different filter.`}
               </p>
               <button
-                className="bg-gradient-to-r from-[#9C0B13] to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-red-600 hover:to-[#9C0B13] transition-all duration-300"
+                className="bg-gradient-to-r from-red-800 to-red-900 text-white px-8 py-3 rounded-xl font-semibold hover:from-red-900 hover:to-red-800 transition-all duration-300"
                 onClick={() => (window.location.href = "/products")}
               >
                 Explore Products
@@ -291,56 +277,52 @@ useEffect(() => {
               {userOrders.map((order) => (
                 <div
                   key={order._id}
-                  className="bg-white rounded-2xl shadow-lg border border-[#9C0B13]/10 overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  className="bg-white rounded-2xl shadow-lg border border-red-100 overflow-hidden hover:shadow-xl transition-shadow duration-300"
                 >
                   {/* Order Header */}
-                  <div className="bg-gradient-to-r from-[#9C0B13] to-red-600 text-white p-4 sm:p-6">
-  <div className="flex flex-col gap-4">
-    <div className="flex justify-between items-start">
-      <h3 className="text-lg sm:text-xl font-bold">
-        Order #{order._id.slice(-8)}
-      </h3>
-      <div
-        className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(
-          order.cart?.status || "processing"
-        )}`}
-      >
-        {getStatusIcon(order.cart?.status || "processing")}
-        <span className="capitalize">
-          {order.cart?.status || "processing"}
-        </span>
-      </div>
-    </div>
-    
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs sm:text-sm opacity-90">
-      <div className="flex items-center space-x-1">
-        {/* <Calendar className="w-4 h-4 flex-shrink-0" /> */}
-        {/* <span className="truncate">{formatDate(order.createdAt)}</span> */}
-      </div>
-      <div className="flex items-center space-x-1">
-        <Package className="w-4 h-4 flex-shrink-0" />
-        <span>{order.cart?.items?.length || 0} items</span>
-      </div>
-      <div className="flex items-center space-x-1">
-        <span className="truncate">Payment: {order.typeOfPayment || "N/A"}</span>
-      </div>
-    </div>
-    
-    <div className="text-right">
-      <div className="text-xl sm:text-2xl font-bold">
-        ₹{order.cart?.items?.reduce(
-          (total, item) =>
-            total +
-            (item.product?.discountedPrice ||
-              item.product?.price ||
-              0) *
-              item.quantity,
-          0
-        )?.toLocaleString() || "0"}
-      </div>
-    </div>
-  </div>
-</div>
+                  <div className="bg-gradient-to-r from-red-800 to-red-900 text-white p-4 sm:p-6">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-lg sm:text-xl font-bold">
+                          Order #{order._id.slice(-8)}
+                        </h3>
+                        <div
+                          className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(
+                            order.cart?.status || "processing"
+                          )}`}
+                        >
+                          {getStatusIcon(order.cart?.status || "processing")}
+                          <span className="capitalize">
+                            {order.cart?.status || "processing"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs sm:text-sm opacity-90">
+                        <div className="flex items-center space-x-1">
+                          <Package className="w-4 h-4 flex-shrink-0" />
+                          <span>{order.cart?.items?.length || 0} items</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <span className="truncate">Payment: {order.typeOfPayment || "N/A"}</span>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-xl sm:text-2xl font-bold">
+                          ₹{(order.amount || order.cart?.items?.reduce(
+                            (total, item) =>
+                              total +
+                              (item.product?.discountedPrice ||
+                                item.product?.price ||
+                                0) *
+                                item.quantity,
+                            0
+                          ) || 0)?.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Order Items */}
                   <div className="p-6">
@@ -348,7 +330,7 @@ useEffect(() => {
                       {order.cart?.items?.map((item, index) => (
                         <div
                           key={item._id || index}
-                          className="flex items-center space-x-4 p-4 bg-[#FEF7D7]/30 rounded-lg"
+                          className="flex items-center space-x-4 p-4 bg-amber-50 rounded-lg"
                         >
                           <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                             {item.product?.images?.[0]?.url ||
@@ -378,7 +360,7 @@ useEffect(() => {
                             </div>
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-semibold text-[#9C0B13]">
+                            <h4 className="font-semibold text-red-800">
                               {item.product?.name || "Product Name"}
                             </h4>
                             <p className="text-gray-600">
@@ -396,7 +378,7 @@ useEffect(() => {
                             )}
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-[#9C0B13]">
+                            <p className="font-bold text-red-800">
                               ₹
                               {(
                                 item.product?.discountedPrice ||
@@ -427,25 +409,17 @@ useEffect(() => {
                       ))}
                     </div>
 
-                    {/* Shipping Address from user data */}
+                    {/* Shipping Address */}
                     {order.cart?.user?.address && (
                       <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-2 mb-2">
-                          <MapPin className="w-4 h-4 text-[#9C0B13]" />
-                          <span className="font-semibold text-[#9C0B13]">
+                          <MapPin className="w-4 h-4 text-red-800" />
+                          <span className="font-semibold text-red-800">
                             Delivery Address
                           </span>
                         </div>
                         <p className="text-gray-700">
                           <strong>{order.cart.user.name}</strong>
-                          <br />
-                          {/* {order.cart.user.address.street &&
-                            `${order.cart.user.address.street}, `}
-                          {order.cart.user.address.societyName &&
-                            `${order.cart.user.address.societyName}, `}
-                          {order.cart.user.address.city},{" "}
-                          {order.cart.user.address.state} -{" "}
-                          {order.cart.user.address.pincode} */}
                         </p>
                         {order.cart.user.phone && (
                           <p className="text-gray-600 mt-1 flex items-center">
@@ -466,12 +440,11 @@ useEffect(() => {
                     <div className="mt-6 flex space-x-4">
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="flex items-center space-x-2 bg-[#9C0B13] text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300"
+                        className="flex items-center space-x-2 bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-900 transition-colors duration-300"
                       >
                         <Eye className="w-4 h-4" />
                         <span>View Details</span>
                       </button>
-                      
                     </div>
                   </div>
                 </div>
@@ -485,7 +458,7 @@ useEffect(() => {
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-[#9C0B13] to-red-600 text-white p-6">
+            <div className="bg-gradient-to-r from-red-800 to-red-900 text-white p-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-2xl font-bold">Order Details</h3>
                 <button
@@ -498,38 +471,37 @@ useEffect(() => {
             </div>
             <div className="p-6">
               <div className="space-y-6">
-            <div>
-  <h4 className="font-semibold text-[#9C0B13] mb-2">Order Information</h4>
-  <div className="grid grid-cols-2 gap-4 text-sm">
-    <div>Order ID: {selectedOrder._id.slice(-8)}</div>
-    {/* <div>Date: {formatDate(selectedOrder.createdAt)}</div> */}
-    <div>Status: {selectedOrder.cart?.status || 'Processing'}</div>
-    <div>Payment: {selectedOrder.typeOfPayment || 'N/A'}</div>
-    <div className="col-span-2">
-      Total: ₹{selectedOrder.cart?.items?.reduce((total, item) => total + ((item.product?.discountedPrice || item.product?.price || 0) * item.quantity), 0)?.toLocaleString() || '0'}
-    </div>
-  </div>
-</div>
+                <div>
+                  <h4 className="font-semibold text-red-800 mb-2">Order Information</h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>Order ID: {selectedOrder._id.slice(-8)}</div>
+                    <div>Status: {selectedOrder.cart?.status || 'Processing'}</div>
+                    <div>Payment: {selectedOrder.typeOfPayment || 'N/A'}</div>
+                    <div className="col-span-2">
+                      Total: ₹{(selectedOrder.amount || selectedOrder.cart?.items?.reduce((total, item) => total + ((item.product?.discountedPrice || item.product?.price || 0) * item.quantity), 0) || 0)?.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
 
-<div>
-  <h4 className="font-semibold text-[#9C0B13] mb-2">Items Ordered</h4>
-  <div className="space-y-2">
-    {selectedOrder.cart?.items?.map((item, index) => (
-      <div key={item._id || index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-        <div className="flex-1">
-          <span className="font-medium">{item.product?.name || 'Product Name'}</span>
-          <span className="text-gray-600"> (x{item.quantity})</span>
-          {item.product?.shortDescription && (
-            <p className="text-gray-500 text-sm">{item.product.shortDescription}</p>
-          )}
-        </div>
-        <span className="font-semibold">
-          ₹{((item.product?.discountedPrice || item.product?.price || 0) * item.quantity)?.toLocaleString()}
-        </span>
-      </div>
-    ))}
-  </div>
-</div>
+                <div>
+                  <h4 className="font-semibold text-red-800 mb-2">Items Ordered</h4>
+                  <div className="space-y-2">
+                    {selectedOrder.cart?.items?.map((item, index) => (
+                      <div key={item._id || index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <div className="flex-1">
+                          <span className="font-medium">{item.product?.name || 'Product Name'}</span>
+                          <span className="text-gray-600"> (x{item.quantity})</span>
+                          {item.product?.shortDescription && (
+                            <p className="text-gray-500 text-sm">{item.product.shortDescription}</p>
+                          )}
+                        </div>
+                        <span className="font-semibold">
+                          ₹{((item.product?.discountedPrice || item.product?.price || 0) * item.quantity)?.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
