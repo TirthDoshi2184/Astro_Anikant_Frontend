@@ -34,6 +34,7 @@ import WishlistPage from "./pages/WishlistPage";
 import PrivacyPolicyPage from "./pages/Privacy_Policy";
 import TermsConditionsPage from "./pages/Terms_and_Condition";
 import { useEffect } from "react";
+import AdminReviews from "./Components/Admin/AdminReview";
 
 function ScrollToTop() {
   const location = useLocation();
@@ -120,7 +121,7 @@ function App() {
         <Route path="/adminvisits" element={<AdminVisits />} />
         <Route path="/adminvisits/:id" element={<AdminSingleVisit />} />
         <Route path="/adminproductrequest" element={<AdminProductRequest />} />
-
+        <Route path="/adminReview" element={<AdminReviews />} />
         
         {/* 404 Route - should be last */}
         <Route path="*" element={<div className="p-8 text-center">Page Not Found - 404</div>} />

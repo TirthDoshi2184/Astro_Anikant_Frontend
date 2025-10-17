@@ -15,12 +15,15 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import AdminSidebar from './AdminSidePanel';
 
 export const AdminProductsView = () => {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerPage] = useState(25);
   
   // Get current location to determine active menu item
   const location = useLocation();
@@ -65,10 +68,20 @@ export const AdminProductsView = () => {
     setActiveMenuItem(getActiveMenuItem());
   }, [location.pathname]);
 
+  useEffect(() => {
+  setCurrentPage(1); // Reset to first page when search changes
+}, [search]);
+
   // Filter users by search term
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  // ADD THIS - Pagination logic
+const indexOfLastProduct = currentPage * itemsPerPage;
+const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
@@ -90,64 +103,9 @@ export const AdminProductsView = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
       {/* Sidebar */}
-      <div className="w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-900 shadow-2xl">
-        {/* Logo Section */}
-        <div className="p-6 border-b border-red-700/50">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
-                <Home className="w-5 h-5 text-red-900" />
-              </div>
-              <div className="absolute -inset-1 bg-gradient-to-br from-amber-300 to-yellow-400 rounded-full opacity-30 blur-sm"></div>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-amber-50">Astro Anekant</h2>
-              <p className="text-xs text-amber-200">Admin Panel</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Menu */}
-        <nav className="p-4 space-y-2">
-          {sidebarItems.map((item) => {
-            const IconComponent = item.icon;
-            
-            // Special handling for logout
-            if (item.id === 'logout') {
-              return (
-                <button
-                  key={item.id}
-                  onClick={handleLogout}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 text-amber-100 hover:text-red-900 hover:bg-amber-400/90`}
-                >
-                  <IconComponent className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            }
-            
-            // Regular navigation items
-            return (
-              <Link
-                key={item.id}
-                to={item.link}
-                onClick={() => setActiveMenuItem(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${
-                  activeMenuItem === item.id
-                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
-                    : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
-                }`}
-              >
-                <IconComponent className="w-5 h-5" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
+      <AdminSidebar/>
       {/* Main Content */}
-      <div className="flex-1 p-8">
+      <div className="flex-1 ml-64 p-6">
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
@@ -235,7 +193,7 @@ export const AdminProductsView = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-red-200/50">
-                  {filteredProducts.map((product, index) => (
+                  {currentProducts.map((product, index) => (
                     <tr
                       key={product._id}
                       className={`hover:bg-gradient-to-r hover:from-amber-100/50 hover:to-yellow-100/50 transition-all duration-300 ${
@@ -280,7 +238,7 @@ export const AdminProductsView = () => {
             </div>
 
             {/* Empty State */}
-            {filteredProducts.length === 0 && (
+            {currentProducts.length === 0 && (
               <div className="text-center py-12">
                 <Users className="mx-auto h-12 w-12 text-red-400" />
                 <h3 className="mt-2 text-lg font-medium text-red-900">No Products found</h3>
@@ -289,8 +247,75 @@ export const AdminProductsView = () => {
                 </p>
               </div>
             )}
+
+
           </div>
+          
         )}
+{/* Pagination Controls */}
+{filteredProducts.length > itemsPerPage && (
+  <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border-2 border-red-900/20 p-6 mt-6">
+    <div className="flex items-center justify-between">
+      <div className="text-sm text-red-700">
+        Showing <span className="font-semibold text-red-900">{indexOfFirstProduct + 1}</span> to{' '}
+        <span className="font-semibold text-red-900">
+          {Math.min(indexOfLastProduct, filteredProducts.length)}
+        </span>{' '}
+        of <span className="font-semibold text-red-900">{filteredProducts.length}</span> products
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-all duration-300"
+        >
+          Previous
+        </button>
+        
+        <div className="flex items-center space-x-1">
+          {[...Array(totalPages)].map((_, index) => {
+            const pageNumber = index + 1;
+            // Show first page, last page, current page, and pages around current
+            if (
+              pageNumber === 1 ||
+              pageNumber === totalPages ||
+              (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+            ) {
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    currentPage === pageNumber
+                      ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg'
+                      : 'bg-white text-red-900 hover:bg-amber-100'
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            } else if (
+              pageNumber === currentPage - 2 ||
+              pageNumber === currentPage + 2
+            ) {
+              return <span key={pageNumber} className="text-red-700">...</span>;
+            }
+            return null;
+          })}
+        </div>
+        
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-all duration-300"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         {/* Stats Cards */}
         {!loading && !error && (

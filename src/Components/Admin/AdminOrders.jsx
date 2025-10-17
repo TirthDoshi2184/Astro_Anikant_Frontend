@@ -18,6 +18,7 @@ import {
     Download
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import AdminSidebar from './AdminSidePanel'
 
 export const AdminOrders = () => {
     const [orders, setOrders] = useState([])
@@ -187,12 +188,12 @@ export const AdminOrders = () => {
     }
 
     return (
-        <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
+        <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
             {/* Fixed Sidebar */}
-            <AdminSideNav />
+            <AdminSidebar />
             
             {/* Main Content */}
-            <div className="flex-1 p-8">
+            <div className="flex-1 ml-70 flex flex-col h-screen">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center space-x-3 mb-4">
@@ -341,7 +342,7 @@ export const AdminOrders = () => {
                                                     </div>
                                                     <div>
                                                         <p className="font-medium text-red-900">
-                                                            {order?.cart?.product?.name || 'N/A'}
+                                                            {order?.cart?.items?.[0]?.product?.name || 'N/A'}
                                                         </p>
                                                     </div>
                                                 </div>

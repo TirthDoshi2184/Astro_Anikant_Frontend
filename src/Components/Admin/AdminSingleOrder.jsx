@@ -25,6 +25,7 @@ import {
     Warehouse,
     Image as ImageIcon
 } from 'lucide-react'
+import AdminSidebar from './AdminSidePanel';
 
 export const AdminSingleOrder = () => {
     const { id } = useParams()
@@ -138,7 +139,7 @@ export const AdminSingleOrder = () => {
         <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
             {/* Fixed Sidebar */}
             <div className="fixed left-0 top-0 h-full z-10">
-                <AdminSideNav />
+                <AdminSidebar />
             </div>
             
             {/* Main Content */}

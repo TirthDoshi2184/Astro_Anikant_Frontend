@@ -136,61 +136,7 @@ export const AdminVisits = () => {
     return (
         <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
             {/* Sidebar - Fixed */}
-            <div className="w-64 bg-gradient-to-b from-red-900 via-red-800 to-red-900 shadow-2xl fixed h-full z-10">
-                {/* Logo Section */}
-                <div className="p-6 border-b border-red-700/50">
-                    <div className="flex items-center space-x-3">
-                        <div className="relative">
-                            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
-                                <Home className="w-5 h-5 text-red-900" />
-                            </div>
-                            <div className="absolute -inset-1 bg-gradient-to-br from-amber-300 to-yellow-400 rounded-full opacity-30 blur-sm"></div>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-amber-50">Astro Anekant</h2>
-                            <p className="text-xs text-amber-200">Admin Panel</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Navigation Menu */}
-                <nav className="p-4 space-y-2">
-                    {sidebarItems.map((item) => {
-                        const IconComponent = item.icon;
-
-                        // Special handling for logout
-                        if (item.id === 'logout') {
-                            return (
-                                <button
-                                    key={item.id}
-                                    onClick={handleLogout}
-                                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 text-amber-100 hover:text-red-900 hover:bg-amber-400/90`}
-                                >
-                                    <IconComponent className="w-5 h-5" />
-                                    <span>{item.label}</span>
-                                </button>
-                            );
-                        }
-
-                        // Regular navigation items
-                        return (
-                            <Link
-                                key={item.id}
-                                to={item.link}
-                                onClick={() => setActiveMenuItem(item.id)}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 ${activeMenuItem === item.id
-                                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-900 shadow-lg shadow-amber-500/30'
-                                    : 'text-amber-100 hover:text-red-900 hover:bg-amber-400/90'
-                                    }`}
-                            >
-                                <IconComponent className="w-5 h-5" />
-                                <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
-            </div>
-
+            <AdminSidebar activeMenuItem={activeMenuItem} />
             {/* Main Content - With left margin to account for fixed sidebar */}
             <div className="flex-1 ml-64 p-6 overflow-y-auto">
                 <div className="max-w-7xl mx-auto">
@@ -295,12 +241,12 @@ export const AdminVisits = () => {
                                                         Phone
                                                     </div>
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-red-900 uppercase tracking-wider">
+                                                {/* <th className="px-6 py-4 text-left text-xs font-medium text-red-900 uppercase tracking-wider">
                                                     <div className="flex items-center gap-2">
                                                         <Calendar className="w-4 h-4" />
                                                         Date
                                                     </div>
-                                                </th>
+                                                </th> */}
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-red-900 uppercase tracking-wider">
                                                     Action
                                                 </th>
@@ -330,11 +276,11 @@ export const AdminVisits = () => {
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">{visit?.phone || 'N/A'}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    {/* <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">
                                                             {formatDate(visit.createdAt || visit.visit_date)}
                                                         </div>
-                                                    </td>
+                                                    </td> */}
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex items-center gap-2">
                                                             <Link
