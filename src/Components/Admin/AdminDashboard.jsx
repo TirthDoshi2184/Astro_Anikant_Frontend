@@ -297,40 +297,7 @@ export const AdminDashboard = () => {
             </div>
 
             {/* Additional Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="bg-gradient-to-br from-red-800 to-red-900 rounded-2xl p-6 text-amber-50 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-amber-200 text-sm">Active Sessions</p>
-                    <p className="text-3xl font-bold">24</p>
-                    <p className="text-amber-300 text-xs mt-1">+12% from yesterday</p>
-                  </div>
-                  <Moon className="w-8 h-8 text-amber-300" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-6 text-red-900 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-red-700 text-sm">Revenue Today</p>
-                    <p className="text-3xl font-bold">₹12.5k</p>
-                    <p className="text-red-700 text-xs mt-1">+8% from last week</p>
-                  </div>
-                  <Sun className="w-8 h-8 text-red-700" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-red-700 to-red-800 rounded-2xl p-6 text-amber-50 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-amber-200 text-sm">Satisfaction Rate</p>
-                    <p className="text-3xl font-bold">98.5%</p>
-                    <p className="text-amber-300 text-xs mt-1">+2.1% this month</p>
-                  </div>
-                  <Star className="w-8 h-8 text-amber-300" />
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>

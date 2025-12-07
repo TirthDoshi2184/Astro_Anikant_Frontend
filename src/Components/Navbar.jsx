@@ -15,10 +15,10 @@ const AstrologyNavbar = () => {
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
     { id: 'products', label: 'Products', path: '/products' },
-    { id: 'about', label: 'About Us', path: '/about' },
+    { id: 'booking', label: 'Book Consultation', path: '/booking' },
     { id: 'order', label: 'My Orders', path: '/order' },
-    { id: 'Support', label: 'Support Us', path: '/donation' },
-    { id: 'booking', label: 'Book Consultation', path: '/booking' }
+    { id: 'about', label: 'About Us', path: '/about' },
+    // { id: 'Support', label: 'Support Us', path: '/donation' },
   ];
 
   // Fetch cart count from API
@@ -125,6 +125,20 @@ const fetchWishlistCount = async (userId) => {
     window.removeEventListener('wishlistCountUpdated', handleWishlistCountUpdate); // ADD THIS
   };
 }, []);
+// Close profile dropdown on scroll (mobile)
+useEffect(() => {
+  const handleScroll = () => {
+    if (isProfileOpen) {
+      setIsProfileOpen(false);
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  
+  return () => {
+    window.removeEventListener('scroll', handleScroll);
+  };
+}, [isProfileOpen]);
   // Check authentication and fetch user data
   useEffect(() => {
     const checkAuth = async () => {
@@ -137,6 +151,7 @@ const fetchWishlistCount = async (userId) => {
         // Parse user ID from localStorage and fetch cart count
         try {
           const parsedUser = JSON.parse(userString);
+          setUser(parsedUser);
           const userId = parsedUser.userId || parsedUser.id || parsedUser._id;
           // Inside checkAuth function, after fetchCartCount call:
 if (userId) {
@@ -359,54 +374,29 @@ const handleLogout = () => {
               </div>
 
               {/* Enhanced Profile Dropdown - Mobile Optimized */}
-              <div className="relative">
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  disabled={isLoading}
-                  className={`flex items-center space-x-1 lg:space-x-3 p-3 lg:p-4 rounded-full transition-all duration-500 transform hover:scale-105 border-2 ${
-                    isProfileOpen
-                      ? 'bg-gradient-to-br from-[#9C0B13] to-red-800 text-[#FEF7D7] shadow-2xl shadow-[#9C0B13]/40 border-amber-300/50'
-                      : 'bg-gradient-to-br from-[#FEF7D7] to-amber-100 text-[#9C0B13] hover:bg-gradient-to-br hover:from-[#9C0B13]/90 hover:to-red-800/90 hover:text-[#FEF7D7] border-amber-300/30 hover:border-amber-300/60'
-                  } ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  <div className="relative">
-                    <User className="w-5 h-5 lg:w-6 lg:h-6" />
-                    {isAuthenticated && (
-                      <div className="absolute -bottom-1 -right-1 w-2 h-2 lg:w-3 lg:h-3 bg-green-400 rounded-full border border-white lg:border-2 animate-pulse"></div>
-                    )}
-                  </div>
-                  <ChevronDown className={`w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-500 ${isProfileOpen ? 'rotate-180' : ''} hidden sm:block`} />
-                </button>
+             {/* Enhanced Profile Dropdown - Mobile Optimized */}
+<div className="relative">
+  <button
+    onClick={() => setIsProfileOpen(!isProfileOpen)}
+    disabled={isLoading}
+    className={`flex items-center space-x-1 lg:space-x-3 p-3 lg:p-4 rounded-full transition-all duration-500 transform hover:scale-105 border-2 ${
+      isProfileOpen
+        ? 'bg-gradient-to-br from-[#9C0B13] to-red-800 text-[#FEF7D7] shadow-2xl shadow-[#9C0B13]/40 border-amber-300/50'
+        : 'bg-gradient-to-br from-[#FEF7D7] to-amber-100 text-[#9C0B13] hover:bg-gradient-to-br hover:from-[#9C0B13]/90 hover:to-red-800/90 hover:text-[#FEF7D7] border-amber-300/30 hover:border-amber-300/60'
+    } ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+  >
+    <div className="relative">
+      <User className="w-5 h-5 lg:w-6 lg:h-6" />
+      {isAuthenticated && (
+        <div className="absolute -bottom-1 -right-1 w-2 h-2 lg:w-3 lg:h-3 bg-green-400 rounded-full border border-white lg:border-2 animate-pulse"></div>
+      )}
+    </div>
+    <ChevronDown className={`w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-500 ${isProfileOpen ? 'rotate-180' : ''} hidden sm:block`} />
+  </button>
 
-                {/* Enhanced Dropdown Menu */}
-                {isProfileOpen && (
-                  <div className="absolute right-0 mt-4 w-72 lg:w-80 bg-gradient-to-br from-[#FEF7D7]/95 via-amber-50/95 to-[#FEF7D7]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border-3 border-[#9C0B13]/20 overflow-hidden animate-in fade-in slide-in-from-top-10 duration-300">
-                    
-                    {/* Navigation Items for Mobile */}
-                    <div className="lg:hidden py-3 border-b border-[#9C0B13]/10">
-                      <div className="px-3 pb-2">
-                        <div className="text-xs text-[#9C0B13]/60 font-semibold uppercase tracking-wider">Navigation</div>
-                      </div>
-                      {navItems.map((item, index) => (
-                        <button
-                          key={item.id}
-                          onClick={() => {
-                            handleNavClick(item);
-                            setIsProfileOpen(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-6 py-3 text-left transition-all duration-300 hover:bg-gradient-to-r group ${
-                            activeItem === item.id
-                              ? 'text-[#FEF7D7] bg-gradient-to-r from-[#9C0B13] to-red-800'
-                              : 'text-[#9C0B13] hover:from-[#9C0B13]/10 hover:to-red-800/10'
-                          }`}
-                        >
-                          <span className="font-medium">{item.label}</span>
-                          {activeItem === item.id && (
-                            <div className="w-2 h-2 bg-amber-300 rounded-full animate-pulse"></div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
+  {/* Enhanced Dropdown Menu - Fixed positioning for mobile */}
+  {isProfileOpen && (
+    <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:inset-x-auto lg:top-auto lg:mt-4 w-auto lg:w-80 bg-gradient-to-br from-[#FEF7D7]/98 via-amber-50/98 to-[#FEF7D7]/98 backdrop-blur-2xl rounded-3xl shadow-2xl border-3 border-[#9C0B13]/20 overflow-hidden animate-in fade-in slide-in-from-top-10 duration-300 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto">       
                     
                     {/* User info section */}
                     {isAuthenticated && user && (
@@ -436,10 +426,8 @@ const handleLogout = () => {
                     )}
                     
                     {/* Profile Menu items */}
-                    <div className="py-3">
-                      <div className="px-3 pb-2 lg:hidden">
-                        <div className="text-xs text-[#9C0B13]/60 font-semibold uppercase tracking-wider">Account</div>
-                      </div>
+                    <div className="py-7 px-3">
+                      
                       {profileMenuItems.map((item, index) => {
                         const IconComponent = item.icon;
                         return (

@@ -129,10 +129,10 @@ const OrderCheckoutPage = () => {
       return false;
     }
 
-    if (!agreedToPrivacy) {
-      setError('Please accept the Privacy Policy to proceed');
-      return false;
-    }
+    // if (!agreedToPrivacy) {
+    //   setError('Please accept the Privacy Policy to proceed');
+    //   return false;
+    // }
 
     return true;
   };
@@ -462,10 +462,10 @@ const OrderCheckoutPage = () => {
                     className="mt-1 mr-3 w-4 h-4 text-red-800 border-2 border-gray-300 rounded focus:ring-red-500" 
                     required 
                   />
-                  <span className="text-sm text-gray-700">I agree to the <a href="/terms-condition" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and have read the return policy</span>
+                  <span className="text-sm text-gray-700">I agree to the <a href="/terms-condition" className="text-red-800 hover:underline font-semibold">Terms & Conditions</a> and <a href="#" className="text-red-800 hover:underline font-semibold">Privacy Policy</a>  </span>
                 </label>
 
-                <label className="flex items-start cursor-pointer group">
+                {/* <label className="flex items-start cursor-pointer group">
                   <input 
                     type="checkbox" 
                     checked={agreedToPrivacy}
@@ -474,7 +474,7 @@ const OrderCheckoutPage = () => {
                     required 
                   />
                   <span className="text-sm text-gray-700">I accept the <a href="#" className="text-red-800 hover:underline font-semibold">Privacy Policy</a> and consent to data processing</span>
-                </label>
+                </label> */}
               </div>
             </div>
           </div>
@@ -499,6 +499,9 @@ const OrderCheckoutPage = () => {
                       <p className="text-xs text-gray-600">Qty: {item.quantity || 1}</p>
                     </div>
                     <div className="text-right">
+                      <p className="font-bold  text-gray-500 line-through">
+                        ₹{item.product?.price || 0}
+                      </p>
                       <p className="font-bold text-red-800">
                         ₹{item.product?.discountedPrice || item.product?.price || 0}
                       </p>
@@ -542,9 +545,9 @@ const OrderCheckoutPage = () => {
 
               <button
                 onClick={handleSubmitOrder}
-                disabled={submitting || !agreedToTerms || !agreedToPrivacy}
+                disabled={submitting || !agreedToTerms }
                 className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transform transition-all duration-300 shadow-lg hover:shadow-xl ${
-                  submitting || !agreedToTerms || !agreedToPrivacy
+                  submitting || !agreedToTerms 
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-red-800 to-red-900 text-white hover:from-red-900 hover:to-red-800 hover:scale-105'
                   }`}
@@ -558,10 +561,6 @@ const OrderCheckoutPage = () => {
                   `Place Order - COD ₹${total} ✨`
                 )}
               </button>
-              <div className="mt-4 text-center">
-                <p className="text-xs text-gray-500">Pay when you receive your order</p>
-                <p className="text-xs text-gray-500 mt-1">Cart ID: {cartId}</p>
-              </div>
             </div>
           </div>
         </div>

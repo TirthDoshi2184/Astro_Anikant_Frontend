@@ -27,10 +27,12 @@ import {
     Trash2,
     EyeIcon,
     Filter,
-    Package
+    Package,
+    Check
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import AdminSidebar from './AdminSidePanel';
 
 export const AdminVisits = () => {
     const location = useLocation();
@@ -38,6 +40,7 @@ export const AdminVisits = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [updatingId, setUpdatingId] = useState(null);
 
     const getActiveMenuItem = () => {
         const path = location.pathname;
@@ -101,6 +104,50 @@ export const AdminVisits = () => {
         );
     });
 
+  const handleStatusChange = async (visitId, newStatus) => {
+    const oldVisit = visits.find(v => v._id === visitId);
+    
+    if (newStatus === "Paid" && oldVisit.status !== "Paid") {
+        const transactionId = prompt("Enter UPI Transaction ID:");
+        if (!transactionId) {
+            alert("Transaction ID is required to mark as paid");
+            return;
+        }
+        
+        try {
+            setUpdatingId(visitId);
+            await axios.put(
+                `https://astroanikantbackend-2.onrender.com/visit/updatevisit/${visitId}`,
+                {
+                    status: newStatus,
+                    upiTransactionId: transactionId
+                }
+            );
+            await getAllVisits();
+            alert("Status updated successfully!");
+        } catch (error) {
+            console.error("Error updating status:", error);
+            alert("Failed to update status. Please try again.");
+        } finally {
+            setUpdatingId(null);
+        }
+    } else {
+        try {
+            setUpdatingId(visitId);
+            await axios.put(
+                `https://astroanikantbackend-2.onrender.com/visit/updatevisit/${visitId}`,
+                { status: newStatus }
+            );
+            await getAllVisits();
+            alert("Status updated successfully!");
+        } catch (error) {
+            console.error("Error updating status:", error);
+            alert("Failed to update status. Please try again.");
+        } finally {
+            setUpdatingId(null);
+        }
+    }
+};
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
@@ -136,7 +183,7 @@ export const AdminVisits = () => {
     return (
         <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
             {/* Sidebar - Fixed */}
-            <AdminSidebar activeMenuItem={activeMenuItem} />
+            <AdminSidebar activeMenuItem='visits' />
             {/* Main Content - With left margin to account for fixed sidebar */}
             <div className="flex-1 ml-64 p-6 overflow-y-auto">
                 <div className="max-w-7xl mx-auto">
@@ -148,8 +195,8 @@ export const AdminVisits = () => {
                                     <Moon className="w-8 h-8 text-red-900" />
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-bold text-amber-50 mb-1">Visits Management</h2>
-                                    <p className="text-amber-200">Manage and track all user visits</p>
+                                    <h2 className="text-3xl font-bold text-amber-50 mb-1">Consultation Management</h2>
+                                    <p className="text-amber-200">Manage and track all user consultation</p>
                                 </div>
                             </div>
                             <div className="text-right">
@@ -241,6 +288,12 @@ export const AdminVisits = () => {
                                                         Phone
                                                     </div>
                                                 </th>
+                                                <th className="px-6 py-4 text-left text-xs font-medium text-red-900 uppercase tracking-wider">
+    <div className="flex items-center gap-2">
+        <ToggleRight className="w-4 h-4" />
+        Status
+    </div>
+</th>
                                                 {/* <th className="px-6 py-4 text-left text-xs font-medium text-red-900 uppercase tracking-wider">
                                                     <div className="flex items-center gap-2">
                                                         <Calendar className="w-4 h-4" />
@@ -276,6 +329,29 @@ export const AdminVisits = () => {
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">{visit?.phone || 'N/A'}</div>
                                                     </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+    <select
+        value={visit?.status || 'Pending'}
+        onChange={(e) => handleStatusChange(visit?._id, e.target.value)}
+        disabled={updatingId === visit._id}
+        className={`px-3 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-sm font-medium ${
+            visit.status === "Paid" 
+                ? "text-green-800" 
+                : visit.status === "Confirmed"
+                ? "text-blue-800"
+                : visit.status === "Processing"
+                ? "text-purple-800"
+                : visit.status === "Cancelled"
+                ? "text-red-800"
+                : "text-yellow-800"
+        } ${updatingId === visit._id ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+    >
+        <option value="Pending">Pending</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="Processing">Processing</option>
+        <option value="Cancelled">Cancelled</option>
+    </select>
+</td>
                                                     {/* <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">
                                                             {formatDate(visit.createdAt || visit.visit_date)}

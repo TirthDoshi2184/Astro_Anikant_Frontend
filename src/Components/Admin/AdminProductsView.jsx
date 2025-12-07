@@ -103,7 +103,7 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
       {/* Sidebar */}
-      <AdminSidebar/>
+      <AdminSidebar activeMenuItem='products'/>
       {/* Main Content */}
       <div className="flex-1 ml-64 p-6">
         {/* Header Section */}

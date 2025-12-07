@@ -58,7 +58,7 @@ const Footer = () => {
     { name: "Terms & Conditions", path: "/terms-conditions" },
     // { name: "Shipping Info", path: "/shipping-info" },
     { name: "Book a Consultation", path: "/booking" },
-    { name: "Support Us", path: "/donation" }
+    // { name: "Support Us", path: "/donation" }
   ];
 
   // On click, handleNavigation is already used in the button below to redirect to the given path.
@@ -109,10 +109,10 @@ const productCategories = [
 ];
 
   const contactInfo = {
-    phone: "+91 98765 43210",
+    phone: "+91 73729 90212",
     email: "astroanekant@gmail.com",
     address:"Astro anekant setho ki gali salumbar 313027",
-    whatsapp: "+91 98765 43210"
+    whatsapp: "+91 73729 90212"
   };
 
 const socialLinks = [
@@ -224,6 +224,13 @@ const socialLinks = [
                   <div>
                     <p className="text-amber-900 font-semibold text-sm">Email</p>
                     <p className="text-amber-800 text-sm">{contactInfo.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Phone className="w-4 h-4 text-orange-600" />
+                  <div>
+                    <p className="text-amber-900 font-semibold text-sm">Phone</p>
+                    <p className="text-amber-800 text-sm">{contactInfo.phone}</p>
                   </div>
                 </div>
                   <div className="flex items-center space-x-3">

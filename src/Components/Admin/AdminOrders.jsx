@@ -130,18 +130,33 @@ export const AdminOrders = () => {
             setCurrentPage(currentPage - 1)
         }
     }
-
-    const handleStatusUpdate = async (orderId, newStatus) => {
-        try {
-            // Add your API call to update order status
-            console.log(`Updating order ${orderId} to status: ${newStatus}`)
-            // await axios.put(`https://astroanikantbackend-2.onrender.com/order/update/${orderId}`, { status: newStatus })
-            // Refresh orders after update
-            getAllOrders()
-        } catch (error) {
-            console.error('Error updating order status:', error)
+const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+        console.log('Updating order:', orderId, 'to status:', newStatus);
+        
+        const response = await axios.put(
+            `https://astroanikantbackend-2.onrender.com/order/update-status/${orderId}`, 
+            { status: newStatus },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        
+        console.log('Update response:', response.data);
+        
+        // Wait for the update to complete, then refresh
+        if (response.data && response.status === 200) {
+            await getAllOrders(); // Wait for orders to reload
+            alert('Order status updated successfully!');
         }
+    } catch (error) {
+        console.error('Full error:', error);
+        console.error('Error response:', error.response?.data);
+        alert(`Failed to update: ${error.response?.data?.message || error.message}`);
     }
+}
 
     const getStatusColor = (status) => {
         switch (normalizeStatus(status)) {
@@ -190,7 +205,8 @@ export const AdminOrders = () => {
     return (
         <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
             {/* Fixed Sidebar */}
-            <AdminSidebar />
+            <AdminSidebar activeMenuItem='orders'/>
+            
             
             {/* Main Content */}
             <div className="flex-1 ml-70 flex flex-col h-screen">
@@ -312,13 +328,13 @@ export const AdminOrders = () => {
                                 <ShoppingBag className="w-12 h-12 text-red-300 mx-auto mb-4" />
                                 <p className="text-red-600 text-lg">No orders found</p>
                                 <p className="text-red-400">Try adjusting your search or filters</p>
-                                <div className="mt-4 p-4 bg-gray-100 rounded-lg text-left">
+                                {/* <div className="mt-4 p-4 bg-gray-100 rounded-lg text-left">
                                     <p className="font-semibold text-gray-700">Debug Info:</p>
                                     <p className="text-sm text-gray-600">Total orders: {orders.length}</p>
                                     <p className="text-sm text-gray-600">Search term: "{searchTerm}"</p>
                                     <p className="text-sm text-gray-600">Status filter: "{statusFilter}"</p>
                                     <p className="text-sm text-gray-600">Check console for detailed filtering info</p>
-                                </div>
+                                </div> */}
                             </div>
                         ) : (
                             <table className="w-full">
@@ -380,15 +396,30 @@ export const AdminOrders = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <div className="flex items-center space-x-2">
-                                                    <Link
-                                                        to={`/adminorders/${order?._id}`}
-                                                        className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 hover:from-red-700 hover:to-red-800"
-                                                    >
-                                                        View
-                                                    </Link>
-                                                </div>
-                                            </td>
+    <div className="flex items-center space-x-2">
+        <select
+    value={order?.status || 'pending'}
+    onChange={(e) => {
+        console.log('Order object:', order);
+        console.log('Order ID:', order?._id);
+        handleStatusUpdate(order?._id, e.target.value);
+    }}
+    className="px-3 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-sm"
+>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="processing">Processing</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+        <Link
+            to={`/adminorders/${order?._id}`}
+            className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 hover:from-red-700 hover:to-red-800"
+        >
+            <Eye className="w-4 h-4" />
+        </Link>
+    </div>
+</td>
                                         </tr>
                                     ))}
                                 </tbody>

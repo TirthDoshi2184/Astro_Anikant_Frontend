@@ -50,6 +50,46 @@ const HomePage = () => {
     additionalInfo: "",
   });
 
+  const [feedbackData, setFeedbackData] = useState({
+  email: "",
+  feedback: ""
+});
+
+const handleFeedbackChange = (e) => {
+  const { name, value } = e.target;
+  setFeedbackData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
+const handleFeedbackSubmit = async () => {
+  if (!feedbackData.email || !feedbackData.feedback) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(feedbackData.email)) {
+    alert("Please enter a valid email address");
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      "https://astroanikantbackend-2.onrender.com/feedback/submit",
+      feedbackData
+    );
+
+    if (response.data.success) {
+      alert(response.data.message);
+      setFeedbackData({ email: "", feedback: "" });
+    }
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
+    alert(error.response?.data?.message || "Failed to submit feedback. Please try again later.");
+  }
+};
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -433,6 +473,35 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FEF7D7] to-white">
+
+      {/* Option 2: Direct Price Focus */}
+<div className="bg-gradient-to-r from-[#9C0B13] via-indigo-900 to-[#9C0B13] py-3 md:py-4 px-4 md:px-6 text-center relative overflow-hidden">
+  <div className="absolute inset-0 opacity-20">
+    <div className="absolute top-0 left-1/4 w-12 md:w-20 h-12 md:h-20 bg-[#FEF7D7] rounded-full animate-pulse blur-sm"></div>
+    <div className="absolute top-2 right-1/4 w-10 md:w-16 h-10 md:h-16 bg-yellow-300 rounded-full animate-bounce blur-sm"></div>
+  </div>
+
+  <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4">
+    <Sparkles className="hidden sm:block w-5 h-5 md:w-8 md:h-8 text-yellow-300 animate-spin-slow" />
+    
+    <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#FEF7D7] animate-pulse">
+        ✨ Freshly Launched ✨
+      </h3>
+      <span className="text-sm sm:text-base md:text-xl text-yellow-300 font-semibold">
+        Premium Quality, Honest Pricing
+      </span>
+    </div>
+
+    <Sparkles className="hidden sm:block w-5 h-5 md:w-8 md:h-8 text-yellow-300 animate-spin-slow" />
+    
+    <div className="mt-2 sm:mt-0 bg-yellow-400 text-[#9C0B13] px-3 md:px-4 py-1 md:py-2 rounded-full font-bold text-xs md:text-sm animate-bounce shadow-lg whitespace-nowrap">
+      💰 Best Prices Ever
+    </div>
+  </div>
+
+  <div className="absolute bottom-0 left-0 right-0 h-0.5 md:h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse"></div>
+</div>
       {/* Energization Popup */}
       {showEnergizationPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4">
@@ -1330,6 +1399,95 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      {/* Feedback Section */}
+<section
+  id="feedback"
+  data-animate
+  className={`py-20 px-6 bg-gradient-to-br from-[#FEF7D7] to-yellow-50 relative overflow-hidden transform transition-all duration-1000 ${
+    isVisible.feedback
+      ? "translate-y-0 opacity-100"
+      : "translate-y-10 opacity-0"
+  }`}
+>
+  {/* Background Elements */}
+  <div className="absolute inset-0 opacity-10">
+    <div className="absolute top-20 right-20 w-32 h-32 bg-[#9C0B13]/20 rounded-full animate-pulse"></div>
+    <div className="absolute bottom-32 left-16 w-24 h-24 bg-[#9C0B13]/15 rounded-full animate-bounce delay-1000"></div>
+  </div>
+
+  <div className="container mx-auto relative z-10">
+    <div className="text-center mb-16">
+      {/* Icon */}
+      <div className="mb-8 flex justify-center">
+        <div className="w-20 h-20 bg-gradient-to-br from-[#9C0B13] to-red-700 rounded-full flex items-center justify-center animate-pulse shadow-2xl">
+          <Heart className="w-10 h-10 text-[#FEF7D7]" />
+        </div>
+      </div>
+
+      <h2 className="text-5xl font-bold text-[#9C0B13] mb-4">
+        We Value Your Feedback
+      </h2>
+      <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        Help us serve you better. Share your thoughts and suggestions with us
+      </p>
+      <div className="w-24 h-1 bg-gradient-to-r from-[#9C0B13] to-red-400 mx-auto mt-6"></div>
+    </div>
+
+    {/* Feedback Form */}
+    <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-2 border-[#9C0B13]/10">
+      <div className="space-y-6">
+        {/* Email Field */}
+        <div className="group">
+          <label className="flex items-center text-lg font-semibold text-[#9C0B13] mb-3">
+            <Mail className="w-5 h-5 mr-3 text-red-600" />
+            Your Email Address
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={feedbackData.email}
+            onChange={handleFeedbackChange}
+            placeholder="your.email@example.com"
+            className="w-full px-6 py-4 bg-[#FEF7D7]/30 border-2 border-[#9C0B13]/20 rounded-2xl text-[#9C0B13] text-lg font-medium placeholder-gray-500 focus:outline-none focus:border-[#9C0B13] focus:bg-[#FEF7D7]/50 transition-all duration-300"
+            required
+          />
+        </div>
+
+        {/* Feedback Box */}
+        <div className="group">
+          <label className="flex items-center text-lg font-semibold text-[#9C0B13] mb-3">
+            <Sparkles className="w-5 h-5 mr-3 text-red-600" />
+            Your Feedback & Suggestions
+          </label>
+          <textarea
+            name="feedback"
+            value={feedbackData.feedback}
+            onChange={handleFeedbackChange}
+            rows="6"
+            placeholder="Share your experience, suggestions, or any thoughts you'd like us to know..."
+            className="w-full px-6 py-4 bg-[#FEF7D7]/30 border-2 border-[#9C0B13]/20 rounded-2xl text-[#9C0B13] text-lg font-medium placeholder-gray-500 focus:outline-none focus:border-[#9C0B13] focus:bg-[#FEF7D7]/50 transition-all duration-300 resize-none"
+            required
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="text-center pt-4">
+          <button
+            type="button"
+            onClick={handleFeedbackSubmit}
+            className="group bg-gradient-to-r from-[#9C0B13] to-red-700 hover:from-red-700 hover:to-[#9C0B13] text-[#FEF7D7] px-10 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center mx-auto"
+          >
+            <Send className="w-5 h-5 mr-3 group-hover:animate-pulse" />
+            Submit Feedback
+          </button>
+          <p className="text-gray-500 mt-4 text-sm">
+            Your feedback helps us improve our services
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
     </div>
   );
 };

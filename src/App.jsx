@@ -1,5 +1,6 @@
 import { useLocation, Routes, Route, matchPath } from "react-router-dom";
 
+import ProtectedRoute from "./Components/Admin/ProtectedRoutes"; // or './utils/ProtectedRoute'
 import AstrologyHomepage from './pages/Home'
 import AstrologyLogin from './pages/Login';
 import AstrologyNavbar from './Components/Navbar';
@@ -35,6 +36,7 @@ import PrivacyPolicyPage from "./pages/Privacy_Policy";
 import TermsConditionsPage from "./pages/Terms_and_Condition";
 import { useEffect } from "react";
 import AdminReviews from "./Components/Admin/AdminReview";
+import AdminFeedback from "./Components/Admin/AdminFeedback";
 
 function ScrollToTop() {
   const location = useLocation();
@@ -68,7 +70,9 @@ function App() {
     "/adminproductrequest",
     "/login",
     "/forgotuseremail",
-    "/paymentdemo"
+    "/paymentdemo",
+    "/adminReview",
+    "/adminfeedback"
   ];
 
   // Check if current path matches any of the patterns
@@ -107,21 +111,23 @@ function App() {
 
         
         {/* Admin Routes */}
-        <Route path="/adminpanel" element={<AdminSidePanel />} />
-        <Route path="/admindashboard" element={<AdminDashboard />} />
-        <Route path="/adminsidenav" element={<AdminSideNav />} />
-        <Route path="/adminusers" element={<AdminUsersView />} />
-        <Route path="/adminusers/:id" element={<AdminSingleUser />} />
-        <Route path="/adminproducts" element={<AdminProductsView />} />
-        <Route path="/adminupdateuser/:id" element={<AdminUpdateUser />} />
-        <Route path="/adminsingleproductview/:id" element={<AdminProductDetail />} />
-        <Route path="/adminlogin" element={<AdminLogin />} />
-        <Route path="/adminorders" element={<AdminOrders />} />
-        <Route path="/adminorders/:id" element={<AdminSingleOrder />} />
-        <Route path="/adminvisits" element={<AdminVisits />} />
-        <Route path="/adminvisits/:id" element={<AdminSingleVisit />} />
-        <Route path="/adminproductrequest" element={<AdminProductRequest />} />
-        <Route path="/adminReview" element={<AdminReviews />} />
+      {/* Admin Routes */}
+<Route path="/adminlogin" element={<AdminLogin />} />
+<Route path="/adminpanel" element={<ProtectedRoute><AdminSidePanel /></ProtectedRoute>} />
+<Route path="/admindashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+<Route path="/adminsidenav" element={<ProtectedRoute><AdminSideNav /></ProtectedRoute>} />
+<Route path="/adminusers" element={<ProtectedRoute><AdminUsersView /></ProtectedRoute>} />
+<Route path="/adminusers/:id" element={<ProtectedRoute><AdminSingleUser /></ProtectedRoute>} />
+<Route path="/adminproducts" element={<ProtectedRoute><AdminProductsView /></ProtectedRoute>} />
+<Route path="/adminupdateuser/:id" element={<ProtectedRoute><AdminUpdateUser /></ProtectedRoute>} />
+<Route path="/adminsingleproductview/:id" element={<ProtectedRoute><AdminProductDetail /></ProtectedRoute>} />
+<Route path="/adminorders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
+<Route path="/adminorders/:id" element={<ProtectedRoute><AdminSingleOrder /></ProtectedRoute>} />
+<Route path="/adminvisits" element={<ProtectedRoute><AdminVisits /></ProtectedRoute>} />
+<Route path="/adminvisits/:id" element={<ProtectedRoute><AdminSingleVisit /></ProtectedRoute>} />
+<Route path="/adminproductrequest" element={<ProtectedRoute><AdminProductRequest /></ProtectedRoute>} />
+<Route path="/adminReview" element={<ProtectedRoute><AdminReviews /></ProtectedRoute>} />
+<Route path="/adminfeedback" element={<ProtectedRoute><AdminFeedback /></ProtectedRoute>} />
         
         {/* 404 Route - should be last */}
         <Route path="*" element={<div className="p-8 text-center">Page Not Found - 404</div>} />

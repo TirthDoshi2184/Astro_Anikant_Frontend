@@ -774,31 +774,31 @@ onClick={() => window.location.href = '/products'}
           <div className="bg-gradient-to-r from-[#FEF7D7] to-white p-6 rounded-2xl shadow-lg border-2 border-[#9C0B13]/20">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3">
-<div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
-  <Star className="w-5 h-5 sm:w-6 sm:h-6 text-[#FEF7D7] animate-spin" />
-</div>
-<div>
-  <div className="font-bold text-[#9C0B13] text-sm sm:text-base">Free Shipping</div>
-</div>
+  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
+    <Star className="w-5 h-5 sm:w-6 sm:h-6 text-[#FEF7D7] animate-spin" />
+  </div>
+  <div>
+    <div className="font-bold text-[#9C0B13] text-sm sm:text-base">Free Shipping</div>
+  </div>
 </div>
 
-              <div className="flex items-center justify-center space-x-3">
-                <div className="w-12 h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-[#FEF7D7] animate-pulse" />
-                </div>
-                <div>
-                  <div className="font-bold text-[#9C0B13]">Temple Blessed Products</div>
-                </div>
-              </div>
+<div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3">
+  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
+    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#FEF7D7] animate-pulse" />
+  </div>
+  <div>
+    <div className="font-bold text-[#9C0B13] text-sm sm:text-base">Temple Blessed Products</div>
+  </div>
+</div>
 
-              <div className="flex items-center justify-center space-x-3">
-                <div className="w-12 h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-[#FEF7D7] animate-bounce" />
-                </div>
-                <div>
-                  <div className="font-bold text-[#9C0B13]">Satisfaction guaranteed</div>
-                </div>
-              </div>
+<div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3">
+  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#9C0B13] rounded-full flex items-center justify-center">
+    <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-[#FEF7D7] animate-bounce" />
+  </div>
+  <div>
+    <div className="font-bold text-[#9C0B13] text-sm sm:text-base">Satisfaction guaranteed</div>
+  </div>
+</div>
             </div>
           </div>
         </div>

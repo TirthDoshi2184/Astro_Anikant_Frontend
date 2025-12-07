@@ -14,7 +14,7 @@ export const AdminReviews = () => {
   const getAllReviews = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:1921/review/all");
+      const response = await fetch("https://astroanikantbackend-2.onrender.com/review/all");
       const data = await response.json();
       setReviews(data.data);
       setFilteredReviews(data.data);
@@ -30,7 +30,7 @@ export const AdminReviews = () => {
     if (window.confirm("Are you sure you want to delete this review?")) {
       try {
         setDeleteLoading(reviewId);
-        const response = await fetch(`http://localhost:1921/review/delete/${reviewId}`, {
+        const response = await fetch(`https://astroanikantbackend-2.onrender.com/review/delete/${reviewId}`, {
           method: 'DELETE'
         });
         const data = await response.json();
@@ -121,7 +121,7 @@ export const AdminReviews = () => {
   return (
     <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
       {/* Sidebar */}
-        <AdminSidebar activeMenuItem={activeMenuItem} />
+        <AdminSidebar activeMenuItem='reviews'/>
       {/* Main Content */}
       <div className="flex-1 ml-64 flex flex-col h-screen">
         {/* Header */}

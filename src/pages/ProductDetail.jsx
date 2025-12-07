@@ -337,7 +337,7 @@ const handleSubmitReview = async () => {
         draggable: true,
         className: "mystical-toast",
         bodyClassName: "mystical-body",
-        closeButton: false
+        closeButton: true
       }
     );
     return;
@@ -360,7 +360,7 @@ const handleSubmitReview = async () => {
         draggable: true,
         className: "mystical-toast",
         bodyClassName: "mystical-body",
-        closeButton: false
+        closeButton: true
       }
     );
     return;
@@ -388,7 +388,7 @@ const handleSubmitReview = async () => {
           draggable: true,
           className: "mystical-toast",
           bodyClassName: "mystical-body",
-          closeButton: false
+          closeButton: true
         }
       );
       return;
@@ -428,7 +428,7 @@ const handleSubmitReview = async () => {
           draggable: true,
           className: "mystical-toast mystical-success",
           bodyClassName: "mystical-body",
-          closeButton: false
+          closeButton: true
         }
       );
 
@@ -456,7 +456,7 @@ const handleSubmitReview = async () => {
         draggable: true,
         className: "mystical-toast",
         bodyClassName: "mystical-body",
-        closeButton: false
+        closeButton: true
       }
     );
   } finally {
@@ -582,7 +582,7 @@ const handleMarkHelpful = async (reviewId) => {
         draggable: true,
         className: "mystical-toast mystical-update",
         bodyClassName: "mystical-body",
-        closeButton: false
+        closeButton: true
       }
     );
   } else {
@@ -603,7 +603,7 @@ const handleMarkHelpful = async (reviewId) => {
         draggable: true,
         className: "mystical-toast mystical-success",
         bodyClassName: "mystical-body",
-        closeButton: false
+        closeButton: true
       }
     );
   }
@@ -905,20 +905,51 @@ const handleMarkHelpful = async (reviewId) => {
                       
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 space-y-1">
-                    <p>
-                      <strong>SKU:</strong> {product.sku || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Stone Type:</strong> {product.stoneType}
-                    </p>
-                    <p>
-                      <strong>Weight:</strong> {getWeightDisplay()}
-                    </p>
-                    <p>
-                      <strong>Dimensions:</strong> {getDimensionsDisplay()}
-                    </p>
-                  </div>
+<div className="grid grid-cols-2 gap-3">
+  {/* SKU - Always show if available */}
+  {product.sku && (
+    <div className="relative overflow-hidden px-4 py-3 rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 shadow-sm hover:shadow-md transition-all duration-300 group">
+      <div className="absolute top-0 right-0 w-16 h-16 bg-purple-200 rounded-full opacity-20 -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-500"></div>
+      <div className="relative">
+        <p className="text-xs font-semibold text-purple-600 uppercase tracking-wide mb-1">SKU</p>
+        <p className="text-sm font-bold text-gray-800">{product.sku}</p>
+      </div>
+    </div>
+  )}
+  
+  {/* Stone Type - Only show if available */}
+  {product.stoneType && (
+    <div className="relative overflow-hidden px-4 py-3 rounded-xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 shadow-sm hover:shadow-md transition-all duration-300 group">
+      <div className="absolute top-0 right-0 w-16 h-16 bg-amber-200 rounded-full opacity-20 -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-500"></div>
+      <div className="relative">
+        <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">Stone Type</p>
+        <p className="text-sm font-bold text-gray-800">{product.stoneType}</p>
+      </div>
+    </div>
+  )}
+  
+  {/* Weight - Only show if available and not "N/A" */}
+  {getWeightDisplay() !== "N/A" && (
+    <div className="relative overflow-hidden px-4 py-3 rounded-xl border-2 border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-sm hover:shadow-md transition-all duration-300 group">
+      <div className="absolute top-0 right-0 w-16 h-16 bg-teal-200 rounded-full opacity-20 -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-500"></div>
+      <div className="relative">
+        <p className="text-xs font-semibold text-teal-600 uppercase tracking-wide mb-1">Weight</p>
+        <p className="text-sm font-bold text-gray-800">{getWeightDisplay()}</p>
+      </div>
+    </div>
+  )}
+  
+  {/* Dimensions - Only show if available and not "N/A" */}
+  {getDimensionsDisplay() !== "N/A" && (
+    <div className="relative overflow-hidden px-4 py-3 rounded-xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50 shadow-sm hover:shadow-md transition-all duration-300 group">
+      <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-200 rounded-full opacity-20 -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-500"></div>
+      <div className="relative">
+        <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">Dimensions</p>
+        <p className="text-sm font-bold text-gray-800">{getDimensionsDisplay()}</p>
+      </div>
+    </div>
+  )}
+</div>
                 </div>
 
                 {/* Pricing */}
@@ -933,25 +964,49 @@ const handleMarkHelpful = async (reviewId) => {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2 mb-6">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        product.stock > 0
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {product.stock > 0
-                        ? `In Stock (${product.stock} available)`
-                        : "Out of Stock"}
-                    </span>
-                    {product.isFeatured && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        Featured
-                      </span>
-                    )}
-                  </div>
-
+                 <div className="grid grid-cols-2 gap-3 mb-6">
+  <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border ${
+    product.stock > 0
+      ? "bg-green-50 border-green-200"
+      : "bg-red-50 border-red-200"
+  }`}>
+    <div className={`w-2 h-2 rounded-full ${
+      product.stock > 0 ? "bg-green-500" : "bg-red-500"
+    }`}></div>
+    <span className={`text-sm font-medium ${
+      product.stock > 0 ? "text-green-800" : "text-red-800"
+    }`}>
+      {product.stock > 0
+        ? `In Stock (${product.stock})`
+        : "Out of Stock"}
+    </span>
+  </div>
+  
+  <div className="flex items-center space-x-2 px-3 py-2 rounded-lg border bg-blue-50 border-blue-200">
+    <Shield className="w-4 h-4 text-blue-600" />
+    <span className="text-sm font-medium text-blue-800">
+      100% Natural
+    </span>
+  </div>
+  
+  {product.isFeatured && (
+    <div className="flex items-center space-x-2 px-3 py-2 rounded-lg border bg-yellow-50 border-yellow-200">
+      <Star className="w-4 h-4 text-yellow-600 fill-current" />
+      <span className="text-sm font-medium text-yellow-800">
+        Featured
+      </span>
+    </div>
+  )}
+  
+  {product.certification && (
+    <div className="flex items-center space-x-2 px-3 py-2 rounded-lg border bg-purple-50 border-purple-200">
+      <Shield className="w-4 h-4 text-purple-600" />
+      <span className="text-sm font-medium text-purple-800">
+        Certified
+      </span>
+    </div>
+  )}
+</div>
                   {/* Quantity Selector */}
                   <div className="flex items-center space-x-4 mb-6">
                     <label className="text-sm font-medium text-gray-700">
@@ -1012,26 +1067,7 @@ const handleMarkHelpful = async (reviewId) => {
               </div>
             </div>
 
-            {/* Expert Consultation CTA */}
-            <div className="bg-gradient-to-r from-red-800 to-red-900 rounded-2xl p-6 text-white shadow-xl">
-              <div className="flex items-center space-x-4">
-                <MessageCircle className="w-8 h-8" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">
-                    Need Expert Guidance?
-                  </h3>
-                  <p className="text-red-100">
-                    Consult our astrologer for personalized recommendations
-                  </p>
-                </div>
-                <button
-                  className="bg-white text-red-800 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-200 transition-all duration-300"
-                  onClick={() => (window.location.href = "/booking")}
-                >
-                  Book Now
-                </button>
-              </div>
-            </div>
+           
           </div>
         </div>
 
@@ -1320,6 +1356,26 @@ const handleMarkHelpful = async (reviewId) => {
 )}
           </div>
         </div>
+         {/* Expert Consultation CTA */}
+            <div className="bg-gradient-to-r from-red-800 to-red-900 rounded-2xl p-6 text-white shadow-xl m-5">
+              <div className="flex items-center space-x-6">
+                <MessageCircle className="w-8 h-8" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">
+                    Need Expert Guidance?
+                  </h3>
+                  <p className="text-red-100">
+                    Consult our astrologer for personalized recommendations
+                  </p>
+                </div>
+                <button
+                  className="bg-white text-red-800 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-200 transition-all duration-300"
+                  onClick={() => (window.location.href = "/booking")}
+                >
+                  Book Now
+                </button>
+              </div>
+            </div>
 
      {/* Related Products */}
 <div className="mt-16">

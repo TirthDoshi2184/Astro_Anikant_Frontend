@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
+import AdminSidebar from './AdminSidePanel';
 
 export const AdminSingleVisit = () => {
     const location = useLocation();
@@ -141,7 +142,7 @@ export const AdminSingleVisit = () => {
     return (
         <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
             {/* Sidebar - Fixed */}
-            <AdminSidebar activeMenuItem={activeMenuItem} />
+            <AdminSidebar activeMenuItem='visits'/>
             {/* Main Content - With left margin to account for fixed sidebar */}
             <div className="flex-1 ml-64 p-6 overflow-y-auto">
                 <div className="max-w-4xl mx-auto">

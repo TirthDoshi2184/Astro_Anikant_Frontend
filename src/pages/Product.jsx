@@ -124,7 +124,14 @@ filtered.sort((a, b) => {
 const clearAllFilters = () => {
   setPriceRange([0, 50000]);
   setSearchQuery('');
+  setSortBy('popularity');
   setCurrentPage(1);
+  
+  // Clear URL parameters
+  window.history.pushState({}, '', window.location.pathname);
+  
+  // Fetch all products without any filters
+  fetchProducts();
 };
 
   const clearCategoryFilter = () => {
@@ -295,8 +302,16 @@ const clearAllFilters = () => {
     {currentProducts.map(product => (
       <div
         key={product._id}
-        className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer flex flex-col h-full"
-        onClick={() => navigate(`/productdetail/${product._id}`)}
+        className={`bg-white rounded-lg shadow-md transition-shadow overflow-hidden group flex flex-col h-full ${
+  product.stock > 0 && product.isActive 
+    ? 'hover:shadow-lg cursor-pointer' 
+    : 'opacity-60 cursor-not-allowed'
+}`}
+        onClick={() => {
+  if (product.stock > 0 && product.isActive) {
+    navigate(`/productdetail/${product._id}`);
+  }
+}}
       >
         {/* Product Image */}
         <div className="relative overflow-hidden">
@@ -331,13 +346,14 @@ const clearAllFilters = () => {
           </div>
 
           {/* Stock Status - Mobile Optimized */}
-          <div className="absolute bottom-2 left-2">
-            <span className={`px-1.5 py-0.5 rounded text-xs font-semibold ${
-              product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}>
-              {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-            </span>
-          </div>
+         {/* Stock Status - Mobile Optimized - Only show if in stock and active */}
+{product.stock > 0 && product.isActive && (
+  <div className="absolute bottom-2 left-2">
+    <span className="px-1.5 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">
+      In Stock
+    </span>
+  </div>
+)}
         </div>
         
         {/* Product Info - Mobile Optimized */}

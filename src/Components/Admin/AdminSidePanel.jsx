@@ -1,14 +1,16 @@
 import { Users, Package, ShoppingCart, Star, Moon, Home, BarChart3, LogOut, MessageSquare, ShoppingBag } from "lucide-react";
+import { FcFeedback } from "react-icons/fc";
 
 export const AdminSidebar = ({ activeMenuItem = 'dashboard' }) => {
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
     { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
     { id: 'products', label: 'Products', icon: Star, link: '/adminproducts' },
-    { id: 'inquiry', label: 'Visits', icon: Moon, link: '/adminvisits' },
+    { id: 'visits', label: 'Consultation', icon: Moon, link: '/adminvisits' },
     { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
     { id: 'reviews', label: 'Reviews', icon: MessageSquare, link: '/adminReview' },
     { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
+    { id: 'feedback', label:'Feedback', icon:FcFeedback, link:'/adminfeedback'},
     { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
   ];
 

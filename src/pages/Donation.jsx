@@ -324,7 +324,7 @@ const handlePaymentComplete = async () => {
                 <h4 className="text-lg font-semibold text-[#9C0B13] mb-4">Scan QR Code</h4>
                 <div className="bg-white p-4 rounded-xl shadow-lg inline-block">
                     <img 
-                        src="https://res.cloudinary.com/drl7llkoc/image/upload/v1759136986/WhatsApp_Image_2025-09-25_at_15.32.17_ed31f4e4_zna1gt.jpg" // Replace with your actual QR code
+                        src="https://res.cloudinary.com/dnbfumeob/image/upload/v1761578537/Screenshot_2025-10-27_205150_qwu2mg.png" // Replace with your actual QR code
                         alt="UPI QR Code" 
                         className="w-80 h-80 mx-auto"
                     />

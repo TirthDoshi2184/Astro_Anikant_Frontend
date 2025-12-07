@@ -29,6 +29,7 @@ import {
   Package
 } from 'lucide-react';
 import axios from 'axios';
+import AdminSidebar from './AdminSidePanel';
 
 export const AdminSingleUser = () => {
   const [user, setUser] = useState({});
