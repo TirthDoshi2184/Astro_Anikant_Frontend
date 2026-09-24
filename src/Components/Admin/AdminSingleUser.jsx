@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-
-// Icons
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios'
 import {
   User,
   Mail,
@@ -9,304 +8,305 @@ import {
   ShoppingBag,
   Trash2,
   Edit,
-  ArrowLeft,
-  Search,
-  UserPlus,
-  Users,
-  Settings,
-  LogOut,
-  BarChart3,
-  Eye,
-  Home,
-  Star,
-  Moon,
-  Sun,
   CheckCheckIcon,
-  MapPinIcon,
   MapPin,
-  GalleryVerticalEnd,
   VenusAndMars,
-  Package
-} from 'lucide-react';
-import axios from 'axios';
-import AdminSidebar from './AdminSidePanel';
+  Package,
+} from 'lucide-react'
+import AdminSidebar from './AdminSidePanel'
+
+const API = 'https://astroanikantbackend-2.onrender.com'
+
+const STATUS_STYLES = {
+  pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  confirmed: 'bg-blue-100 text-blue-800 border-blue-200',
+  processing: 'bg-purple-100 text-purple-800 border-purple-200',
+  shipped: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  completed: 'bg-green-100 text-green-800 border-green-200',
+  delivered: 'bg-green-100 text-green-800 border-green-200',
+  cancelled: 'bg-red-100 text-red-800 border-red-200',
+}
+
+const normalizeStatus = (s) => s?.toString().toLowerCase().trim() || 'unknown'
+
+const formatDate = (d) => {
+  if (!d) return 'N/A'
+  const date = new Date(d)
+  if (isNaN(date.getTime())) return 'N/A'
+  return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+// Orders don't reliably store `amount`, so fall back to summing the cart items
+const getOrderTotal = (order) => {
+  if (Number(order?.amount) > 0) return Number(order.amount)
+  const items = order?.cart?.items || []
+  return items.reduce((sum, item) => {
+    const p = item?.product
+    const price = Number(p?.discountedPrice) > 0 ? Number(p.discountedPrice) : Number(p?.price) || 0
+    return sum + price * (item?.quantity || 1)
+  }, 0)
+}
+
+const InfoTile = ({ icon: Icon, label, value }) => (
+  <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
+    <Icon className="text-red-600 mt-1 shrink-0" size={18} />
+    <div className="min-w-0">
+      <p className="text-sm text-red-600 font-medium">{label}</p>
+      <p className="font-semibold text-red-900 break-words">{value}</p>
+    </div>
+  </div>
+)
 
 export const AdminSingleUser = () => {
-  const [user, setUser] = useState({});
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const { id } = useParams();
-
-  console.log("userId value:", id, typeof id);
-  console.log(id, "dsknk");
-
-  const getSingleUser = async () => {
-    const response = await axios.get(`https://astroanikantbackend-2.onrender.com/user/getsingleuser/${id}`)
-    setUser(response.data.data)
-    console.log(response.data.data);
-    console.log("user", user);
-  }
-
-  useEffect(() => {
-    getSingleUser()
-  }, [])
-
-  console.log(user?.isActive);
-
-  // Get current location to determine active menu item
-  const location = useLocation();
-
-  // Determine active menu item based on current path
-  const getActiveMenuItem = () => {
-    const path = location.pathname;
-    if (path.includes('/adminusers')) return 'users';
-    if (path.includes('/adminproducts')) return 'astrology';
-    if (path.includes('/admininquiry')) return 'predictions';
-    if (path.includes('/adminvisits')) return 'reports';
-    if (path.includes('/adminsettings')) return 'settings';
-    if (path.includes('/admindashboard')) return 'dashboard';
-    return 'users'; // default for this component
-  };
-
-  const [activeMenuItem, setActiveMenuItem] = useState(getActiveMenuItem());
-
-  // Mock data - replace with actual API calls in real implementation
-  useEffect(() => {
-    // Simulate loading
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  // Update active menu item when location changes
-  useEffect(() => {
-    setActiveMenuItem(getActiveMenuItem());
-  }, [location.pathname]);
-
-  const deleteUser = async () => {
-    // Mock delete function - replace with actual API call
-
-    const response = await axios.delete(`https://astroanikantbackend-2.onrender.com/user/deleteuser/${id}`)
-    navigate("/adminusers")
-    alert('User deleted successfully');
-
-    // In real implementation: navigate('/adminusers');
-  };
-
-  const userOrders = orders.filter(order => order?.user_id?._id === user?._id);
+  const { id } = useParams()
   const navigate = useNavigate()
-  const handleDeleteClick = () => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      deleteUser();
+
+  const [user, setUser] = useState(null)
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [ordersError, setOrdersError] = useState('')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    const load = async () => {
+      setLoading(true)
+      setError('')
+      setOrdersError('')
+
+      // Load user and orders independently so one failing doesn't hide the other
+      const [userRes, ordersRes] = await Promise.allSettled([
+        axios.get(`${API}/user/getsingleuser/${id}`),
+        axios.get(`${API}/order/user/${id}`),
+      ])
+      if (cancelled) return
+
+      if (userRes.status === 'fulfilled') {
+        setUser(userRes.value.data?.data || null)
+      } else {
+        console.error('User fetch failed:', userRes.reason)
+        setError('Could not load this user.')
+      }
+
+      if (ordersRes.status === 'fulfilled') {
+        setOrders(Array.isArray(ordersRes.value.data?.data) ? ordersRes.value.data.data : [])
+      } else {
+        console.error('Orders fetch failed:', ordersRes.reason)
+        setOrdersError('Could not load order history.')
+      }
+
+      setLoading(false)
     }
-  };
 
-  const handleLogout = () => {
-    // Add your logout logic here
-    localStorage.removeItem('adminToken');
-    window.location.href = '/adminlogin';
-  };
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [id])
 
-  const sidebarItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3, link: '/admindashboard' },
-    { id: 'users', label: 'Users', icon: Users, link: '/adminusers' },
-    { id: 'astrology', label: 'Products', icon: Star, link: '/adminproducts' },
-    { id: 'predictions', label: 'Visits', icon: Moon, link: '/adminvisits' },
-    { id: 'orders', label: 'Orders Booked', icon: ShoppingBag, link: '/adminorders' },
-    { id: 'settings', label: 'Settings', icon: Settings, link: '/admin/settings' },
-    { id: 'product-requests', label: 'Product Requests', icon: Package, link: '/adminproductrequest' },
-
-    { id: 'logout', label: 'Logout', icon: LogOut, link: '/adminlogin' }
-  ];
+  const handleDeleteClick = async () => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return
+    try {
+      await axios.delete(`${API}/user/deleteuser/${id}`)
+      navigate('/adminusers')
+    } catch (err) {
+      console.error(err)
+      alert(`Failed to delete user: ${err.response?.data?.message || err.message}`)
+    }
+  }
 
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600" />
       </div>
-    );
+    )
   }
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100">
-      {/* Sidebar - Fixed */}
-      <AdminSidebar activeMenuItem={activeMenuItem} />
-      {/* Main Content Area */}
-      <div className="flex-1 ml-64 flex flex-col h-screen">
-        {/* Header Section - Fixed */}
+      <AdminSidebar activeMenuItem="users" />
+
+      {/* Main area: offset for the fixed sidebar only on large screens */}
+      <div className="flex-1 lg:ml-64 flex flex-col h-screen min-w-0">
+        {/* Header (pt-16 on mobile leaves room for the sidebar's menu button) */}
         <div className="bg-gradient-to-r from-red-900 via-red-800 to-red-900 shadow-2xl flex-shrink-0">
-          <div className="px-8 py-6">
-            <div className="flex items-center space-x-4">
-              {/* <Link 
-                to="/adminusers"
-                className="flex items-center space-x-2 px-4 py-2 bg-amber-400/20 text-amber-100 rounded-xl hover:bg-amber-400/30 transition-all duration-300"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Back to Users</span>
-              </Link> */}
-              <div>
-                <h1 className="text-3xl font-bold text-amber-50">User Details</h1>
-                <p className="text-amber-200">View and manage user information</p>
-              </div>
-            </div>
+          <div className="px-4 sm:px-8 pt-16 pb-5 lg:py-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-amber-50">User Details</h1>
+            <p className="text-amber-200 text-sm sm:text-base">View and manage user information</p>
           </div>
         </div>
 
-        {/* Scrollable Content */}
+        {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
-            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-red-900/20 overflow-hidden">
-              {/* User Header */}
-              <div className="px-6 py-8 bg-gradient-to-r from-red-800 to-red-900 text-amber-50">
-                <div className="flex flex-col md:flex-row items-center">
-                  <div className="bg-amber-400/20 rounded-full p-6 mb-4 md:mb-0 md:mr-6">
-                    <User size={48} className="text-amber-300" />
-                  </div>
-                  <div className="text-center md:text-left">
-                    <h1 className="text-2xl font-bold text-amber-50">{user?.name || 'User Name'}</h1>
-                    <p className="mt-1 text-amber-200">{user?.email || 'user@example.com'}</p>
-                    <p className="mt-2 text-xs bg-amber-400/20 rounded-full px-3 py-1 inline-block text-amber-100">
-                      ID: {user?._id?.slice(-8) || 'Unknown'}...
-                    </p>
+          <div className="p-4 sm:p-6 lg:p-8">
+            {error || !user ? (
+              <div className="bg-white/80 rounded-2xl border-2 border-red-900/20 p-10 text-center">
+                <p className="text-red-700">{error || 'User not found.'}</p>
+              </div>
+            ) : (
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-red-900/20 overflow-hidden">
+                {/* User header */}
+                <div className="px-4 sm:px-6 py-6 sm:py-8 bg-gradient-to-r from-red-800 to-red-900 text-amber-50">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                    <div className="bg-amber-400/20 rounded-full p-5 shrink-0">
+                      <User size={40} className="text-amber-300" />
+                    </div>
+                    <div className="text-center sm:text-left min-w-0">
+                      <h2 className="text-xl sm:text-2xl font-bold text-amber-50 break-words">
+                        {user.name || 'User Name'}
+                      </h2>
+                      <p className="mt-1 text-amber-200 break-all">{user.email || 'user@example.com'}</p>
+                      <p className="mt-2 text-xs bg-amber-400/20 rounded-full px-3 py-1 inline-block text-amber-100">
+                        ID: {user._id?.slice(-8) || 'Unknown'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* User Details */}
-              <div className="p-6">
-                <h2 className="text-lg font-semibold mb-4 text-red-900 flex items-center">
-                  <User size={18} className="mr-2 text-red-600" />
-                  User Information
-                </h2>
+                <div className="p-4 sm:p-6">
+                  {/* User information */}
+                  <h3 className="text-lg font-semibold mb-4 text-red-900 flex items-center">
+                    <User size={18} className="mr-2 text-red-600" />
+                    User Information
+                  </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
-                    <User className="text-red-600 mt-1" size={18} />
-                    <div>
-                      <p className="text-sm text-red-600 font-medium">Full Name</p>
-                      <p className="font-semibold text-red-900">{user?.name || 'Not provided'}</p>
-                    </div>
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <InfoTile icon={User} label="Full Name" value={user.name || 'Not provided'} />
+                    <InfoTile icon={Mail} label="Email Address" value={user.email || 'Not provided'} />
+                    <InfoTile icon={Phone} label="Mobile Number" value={user.phone || 'Not provided'} />
+                    <InfoTile icon={VenusAndMars} label="Gender" value={user.gender || 'Not provided'} />
+                    <InfoTile
+                      icon={CheckCheckIcon}
+                      label="Status"
+                      value={user.isActive === true ? 'Active' : 'Inactive'}
+                    />
 
-                  <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
-                    <Mail className="text-red-600 mt-1" size={18} />
-                    <div>
-                      <p className="text-sm text-red-600 font-medium">Email Address</p>
-                      <p className="font-semibold text-red-900">{user?.email || 'Not provided'}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
-                    <Phone className="text-red-600 mt-1" size={18} />
-                    <div>
-                      <p className="text-sm text-red-600 font-medium">Mobile Number</p>
-                      <p className="font-semibold text-red-900">{user?.phone || 'Not provided'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
-                    <VenusAndMars className="text-red-600 mt-1" size={18} />
-                    <div>
-                      <p className="text-sm text-red-600 font-medium">Gender</p>
-                      <p className="font-semibold text-red-900">{user?.gender || 'Not provided'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
-                    <CheckCheckIcon className="text-red-600 mt-1" size={18} />
-                    <div>
-                      <p className="text-sm text-red-600 font-medium">isActive</p>
-                      <p className="font-semibold text-red-900">{user?.isActive === true ? "Active" : "Inactive"}</p>
-                    </div>
-                  </div>
-
-
-                  <div className="space-y-3">
-                    {user?.address?.length > 0 ? (
-                      user.address.map((addr, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl"
-                        >
-                          <MapPin className="text-red-600 mt-1" size={18} />
-                          <div>
-                            <p className="text-sm text-red-600 font-medium">Address {index + 1}</p>
-                            <p className="font-semibold text-red-900">
-                              {addr.societyName}, {addr.street}, {addr.city}, {addr.state},<br /> {addr.pincode}, {addr.country}
-                            </p>
-                          </div>
+                    <div className="space-y-3">
+                      {user.address?.length > 0 ? (
+                        user.address.map((addr, index) => (
+                          <InfoTile
+                            key={index}
+                            icon={MapPin}
+                            label={`Address ${index + 1}`}
+                            value={[addr.societyName, addr.street, addr.city, addr.state, addr.pincode, addr.country]
+                              .filter(Boolean)
+                              .join(', ')}
+                          />
+                        ))
+                      ) : (
+                        <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
+                          <MapPin className="text-gray-400 mt-1" size={18} />
+                          <p className="text-gray-500">No addresses provided</p>
                         </div>
-                      ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order history */}
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold mb-4 text-red-900 flex items-center">
+                      <ShoppingBag size={18} className="mr-2 text-red-600" />
+                      Order History ({orders.length})
+                    </h3>
+
+                    {ordersError ? (
+                      <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+                        {ordersError}
+                      </div>
+                    ) : orders.length > 0 ? (
+                      <div className="bg-gradient-to-r from-red-50 to-amber-50 rounded-xl p-3 sm:p-4 space-y-4">
+                        {orders.map((order) => {
+                          const items = order?.cart?.items || []
+                          return (
+                            <div
+                              key={order._id}
+                              className="bg-white p-4 rounded-xl border-2 border-red-100 hover:border-red-200 transition-colors"
+                            >
+                              <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+                                <div>
+                                  <p className="font-semibold text-red-900">
+                                    Order #{order._id?.slice(-8) || 'N/A'}
+                                  </p>
+                                  <p className="text-xs text-red-600">{formatDate(order.order_dt)}</p>
+                                </div>
+                                <span
+                                  className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border capitalize ${
+                                    STATUS_STYLES[normalizeStatus(order.status)] ||
+                                    'bg-gray-100 text-gray-800 border-gray-200'
+                                  }`}
+                                >
+                                  {order.status || 'Unknown'}
+                                </span>
+                              </div>
+
+                              <ul className="space-y-1 mb-3">
+                                {items.length > 0 ? (
+                                  items.map((item, i) => (
+                                    <li key={item._id || i} className="flex items-center gap-2 text-sm text-red-800">
+                                      <Package className="w-4 h-4 text-amber-600 shrink-0" />
+                                      <span className="min-w-0 break-words">
+                                        {item?.product?.name || 'Product unavailable'}
+                                      </span>
+                                      <span className="text-red-500 shrink-0">× {item?.quantity || 1}</span>
+                                    </li>
+                                  ))
+                                ) : (
+                                  <li className="text-sm text-red-500">No items found for this order</li>
+                                )}
+                              </ul>
+
+                              <div className="flex items-center justify-between gap-3 pt-3 border-t border-red-100">
+                                <Link
+                                  to={`/adminorders/${order._id}`}
+                                  className="text-sm font-medium text-red-700 hover:text-red-900 underline"
+                                >
+                                  View order
+                                </Link>
+                                <div className="text-right">
+                                  <p className="text-xs text-red-600 font-medium">Total</p>
+                                  <p className="text-lg sm:text-xl font-bold text-red-900">
+                                    ₹{getOrderTotal(order).toLocaleString('en-IN')}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
                     ) : (
-                      <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-xl">
-                        <MapPin className="text-gray-400 mt-1" size={18} />
-                        <p className="text-gray-500">No addresses provided</p>
+                      <div className="bg-gradient-to-r from-red-50 to-amber-50 rounded-xl p-8 text-center">
+                        <ShoppingBag size={32} className="mx-auto text-red-400 mb-2" />
+                        <p className="text-red-600 font-medium">No orders have been placed by this user</p>
+                        <p className="text-red-500 text-sm mt-1">User hasn't made any purchases yet</p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Orders Section */}
-                <div className="mt-8">
-                  <h2 className="text-lg font-semibold mb-4 text-red-900 flex items-center">
-                    <ShoppingBag size={18} className="mr-2 text-red-600" />
-                    Order History ({userOrders.length})
-                  </h2>
-
-                  {userOrders.length > 0 ? (
-                    <div className="bg-gradient-to-r from-red-50 to-amber-50 rounded-xl p-4">
-                      <div className="space-y-4">
-                        {userOrders.map((order, index) => (
-                          <div key={index} className="bg-white p-4 rounded-xl border-2 border-red-100 hover:border-red-200 transition-colors">
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="font-semibold text-red-900">Order #{order._id?.slice(-8) || 'N/A'}</p>
-                                <p className="text-sm text-red-700">
-                                  {order.product_id?.name || 'Product name unavailable'}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-sm text-red-600 font-medium">Amount</p>
-                                <p className="text-xl font-bold text-red-900">₹{order.halfamount || 0}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-gradient-to-r from-red-50 to-amber-50 rounded-xl p-8 text-center">
-                      <ShoppingBag size={32} className="mx-auto text-red-400 mb-2" />
-                      <p className="text-red-600 font-medium">No orders have been placed by this user</p>
-                      <p className="text-red-500 text-sm mt-1">User hasn't made any purchases yet</p>
-                    </div>
-                  )}
+                {/* Actions */}
+                <div className="px-4 sm:px-6 py-4 bg-gradient-to-r from-red-50 to-amber-50 border-t-2 border-red-200 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                  <button
+                    onClick={handleDeleteClick}
+                    className="flex items-center justify-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors shadow-lg"
+                  >
+                    <Trash2 size={18} className="mr-2" />
+                    Delete User
+                  </button>
+                  <Link
+                    to={`/adminupdateuser/${id}`}
+                    className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-xl shadow-lg"
+                  >
+                    <Edit size={18} className="mr-2" />
+                    Update User
+                  </Link>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="px-6 py-4 bg-gradient-to-r from-red-50 to-amber-50 border-t-2 border-red-200 flex flex-col md:flex-row gap-3 md:justify-end">
-                <button
-                  onClick={handleDeleteClick}
-                  className="flex items-center justify-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-600/40"
-                >
-                  <Trash2 size={18} className="mr-2" />
-                  Delete User
-                </button>
-
-                <Link
-
-                  to={`/adminupdateuser/${id}`}
-                  // onClick={() => alert('Update user functionality (mock)')}
-                  className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-amber-50 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-800/40"
-                >
-                  <Edit size={18} className="mr-2" />
-                  Update User
-                </Link>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
